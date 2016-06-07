@@ -1,0 +1,35 @@
+---
+- name     : Set variable store_dir
+  set_fact : store_dir={{variantdb_dir}}/repos/store
+  when     : store_dir is not defined
+
+- name     : Set variable GenomicsDB_dir
+  set_fact : GenomicsDB_dir={{store_dir}}/search_library/dependencies/GenomicsDB/
+  when     : GenomicsDB_dir is not defined
+
+- name     : Set variable GenomicsDB_bin_dir
+  set_fact : GenomicsDB_bin_dir={{GenomicsDB_dir}}/bin/
+  when     : GenomicsDB_bin_dir is not defined
+
+- name     : Set variable htslib_dir
+  set_fact : htslib_dir={{GenomicsDB_dir}}/dependencies/htslib
+  when     : htslib_dir is not defined
+
+- name     : Set variable store_branch
+  set_fact : store_branch={{default_store_branch}}
+  when     : store_branch is not defined
+
+- name : GIT pull store repo
+  git:
+    repo           : git@github.com:Intel-HSS/store.git
+    dest           : "{{store_dir}}"
+    key_file       : "{{ssh_key_dest_dir}}/{{ssh_key_file}}"
+    accept_hostkey : yes
+    recursive      : yes
+    force          : yes
+    version        : "{{ store_branch }}"
+  become         : yes
+  become_user    : "{{owner_user_name}}"
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"

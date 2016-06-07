@@ -1,0 +1,28 @@
+---
+
+- include_vars: gcc.yml
+
+- name: Download gcc source
+  command: curl {{ gcc_url }} -o {{ gcc_arc_path }}
+
+- name: install packages need for gcc build
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state=present"
+  with_items: "{{ dependency_libs }}"
+
+- name: Untar gcc source
+  command: chdir={{ gcc_tmp }} tar xjf {{gcc_arc_path}}
+
+- name: configure build
+  shell: chdir={{ gcc_path }} ./configure --disable-multilib --enable-languages=c,c++ --prefix={{ gcc_prefix }}
+
+- name: make gcc
+  shell: chdir={{ gcc_path }} make clean && make -j {{ (ansible_processor_cores / 1)|int }}
+
+- name: make install gcc
+  command: chdir={{ gcc_path }} make install
+
+- name: delete gcc temporary directory
+  file: path={{ gcc_path }} state=absent
+
+- name: delete gcc archive after install
+  file: path={{ gcc_arc_path }} state=absent

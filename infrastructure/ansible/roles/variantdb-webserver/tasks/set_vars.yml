@@ -1,0 +1,53 @@
+---
+# Update Variant DB variables
+- name     : Set variable array_name
+  set_fact : array_name={{default_array_name}}
+  when     : array_name is not defined
+
+# Update web server variables
+- name     : Set variable uwsgi_socket_path
+  set_fact : uwsgi_socket_path={{default_uwsgi_socket_path}}
+  when     : uwsgi_socket_path is not defined
+
+- name     : Set variable uwsgi_socket
+  set_fact : uwsgi_socket={{uwsgi_socket_path}}/ga4gh_{{array_name}}.sock
+  when     : uwsgi_socket is not defined
+
+- name     : Set variable system_services_path
+  set_fact : system_services_path={{default_system_services_path}}
+  when     : system_services_path is not defined
+
+- name     : Set variable system_services_extension
+  set_fact : system_services_extension={{default_system_services_extension}}
+  when     : system_services_extension is not defined
+
+- name     : Set variable webserver_port
+  set_fact : webserver_port={{default_webserver_port}}
+  when     : webserver_port is not defined
+
+- name     : Set variable import_path
+  set_fact : 
+    import_path     : "{{store_dir}}/test/data/"
+    skip_data_rsync : "true"
+  when     : import_path is not defined
+
+- name     : Set variable metadb_file
+  set_fact : metadb_file={{default_metadb_file}}
+  when     : metadb_file is not defined
+
+- name     : Set variable callset_mapping_file
+  set_fact : callset_mapping_file={{default_callset_mapping_file}}
+  when     : callset_mapping_file is not defined
+
+- name     : Set variable vid_mapping_file
+  set_fact : vid_mapping_file={{default_vid_mapping_file}}
+  when     : vid_mapping_file is not defined
+
+- name     : Set variable size_per_column_partition
+  set_fact : size_per_column_partition={{default_size_per_column_partition}}
+  when     : size_per_column_partition is not defined
+
+- name     : Set variable delete_and_create_tiledb_array
+  set_fact : delete_and_create_tiledb_array={{default_delete_and_create_tiledb_array}}
+  when     : delete_and_create_tiledb_array is not defined
+

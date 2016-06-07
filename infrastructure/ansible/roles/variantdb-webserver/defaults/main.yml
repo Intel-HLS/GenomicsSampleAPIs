@@ -1,0 +1,17 @@
+---
+default_array_name : test
+
+# Webserver defaults
+default_uwsgi_socket_path         : /var/uwsgi
+default_system_services_path      : /etc/systemd/system
+default_system_services_extension : service
+default_webserver_port            : 8990
+
+# files that will be used for importing
+default_metadb_file          : "test.db.gz"
+default_callset_mapping_file : "test.callset_mapping"
+default_vid_mapping_file     : "test.vid_mapping"
+
+# defaults for tiledb_loader
+default_size_per_column_partition : 3000
+default_delete_and_create_tiledb_array : false

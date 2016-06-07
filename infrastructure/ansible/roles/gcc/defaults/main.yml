@@ -1,0 +1,3 @@
+---
+gcc_default_version: 4.9.3
+gcc_prefix: /opt/gcc-{{ gcc_default_version }}

@@ -1,0 +1,14 @@
+---
+
+- name: Install PostgreSQL (Debian)
+  apt: name=postgresql{{ '-' ~ postgresql_version if postgresql_version is defined else '' }}
+
+- name: Get installed version
+  command: dpkg-query -f ${Version;3} --show postgresql
+  when: postgresql_version is not defined
+  register: postgresql_version_query
+  changed_when: false
+
+- name: Set version fact
+  set_fact: postgresql_version={{ postgresql_version_query.stdout }}
+  when: postgresql_version is not defined

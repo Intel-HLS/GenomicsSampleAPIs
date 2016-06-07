@@ -1,0 +1,17 @@
+[web_configuration]
+debug = False
+host = localhost
+
+[tiledb]
+workspace = {{ workspace_dir }}
+arrayname = {{ array_name }}
+fields = END,REF,ALT,QUAL,FILTER,BaseQRankSum,ClippingRankSum,MQRankSum,ReadPosRankSum,DP,MQ,MQ0,DP_FORMAT,MIN_DP,GQ,SB,AD,PL,AF,AN,AC,GT,PS
+sqlalchemy_database_uri = {{ metadb_uri }}
+
+[virtualenv]
+virtualenv = {{ ga4gh_virtualenv }}
+site_packages = {{ ga4gh_virtualenv }}/lib/python2.7/site-packages
+
+[auto_configuration]
+searchlib = {{ store_dir }}/search_library/lib/libquery.so
+

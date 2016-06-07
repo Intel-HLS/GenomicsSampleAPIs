@@ -1,0 +1,27 @@
+---
+- name: set variable dependencies_path
+  set_fact : dependencies_path={{store_dir}}/search_library/dependencies
+
+- name: set variable libcsv_path
+  set_fact: libcsv_path={{dependencies_path}}/libcsv
+
+- name: Create the libcsv_path 
+  file: 
+    path  : "{{libcsv_path}}"
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "{{permissions}}"
+    state : directory
+
+- name: Get package
+  get_url:
+    dest: "{{dependencies_path}}/libcsv.tar.gz"
+    url : http://downloads.sourceforge.net/project/libcsv/libcsv/libcsv-3.0.3/libcsv-3.0.3.tar.gz
+
+- name: Prepare libcsv package
+  shell: >
+    cd {{dependencies_path}} &&
+    tar xzf libcsv.tar.gz  -C {{libcsv_path}} --strip-components=1 &&
+    cd {{libcsv_path}} &&
+    ./configure &&
+    make

@@ -1,0 +1,217 @@
+{
+  "fields": {
+    "BaseQRankSum": {
+      "type": "float",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "ClippingRankSum": {
+      "type": "float",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "MQRankSum": {
+      "type": "float",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "ReadPosRankSum": {
+      "type": "float",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "MQ": {
+      "type": "float",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "MQ0": {
+      "type": "int",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "AF": {
+      "length": "A",
+      "type": "float",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "AN": {
+      "length": 1,
+      "type": "int",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "AC": {
+      "length": "A",
+      "type": "int",
+      "vcf_field_class": [
+        "INFO"
+      ]
+    },
+    "DP": {
+      "type": "int",
+      "vcf_field_class": [
+        "INFO",
+        "FORMAT"
+      ]
+    },
+    "MIN_DP": {
+      "type": "int",
+      "vcf_field_class": [
+        "FORMAT"
+      ]
+    },
+    "GQ": {
+      "type": "int",
+      "vcf_field_class": [
+        "FORMAT"
+      ]
+    },
+    "SB": {
+      "length": 4,
+      "type": "int",
+      "vcf_field_class": [
+        "FORMAT"
+      ]
+    },
+    "AD": {
+      "length": "R",
+      "type": "int",
+      "vcf_field_class": [
+        "FORMAT"
+      ]
+    },
+    "PL": {
+      "length": "G",
+      "type": "int",
+      "vcf_field_class": [
+        "FORMAT"
+      ]
+    },
+    "GT": {
+      "length": "P",
+      "type": "int",
+      "vcf_field_class": [
+        "FORMAT"
+      ]
+    },
+    "PS": {
+      "length": 1,
+      "type": "int",
+      "vcf_field_class": [
+        "FORMAT"
+      ]
+    }
+  },
+  "contigs": {
+    "1": {
+      "length": 249250621,
+      "tiledb_column_offset": 0
+    },
+    "2": {
+      "length": 243199373,
+      "tiledb_column_offset": 274175683
+    },
+    "3": {
+      "length": 198022430,
+      "tiledb_column_offset": 541694993
+    },
+    "4": {
+      "length": 191154276,
+      "tiledb_column_offset": 759519666
+    },
+    "5": {
+      "length": 180915260,
+      "tiledb_column_offset": 969789370
+    },
+    "6": {
+      "length": 171115067,
+      "tiledb_column_offset": 1168796156
+    },
+    "7": {
+      "length": 159138663,
+      "tiledb_column_offset": 1357022730
+    },
+    "8": {
+      "length": 146364022,
+      "tiledb_column_offset": 1532075259
+    },
+    "9": {
+      "length": 141213431,
+      "tiledb_column_offset": 1693075683
+    },
+    "10": {
+      "length": 135534747,
+      "tiledb_column_offset": 1848410457
+    },
+    "11": {
+      "length": 135006516,
+      "tiledb_column_offset": 1997498679
+    },
+    "12": {
+      "length": 133851895,
+      "tiledb_column_offset": 2146005847
+    },
+    "13": {
+      "length": 115169878,
+      "tiledb_column_offset": 2293242931
+    },
+    "14": {
+      "length": 107349540,
+      "tiledb_column_offset": 2419929797
+    },
+    "15": {
+      "length": 102531392,
+      "tiledb_column_offset": 2538014291
+    },
+    "16": {
+      "length": 90354753,
+      "tiledb_column_offset": 2650798822
+    },
+    "17": {
+      "length": 81195210,
+      "tiledb_column_offset": 2750189050
+    },
+    "18": {
+      "length": 78077248,
+      "tiledb_column_offset": 2839503781
+    },
+    "19": {
+      "length": 59128983,
+      "tiledb_column_offset": 2925388754
+    },
+    "20": {
+      "length": 63025520,
+      "tiledb_column_offset": 2990430635
+    },
+    "21": {
+      "length": 48129895,
+      "tiledb_column_offset": 3059758707
+    },
+    "22": {
+      "length": 51304566,
+      "tiledb_column_offset": 3112701592
+    },
+    "X": {
+      "length": 155270560,
+      "tiledb_column_offset": 3169136615
+    },
+    "Y": {
+      "length": 59373566,
+      "tiledb_column_offset": 3339934231
+    },
+    "M": {
+      "length": 16571,
+      "tiledb_column_offset": 3405245154
+    }
+  }
+}

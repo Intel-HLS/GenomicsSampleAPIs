@@ -1,0 +1,54 @@
+{% set major = ansible_distribution_major_version -%}
+[epel]
+name=Extra Packages for Enterprise Linux {{ major }} - $basearch
+baseurl=http://download.fedoraproject.org/pub/epel/{{ major }}/$basearch
+#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-{{ major }}&arch=$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ major }}
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux {{ major }} - $basearch - Debug
+baseurl=http://download.fedoraproject.org/pub/epel/{{ major }}/$basearch/debug
+#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-{{ major }}&arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ major }}
+gpgcheck=1
+
+[epel-source]
+name=Extra Packages for Enterprise Linux {{ major }} - $basearch - Source
+baseurl=http://download.fedoraproject.org/pub/epel/{{ major }}/SRPMS
+#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-source-{{ major }}&arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ major }}
+gpgcheck=1
+
+[epel-testing]
+name=Extra Packages for Enterprise Linux {{ major }} - Testing - $basearch
+baseurl=http://download.fedoraproject.org/pub/epel/testing/{{ major }}/$basearch
+#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=testing-epel{{ major }}&arch=$basearch
+failovermethod=priority
+enabled=0
+gpgcheck=1
+gpgkey=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ major }}
+
+[epel-testing-debuginfo]
+name=Extra Packages for Enterprise Linux {{ major }} - Testing - $basearch - Debug
+baseurl=http://download.fedoraproject.org/pub/epel/testing/{{ major }}/$basearch/debug
+#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=testing-debug-epel{{ major }}&arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ major }}
+gpgcheck=1
+
+[epel-testing-source]
+name=Extra Packages for Enterprise Linux {{ major }} - Testing - $basearch - Source
+baseurl=http://download.fedoraproject.org/pub/epel/testing/{{ major }}/SRPMS
+#mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=testing-source-epel{{ major }}&arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ major }}
+gpgcheck=1

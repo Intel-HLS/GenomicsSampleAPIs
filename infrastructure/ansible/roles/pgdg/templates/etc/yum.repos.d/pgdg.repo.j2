@@ -1,0 +1,17 @@
+{% if  postgresql_version is not defined -%}
+{% set postgresql_version = postgresql_default_version -%}
+{% endif -%}
+[pgdg{{ postgresql_version|replace('.', '') }}]
+name=PostgreSQL {{ postgresql_version }} $releasever - $basearch
+baseurl=https://download.postgresql.org/pub/repos/yum/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://apt.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-{{ postgresql_version|replace('.', '') }}
+
+[pgdg{{ postgresql_version|replace('.', '') }}-source]
+name=PostgreSQL {{ postgresql_version }} $releasever - $basearch - Source
+failovermethod=priority
+baseurl=https://download.postgresql.org/pub/repos/yum/srpms/{{ postgresql_version }}/redhat/rhel-$releasever-$basearch
+enabled=0
+gpgcheck=1
+gpgkey=https://apt.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-{{ postgresql_version|replace('.', '') }}

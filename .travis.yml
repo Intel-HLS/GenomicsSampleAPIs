@@ -1,0 +1,25 @@
+before_install:
+  - sudo apt-get update
+  - sudo service postgresql stop
+  - sudo apt-get remove -y postgresql*
+  - git submodule update --recursive --init
+
+install:
+before_script:
+  - sudo pip install ansible==1.9.4
+  - export inf_dir=./infrastructure
+  - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
+  - cd $inf_dir
+  - if [ -e ansible_requirements.txt ]; then ansible-galaxy install -p ./ansible/roles -r ansible_requirements.txt; fi
+  - sudo ansible-playbook -i 'default,' -e "store_branch=$TRAVIS_BRANCH store_dir=$TRAVIS_BUILD_DIR owner_user_name=$USER client_user_name=$USER" --extra-vars tiledb_csv="test.csv" --extra-vars delete_and_create_tiledb_array=true ansible/variantdb-webserver.yml --connection=local
+  - source /home/variantdb/venv/bin/activate
+  - pip install pytest pytest-cov coverage pytest-flask pytest-mock
+  - pip install sqlalchemy-utils
+  - source $HOME/.bashrc
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - py.test --cov .
+
+sudo: required
+dist: trusty

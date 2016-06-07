@@ -1,0 +1,19 @@
+[uwsgi]
+master = true
+socket = {{ uwsgi_socket }}
+processes = {{ (ansible_processor_cores / 1)|int }}
+base = {{ store_dir }}/web
+home = {{ ga4gh_virtualenv }}
+env = PYTHONPATH={{ store_dir }}/web
+env = LD_LIBRARY_PATH={{ env_ld_library_path }}
+env = GA4GH_CONF={{store_dir}}/web/ga4gh_{{array_name}}.conf
+uid = {{ client_user_name }}
+gid = {{ group_name }}
+wsgi_file =  {{ store_dir }}/web/wsgi.py
+module = wsgi
+callable = application
+chmod-socket = 666
+plugin = logfile
+logger = file:/var/log/uwsgi/uwsgi_{{ array_name }}.log
+no-default-app = true
+need-app = true

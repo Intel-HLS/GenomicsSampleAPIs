@@ -1,0 +1,47 @@
+{
+  "callsets": {
+    "DO76-SA245-SA508-0": {
+      "idx_in_file": 0,
+      "row_idx": 0,
+      "filename": "/path/test.csv"
+    },
+    "DO5-SA167-SA565-4": {
+      "idx_in_file": 4,
+      "row_idx": 4,
+      "filename": "/path/test.csv"
+    },
+    "DO36-SA209-SA472-2": {
+      "idx_in_file": 2,
+      "row_idx": 2,
+      "filename": "/path/test.csv"
+    },
+    "DO90-SA259-SA522-5": {
+      "idx_in_file": 5,
+      "row_idx": 5,
+      "filename": "/path/test.csv"
+    },
+    "DO208-SA387-SA579-6": {
+      "idx_in_file": 6,
+      "row_idx": 6,
+      "filename": "/path/test.csv"
+    },
+    "DO162-SA337-SA596-3": {
+      "idx_in_file": 3,
+      "row_idx": 3,
+      "filename": "/path/test.csv"
+    },
+    "DO378-SA541-SA135-7": {
+      "idx_in_file": 7,
+      "row_idx": 7,
+      "filename": "/path/test.csv"
+    },
+    "DO282-SA451-SA581-1": {
+      "idx_in_file": 1,
+      "row_idx": 1,
+      "filename": "/path/test.csv"
+    }
+  },
+  "unsorted_csv_files": [
+    "/path/test.csv"
+  ]
+}

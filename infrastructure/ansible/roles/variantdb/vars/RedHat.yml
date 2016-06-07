@@ -1,0 +1,15 @@
+---
+dependency_libs:
+  - postgresql-devel
+  - python-psycopg2
+  - python-pip
+  - python-virtualenv
+  - rsync
+  - mod_wsgi
+  - openmpi-devel
+  - zlib-devel
+  - openssl-devel
+  - git-all
+  - libcsv-devel
+
+user_libs: []

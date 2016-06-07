@@ -1,0 +1,60 @@
+---
+- name     : Setup ga4gh ini
+  template :
+    src   : ga4gh.ini.j2 
+    dest  : "{{store_dir}}/web/ga4gh_{{array_name}}.ini"
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "{{permissions}}"
+
+- name     : Setup ga4gh conf
+  template :
+    src   : ga4gh.conf.j2 
+    dest  : "{{store_dir}}/web/ga4gh_{{array_name}}.conf"
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "{{permissions}}"
+
+- name: Verify that the uwsgi_socket_path is present with right permissions
+  file: 
+    path  : "{{uwsgi_socket_path}}"
+    mode  : "u=rwx,g=rwx,o=rwx"
+    state : directory
+
+- name: Verify that the uwsgi log dir is present with right permissions
+  file:
+    path  : /var/log/uwsgi
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "u=rwx,g=rwx,o=r"
+    state : directory
+
+- name: Verify that the uwsgi log file is present with right permissions
+  file:
+    path  : /var/log/uwsgi/uwsgi_{{ array_name }}.log
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "u=rwx,g=rwx,o=r"
+    state : touch
+
+- name     : Setup ga4gh service
+  template :
+    src  : "ga4gh.service.{{ansible_os_family}}.j2"
+    dest : "{{system_services_path}}/ga4gh_{{array_name}}.{{system_services_extension}}"
+
+- name    : reload systemctl
+  command : systemctl daemon-reload
+  when    : ansible_os_family == 'RedHat'
+
+- name    : "restart ga4gh_{{array_name}}"
+  service :
+    name    : "ga4gh_{{array_name}}"
+    enabled : yes
+    state   : restarted
+
+- name     : Setup nginx conf file 
+  template :
+    src  : nginx.conf.j2 
+    dest : "{{nginx_conf_path}}/nginx_ga4gh_{{array_name}}.conf"
+  notify   : restart nginx
+

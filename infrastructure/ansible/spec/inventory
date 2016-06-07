@@ -1,0 +1,8 @@
+
+[default]
+127.0.0.1
+
+[default:vars]
+ntp_location=internal
+default_ntp_server=192.168.100.231
+environment=development

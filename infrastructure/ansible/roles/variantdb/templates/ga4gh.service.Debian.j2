@@ -1,0 +1,10 @@
+description "GA4GH service provider for variant db"
+start on {{ postgresql_service_name }}
+start on nginx
+
+setuid {{ client_user_name }}
+setgid {{ group_name }}
+chdir {{ store_dir }}
+env PATH={{ ga4gh_virtualenv }}/bin
+env LD_LIBRARY_PATH={{ env_ld_library_path }}
+exec {{ ga4gh_virtualenv }}/bin/uwsgi --ini {{ store_dir }}/web/ga4gh_{{ template_array_name }}.ini

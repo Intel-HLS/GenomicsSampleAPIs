@@ -1,0 +1,47 @@
+{
+  "TileDBConfig"    : "/variantdb/repos/store/data/tiledb_config.json",
+  "TileDBAssembly"  : "/variantdb/repos/store/data/hg19.json",
+  "TileDBSchema"    : {
+    "workspace": "/variantdb/BAML",
+    "array": "BEATAML",
+    "fields_list": "END,REF,ALT,QUAL,FILTER,BaseQRankSum,ClippingRankSum,MQRankSum,ReadPosRankSum,DP,MQ,MQ0,DP_FORMAT,MIN_DP,GQ,SB,AD,PL,AF,AN,AC,GT,PS",
+    "ftypes_list": "int64,char:var,char:var,float,int:var,float,float,float,float,int,float,int,int,int,int,int:4,int:var,int:var,float:var,int,int:var,int:var,int,int64"
+  },
+  "DB_URI" : "postgresql+psycopg2://user:pass@localhost/variant_store",
+  "HeaderStartsWith" : "Hugo",
+  "VariantSetMap" : {
+    "Dynamic"     : false,
+    "VariantSet" : "generic"
+  },
+  "SourceSampleId"  : "Matched_Norm_Sample_Barcode",
+  "TargetSampleId"   : "Tumor_Sample_Barcode",
+  "CallSetId" : {
+    "Dynamic"     : true,
+    "CallSetName" : "Matched_Norm_Sample_Barcode"
+  },
+  "Position"  : {
+    "assembly"  : {
+      "Dynamic"     : true,
+      "assemblyName": "NCBI_Build"
+    },
+    "chromosome": "Chromosome",
+    "Location"  : "Start_Position",
+    "End"       : "End_Position" 
+  },
+  "TileDBMapping"   : {
+    "REF"   : "Reference_Allele",
+    "ALT"   : "Tumor_Seq_Allele2", 
+    "AN"    : "n_depth",
+    "AC"    : "t_alt_count",
+    "GT"    : "Strand"
+  },
+  "Seperators" : {
+    "line"  : "\t"
+  },
+  "GTMapping" : {
+    "+" : "1"
+  },
+  "Constants" : {
+    "PLOIDY" : 2
+  }
+}

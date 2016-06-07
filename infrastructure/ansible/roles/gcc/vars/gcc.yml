@@ -1,0 +1,8 @@
+---
+gcc_tmp: /tmp
+gccverpath: "gcc-{{gcc_version}}"
+gcc_arc: "{{gccverpath}}.tar.bz2"
+gcc_arc_path: "{{gcc_tmp}}/{{gcc_arc}}"
+gcc_url: "https://ftp.gnu.org/gnu/gcc/{{gccverpath}}/{{gcc_arc}}"
+gcc_path: "{{gcc_tmp}}/{{gccverpath}}"
+

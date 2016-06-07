@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - { role: epel-release }
+  - { role: ansible-role-build-essential }

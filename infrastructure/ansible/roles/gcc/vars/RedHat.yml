@@ -1,0 +1,6 @@
+---
+
+dependency_libs:
+  - libmpc-devel
+  - mpfr-devel
+  - gmp-devel

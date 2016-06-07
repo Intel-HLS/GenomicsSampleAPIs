@@ -1,0 +1,27 @@
+---
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Set version fact
+  set_fact: gcc_version={{ gcc_default_version }}
+  when: gcc_version is not defined
+
+- include_vars: gcc.yml
+
+- name: set variable gcc_bin_prefix
+  set_fact: gcc_bin_prefix={{ gcc_prefix }}
+  when: ansible_os_family == "RedHat"
+
+- name: set variable gcc_bin_prefix
+  set_fact: gcc_bin_prefix=/usr
+  when: ansible_os_family == "Debian"
+
+- name: Check gcc version under gcc_bin_prefix path
+  shell: "[ -d {{ gcc_bin_prefix }} ] && {{ gcc_bin_prefix }}/bin/gcc -dumpversion || echo 0"
+  register: check_alt_gcc_version
+
+- include: gcc_RedHat.yml
+  when: check_alt_gcc_version.stdout | version_compare( gcc_version, '<') and ansible_os_family == "RedHat"
+
+- include: gcc_Debian.yml
+  when: check_alt_gcc_version.stdout | version_compare( gcc_version, '<') and ansible_os_family == "Debian"

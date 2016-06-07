@@ -1,0 +1,22 @@
+{
+  "treat_deletions_as_intervals": true,
+  "discard_vcf_index": true,
+  "produce_tiledb_array": true,
+  "produce_combined_vcf": false,
+  "size_per_column_partition": 50000,
+  "delete_and_create_tiledb_array": true,
+  "num_parallel_vcf_files": 1,
+  "compress_tiledb_array": true,
+  "offload_vcf_output_processing": true,
+  "column_partitions": [
+    {
+      "begin": 0,
+      "array": "test",
+      "workspace": "/home/variantdb/DB"
+    }
+  ],
+  "row_based_partitioning": false,
+  "segment_size": 1048576,
+  "do_ping_pong_buffering": true,
+  "num_cells_per_tile": 1000
+}

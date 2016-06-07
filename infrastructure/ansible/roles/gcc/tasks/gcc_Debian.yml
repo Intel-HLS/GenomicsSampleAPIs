@@ -1,0 +1,26 @@
+---
+
+- name: add toolchain repo
+  apt_repository: 
+    repo: "ppa:ubuntu-toolchain-r/test"
+
+- name: install apt package for gcc
+  apt: 
+    update_cache: yes
+    name: gcc-4.9
+
+- name: install apt package for g++
+  apt: 
+    update_cache: yes
+    name: g++-4.9
+
+- name: install apt package for gfortran
+  apt: 
+    update_cache: yes
+    name: gfortran-4.9
+
+- name: update alts gcc
+  command: "update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20"
+
+- name: update alts g++
+  command: "update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20"

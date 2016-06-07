@@ -1,0 +1,50 @@
+# vi: set ft=yaml.jinja :
+
+---
+- include_vars: ../../postgresql-server/defaults/main.yml
+
+- template:
+    src:   etc/yum.repos.d/pgdg.repo.j2
+    dest: /etc/yum.repos.d/pgdg.repo
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_os_family == "RedHat" and
+      ( ansible_distribution_major_version == "5" or
+        ansible_distribution_major_version == "6" or
+        ansible_distribution_major_version == "7" )
+
+- name: temp key fix
+  command: "rpmkeys --import http://apt.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-{{ postgresql_version|default(postgresql_default_version)|replace('.', '') }}"
+  when: ansible_os_family == "RedHat" and
+      ( ansible_distribution_major_version == "5" or
+        ansible_distribution_major_version == "6" or
+        ansible_distribution_major_version == "7" )
+
+#- rpm_key:
+#    state: present
+#    key: "https://apt.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-{{ postgresql_version|default(postgresql_default_version)|replace('.', '') }}"
+#  when: ansible_os_family == "RedHat" and
+#      ( ansible_distribution_major_version == "5" or
+#        ansible_distribution_major_version == "6" or
+#        ansible_distribution_major_version == "7" )
+
+- apt_key:
+    state: present
+    keyserver: pgp.mit.edu
+    id: ACCC4CF8
+  when: ansible_os_family == "Debian"
+
+- copy:
+    src:   etc/apt/preferences.d/pgdg.pref
+    dest: /etc/apt/preferences.d/pgdg.pref
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_os_family == "Debian"
+
+- apt_repository:
+    state: present
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+    update_cache: yes
+  when: ansible_os_family == "Debian"

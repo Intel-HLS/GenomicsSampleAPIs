@@ -1,0 +1,9 @@
+[Unit]
+Description = GA4GH Service provider for variant db
+After = nginx.service postgresql.service
+
+[Service]
+
+[Install]
+WantedBy = multi-user.target
+

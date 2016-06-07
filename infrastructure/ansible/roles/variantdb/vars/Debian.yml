@@ -1,0 +1,22 @@
+---
+mpi_path                           : /usr
+mpi_runner                         : mpirun.openmpi
+gcc_prefix                         : /usr/bin/gcc
+template_system_services_extension : conf
+
+dependency_libs:
+  - python-dev
+  - libpq-dev
+  - python-psycopg2
+  - python-pip
+  - python-virtualenv
+  - python-pandas
+  - rsync
+  - libapache2-mod-wsgi
+  - openmpi-bin
+  - libopenmpi-dev
+  - zlib1g-dev
+  - libssl-dev
+  - git-all
+
+user_libs: []

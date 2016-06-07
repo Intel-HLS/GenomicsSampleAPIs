@@ -1,0 +1,54 @@
+---
+# Create group and users
+- name     : Set fact group_name
+  set_fact : group_name={{default_group_name}}
+  when     : group_name is not defined
+
+- name     : Set fact owner_user_name
+  set_fact : owner_user_name={{default_owner_user_name}}
+  when     : owner_user_name is not defined
+
+- name     : Set fact client_user_name
+  set_fact : client_user_name={{default_client_user_name}}
+  when     : client_user_name is not defined
+
+- name     : Set fact permissions
+  set_fact : permissions={{default_permissions}}
+  when     : permissions is not defined
+
+- name : Set fact users_list
+  set_fact : 
+    users_list: 
+      - "{{owner_user_name}}"
+  when: owner_user_name == client_user_name
+
+- name : Set fact users_list
+  set_fact : 
+    users_list: 
+      - "{{owner_user_name}}"
+      - "{{client_user_name}}"
+  when: owner_user_name != client_user_name
+
+- name  : Create variant db group
+  group : name={{group_name}}
+
+- name       : Create the Variant DB users.
+  user       : name={{item}} group={{group_name}}
+  with_items : "{{users_list}}"
+
+# Create directories and set permissions
+- name     : Set fact variantdb_dir
+  set_fact : variantdb_dir={{default_variantdb_dir}}
+  when     : variantdb_dir is not defined
+
+- name     : Set fact workspace_dir
+  set_fact : workspace_dir={{variantdb_dir}}/{{default_workspace_name}}
+  when     : workspace_dir is not defined
+
+- name: Create the Variant DB directory with the right permissions
+  file: 
+    path  : "{{variantdb_dir}}"
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "{{permissions}}"
+    state : directory

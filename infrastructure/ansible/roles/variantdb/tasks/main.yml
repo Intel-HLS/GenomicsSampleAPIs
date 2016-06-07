@@ -1,0 +1,37 @@
+---
+- include_vars     : "{{ item }}"
+  with_first_found :
+   - "{{ ansible_os_family }}.yml"
+   - "RedHat.yml"
+
+- name       : Install required packages
+  action     : "{{ansible_pkg_mgr}} name={{item}} state=present"
+  with_items : "{{dependency_libs}}"
+
+- name       : Install user required packages
+  action     : "{{ansible_pkg_mgr}} name={{item}} state=present"
+  with_items : "{{user_libs}}"
+
+- include : ci.yml
+  when    : ansible_env.CI is defined
+
+# Setup up group, users, and directories
+- include : policy.yml
+
+# Setup ssh keys and configuration
+- include : ssh_keys.yml
+
+# Pull down the required repos
+- include : repos.yml
+
+# Setup Meta DB
+- include : metadb.yml
+
+# Setup GA4GH
+- include : ga4gh.yml
+
+# Setup Genomics DB
+- include : genomicsdb.yml
+
+# Setup templates
+- include : update_templates.yml

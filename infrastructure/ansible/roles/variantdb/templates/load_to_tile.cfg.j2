@@ -1,0 +1,11 @@
+[loader]
+num_processes = 1
+executable = {{GenomicsDB_dir}}/bin/vcf2tiledb
+tile_loader_json = {{store_dir}}/utils/example_configs/tiledb_loader.json
+
+[mpi]
+mpirun = {{mpi_path}}/bin/{{mpi_runner}}
+hostflag = -hostfile
+hosts = {{store_dir}}/utils/example_configs/hosts.txt
+btl_tcp_if_include = 192.168.100.0/24
+include_env = LD_LIBRARY_PATH,PATH

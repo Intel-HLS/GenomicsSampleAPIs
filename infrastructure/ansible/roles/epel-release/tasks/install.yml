@@ -1,0 +1,27 @@
+# vi: set ft=yaml.jinja :
+
+---
+- rpm_key:
+    state: present
+    key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+    validate_certs: no
+  tags:
+    - install
+  when: ansible_os_family == "RedHat" and
+      ( ansible_distribution_major_version == "5" or
+        ansible_distribution_major_version == "6" or
+        ansible_distribution_major_version == "7" )
+
+- name:   /etc/yum.repos.d/epel-release.repo
+  template:
+    src:   etc/yum.repos.d/epel-release.repo.j2
+    dest: /etc/yum.repos.d/epel-release.repo
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+  when: ansible_os_family == "RedHat" and
+      ( ansible_distribution_major_version == "5" or
+        ansible_distribution_major_version == "6" or
+        ansible_distribution_major_version == "7" )
