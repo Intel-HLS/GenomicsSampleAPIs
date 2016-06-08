@@ -1,6 +1,6 @@
 {
-  "TileDBConfig"    : "/variantdb/repos/store/data/tiledb_config.json",
-  "TileDBAssembly"  : "/variantdb/repos/store/data/hg19.json",
+  "TileDBConfig"    : "/variantdb/repos/GenomicsSampleAPIs/data/tiledb_config.json",
+  "TileDBAssembly"  : "/variantdb/repos/GenomicsSampleAPIs/data/hg19.json",
   "TileDBSchema"    : {
     "workspace": "/variantdb/BAML",
     "array": "BEATAML",

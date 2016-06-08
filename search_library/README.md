@@ -29,5 +29,5 @@ Libraries to interface with TileDB from GA4GH/Python is created here.
   This generates an executable - `test_libquery` - under the `tileDB/bin/` folder.  
   
 * `<Path to Tile DB>` is currently the base path where the TileDB GIT repo is cloned.  
-  1.  Make sure that the [`broad`](https://github.com/Intel-HSS/TileDB/tree/broad) branch is checkedout
+  1.  Make sure that the [`broad`](https://github.com/Intel-HLS/TileDB/tree/broad) branch is checkedout
   2.  Do `make clean` and `make variant`. This generates `libtiledb_variant.so` under `variant/bin/`.   

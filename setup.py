@@ -12,7 +12,7 @@ setup(
     description='SQLAlchemy models for the Variant Database',
     long_description='SQLAlchemy models for the Variant Database',
 
-    url='https://github.com/Intel-HSS/store',
+    url='https://github.com/Intel-HLS/GenomicsSampleAPIs',
 
     author='Intel variant store',
     license='MIT',

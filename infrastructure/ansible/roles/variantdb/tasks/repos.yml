@@ -19,9 +19,9 @@
   set_fact : store_branch={{default_store_branch}}
   when     : store_branch is not defined
 
-- name : GIT pull store repo
+- name : GIT pull APIs repo
   git:
-    repo           : git@github.com:Intel-HSS/store.git
+    repo           : git@github.com:Intel-HLS/GenomicsSampleAPIs.git
     dest           : "{{store_dir}}"
     key_file       : "{{ssh_key_dest_dir}}/{{ssh_key_file}}"
     accept_hostkey : yes

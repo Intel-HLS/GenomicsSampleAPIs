@@ -17,7 +17,7 @@ def installPaths(ga4ghPath):
   fp.close()
 
 def main():
-  # Get the installation path for the store repo
+  # Get the installation path for the APIs repo
   apar = argparse.ArgumentParser()
   apar.add_argument("-p", "--port", type=int, default=8008,  help="port for web server")
   apar.add_argument("-s", "--socket", type=str, default="unix:/var/uwsgi/ga4gh.sock",  help="string with socket information fo uwsgi")
