@@ -2,7 +2,7 @@
 
 The Variant Store is a GA4GH compliant RESTful query interface for TileDB. The Variant Store uses Flask and SQLAlchemy to communicate with a Tile database through a c++ search library. The Tile database backend is specifically designed to work with genomic variant data. 
 
-This document describes the various documents in this repository with respect to their role to the Variant Store and general organization. For more detailed information about setting up the Variant Store, interacting with the Variant Store, or further documentation on a specific module or library see the [wiki](https://github.com/Intel-HSS/store/wiki).
+This document describes the various documents in this repository with respect to their role to the Variant Store and general organization. For more detailed information about setting up the Variant Store, interacting with the Variant Store, or further documentation on a specific module or library see the [wiki](https://github.com/Intel-HLS/GenomicsSampleAPIs/wiki).
 
 ## Repository Organization
 
@@ -42,7 +42,7 @@ Overview of the repository structure (individual files omitted):
 The alembic directory holds all the database migrations requried to set up the MetaDB. The database diagram can be found in the wiki.
 
 #### `versions/`
-The alembic versions folder holds all the revisions that define the MetaDB migrations. If a table is created in a revision, it will have a corresponding metadb model in `store/metadb/models`.
+The alembic versions folder holds all the revisions that define the MetaDB migrations. If a table is created in a revision, it will have a corresponding metadb model in `GenomicsSampleAPIs/metadb/models`.
 
 ### `data/`
 The data directory holds all the config files that are associated with data configuration. A given set of data will have at least an associated configuration for the MAF import process and an assembly config (ie. hg19.json). 
@@ -97,4 +97,4 @@ The ga4gh directory houses the application code relating to the avaiable endpoin
 
 GA4GH API: http://ga4gh.org/#/api/v0.5.1 and https://github.com/ga4gh/schemas.
 
-TileDB: https://github.com/Intel-HSS/TileDB
+TileDB: https://github.com/Intel-HLS/TileDB

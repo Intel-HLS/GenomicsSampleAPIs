@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe file('/home/variantdb/repos/store') do
+describe file('/home/variantdb/repos/GenomicsSampleAPIs') do
   it { should be_directory }
 end
 
-describe file('/home/variantdb/repos/store/search_library/lib/libquery.so') do
+describe file('/home/variantdb/repos/GenomicsSampleAPIs/search_library/lib/libquery.so') do
   it { should be_file }
 end
 
-describe file('/home/variantdb/repos/store/web/templates') do
+describe file('/home/variantdb/repos/GenomicsSampleAPIs/web/templates') do
   it { should be_directory }
 end
 

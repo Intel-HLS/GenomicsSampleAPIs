@@ -11,4 +11,4 @@ Information on assembly name transforms and assembly configuration for tiledb.
 #### `hg19.json`
 Information on how to read an assembly. This defines the reference set (hg19) as well as the references (chr) as defined by the GA4GH Reference Schema. For proper offset assignment and reading and ordered list of chromosomes and an offset factor (used for TileDB padding) is required. 
 
-Any web service related configuration files are found in [web/](https://github.com/Intel-HSS/store/tree/metadb/web).
+Any web service related configuration files are found in [web/](https://github.com/Intel-HLS/GenomicsSampleAPIs/tree/metadb/web).

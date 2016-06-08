@@ -6,7 +6,7 @@ for path in sys.path:
     ga4ghPath = path
     break
 if ga4ghPath == None:
-  raise Exception("GA4GHAPI path is not set. Run store/web/install.py, \
+  raise Exception("GA4GHAPI path is not set. Run GenomicsSampleAPIs/web/install.py, \
 and use --system-site-packages when creating a virtualenv")
 
 import config

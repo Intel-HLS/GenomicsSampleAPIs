@@ -1,6 +1,6 @@
 {
-  "TileDBConfig"   : "/home/variantdb/repos/store/utils/example_configs/tiledb_config.json",
-  "TileDBAssembly" : "/home/variantdb/repos/store/utils/example_configs/hg19.json",
+  "TileDBConfig"   : "/home/variantdb/repos/GenomicsSampleAPIs/utils/example_configs/tiledb_config.json",
+  "TileDBAssembly" : "/home/variantdb/repos/GenomicsSampleAPIs/utils/example_configs/hg19.json",
   "TileDBSchema"   : {
     "workspace"   : "/home/variantdb/DB",
     "array"       : "test",
@@ -13,7 +13,7 @@
     "Dynamic"       : true,
     "VariantSet"    : "project_code",
     "VariantLookup" : true,
-    "VariantConfig" : "/home/variantdb/repos/store/utils/example_configs/icgc_variants.json",
+    "VariantConfig" : "/home/variantdb/repos/GenomicsSampleAPIs/utils/example_configs/icgc_variants.json",
     "LookupIdx"     : 2
   },
   "IndividualId"   : "icgc_donor_id",
