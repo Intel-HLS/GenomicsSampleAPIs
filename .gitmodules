@@ -1,4 +1,4 @@
-[submodule "search_library/dependencies/GenomicsDB"]
+[submodule "GenomicsDB"]
 	path = search_library/dependencies/GenomicsDB
 	url = https://github.com/Intel-HLS/GenomicsDB.git
 	branch = master
