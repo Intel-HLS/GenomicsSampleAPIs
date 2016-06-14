@@ -14,7 +14,7 @@ class CallSetToDBArrayAssociation(_Base):
     tile_row_id = sa.Column(BigInteger)
 
     db_array = relationship("DBArray", backref="member_callset_associations")
-    __table_args__ = ( 
+    __table_args__ = (
         PrimaryKeyConstraint('callset_id', 'db_array_id', name='primary_key'),
         )
     #Ensure that (db_array_id, tile_row_id) combination is unique, if tile_row_id != NULL

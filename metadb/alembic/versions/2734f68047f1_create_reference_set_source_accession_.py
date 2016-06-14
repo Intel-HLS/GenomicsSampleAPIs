@@ -18,9 +18,9 @@ import sqlalchemy as sa
 
 def upgrade():
     op.create_table(
-	'reference_set_source_accession',
-	sa.Column('reference_set_id', sa.BigInteger, sa.ForeignKey('reference_set.id'), primary_key=True),
-	sa.Column('source_accession_id', sa.BigInteger, sa.ForeignKey('source_accession.id'), primary_key=True)
+        'reference_set_source_accession',
+        sa.Column('reference_set_id', sa.BigInteger, sa.ForeignKey('reference_set.id'), primary_key=True),
+        sa.Column('source_accession_id', sa.BigInteger, sa.ForeignKey('source_accession.id'), primary_key=True)
     )
 
 def downgrade():

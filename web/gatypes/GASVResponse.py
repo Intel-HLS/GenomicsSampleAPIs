@@ -10,4 +10,3 @@ class GASVResponse(object):
             nextPageToken = str(nextPageToken)
 
         self.gavresponse_info = {'variants' : variants, 'nextPageToken' : nextPageToken}
-

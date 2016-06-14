@@ -13,10 +13,10 @@ def autoinc_handler(sa_table, sa_table_name, id_column_name, id_seq_name, insert
     keys_list = [];
     values_list = [];
     for key,val in insert_dict.iteritems():
-	keys_list.append(key);
-	values_list.append(val if val else ("'%s'"%(str(uuid.uuid4()))));  #if None, generate random string
+        keys_list.append(key);
+        values_list.append(val if val else ("'%s'"%(str(uuid.uuid4()))));  #if None, generate random string
     sa.event.listen(sa_table, 'after_create', sa.DDL(("INSERT INTO %s ( "+
-	",".join([str(x) for x in keys_list]) +
-	" ) VALUES ( "+
-	",".join([str(x) for x in values_list])+
-	" );")%(sa_table_name)).execute_if(dialect='sqlite'))
+        ",".join([str(x) for x in keys_list]) +
+        " ) VALUES ( "+
+        ",".join([str(x) for x in values_list])+
+        " );")%(sa_table_name)).execute_if(dialect='sqlite'))

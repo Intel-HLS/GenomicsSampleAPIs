@@ -1,4 +1,4 @@
-from gatypes import GACall, GACallSet, GAVariant, GAVariantSet, GASVResponse, GACSResponse, GASVSetResponse, GAVariantSetMetadata 
+from gatypes import GACall, GACallSet, GAVariant, GAVariantSet, GASVResponse, GACSResponse, GASVSetResponse, GAVariantSetMetadata
 from flask import json, jsonify
 from ctypes import *
 from string import split, join
@@ -43,14 +43,14 @@ class GTDouble(Structure):
 class GTString(Structure):
     _fields_ = [ ("name", c_char_p), ("count", c_ulonglong), ("data", (POINTER(c_char_p))) ]
 
-class GTCall (Structure):       
-   _fields_ = [ ("id", c_ulonglong), ("int_count", c_ulonglong), ("longlong_count", c_ulonglong),\
-           ("unsigned_count", c_ulonglong), ("unsigned_longlong_count", c_ulonglong),\
-           ("float_count", c_ulonglong), ("double_count", c_ulonglong), ("string_count", c_ulonglong),\
-           ("int_arr", POINTER(POINTER(GTInt))), ("longlong_arr", POINTER(POINTER(GTLongLong))),\
-           ("unsigned", POINTER(POINTER(GTUInt))), ("unsigned_longlong", POINTER(POINTER(GTULongLong))),\
-           ("float_arr", POINTER(POINTER(GTFloat))), ("double_arr", POINTER(POINTER(GTDouble))),\
-           ("string_arr",POINTER(POINTER(GTString))) ]
+class GTCall (Structure):
+    _fields_ = [ ("id", c_ulonglong), ("int_count", c_ulonglong), ("longlong_count", c_ulonglong),\
+            ("unsigned_count", c_ulonglong), ("unsigned_longlong_count", c_ulonglong),\
+            ("float_count", c_ulonglong), ("double_count", c_ulonglong), ("string_count", c_ulonglong),\
+            ("int_arr", POINTER(POINTER(GTInt))), ("longlong_arr", POINTER(POINTER(GTLongLong))),\
+            ("unsigned", POINTER(POINTER(GTUInt))), ("unsigned_longlong", POINTER(POINTER(GTULongLong))),\
+            ("float_arr", POINTER(POINTER(GTFloat))), ("double_arr", POINTER(POINTER(GTDouble))),\
+            ("string_arr",POINTER(POINTER(GTString))) ]
 
 class GTCallArray (Structure):
     _fields_ = [('callcount', c_ulonglong), ('start', c_ulonglong), ('end', c_ulonglong), ('CallArray', POINTER(POINTER(GTCall)))]
@@ -104,7 +104,7 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
             rowIds = metadb.callSetIds2TileRowId(callSetIds, workspace, arrayName)
             rowIds = ",".join(rowIds)
             searchLib.filter_rows(rowIds, token)
-            
+
         if variantSetIds is not None and len(variantSetIds) > 0:
             variantSetId = variantSetIds[0]
             variantSetIdx, variantSetGuid = metadb.variantSetGUID2Id(variantSetId)
@@ -117,7 +117,7 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
         nextPageToken = qresp.contents.nextPageToken
         varcount = qresp.contents.varcount
         vArray = qresp.contents.VariantArray
-        
+
         for i in range(0, varcount):
             callcount = vArray[i].contents.callcount
             CallArray = vArray[i].contents.CallArray
@@ -125,7 +125,7 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
             startp = vArray[i].contents.start
             endp = vArray[i].contents.end
             chromosome, [startp, endp] = metadb.tile2Contig(array_idx, [startp, endp])
-            # Since the query was to a chromosome, the results will not be outside the 
+            # Since the query was to a chromosome, the results will not be outside the
             # chromosome. So just pick chromosome at index 0 for reference name
             referenceName = chromosome[0]
             gaclist = list()
@@ -192,10 +192,10 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
                         callInfo[iname] = callData[iname]
                         index = 0
                         for value in callInfo[iname]:
-                          callInfo[iname][index] = str(value)
-                          index += 1
+                            callInfo[iname][index] = str(value)
+                            index += 1
                 gac = GACall.GACall(callSetId = callId, callSetName = cname, genotype = gtlist, genotypeLikelihood = plist, info = callInfo)
-                
+
                 callMatch = True
 
                 if(callMatch):

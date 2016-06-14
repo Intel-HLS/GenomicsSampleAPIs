@@ -132,7 +132,7 @@ class TestGAtypes:
         assert first_var['referenceName'] == ''
         assert first_var['alternateBases'] == []
         assert first_var['info'] == {}
-     
+
         assert second_var['id'] == 'myid'
         assert second_var['variantSetId'] == 'myvsid'
         assert second_var['start'] == 1
@@ -183,7 +183,7 @@ class TestGAtypes:
         gavs = GAVariantSet.GAVariantSet(id = 'myid', name = 'myname', referenceSetId = 'myrefsetid', datasetId = 'mydsit', metadata = [1, 2, 3, 4])
         min_gasvsr = GASVSetResponse.GASVSetResponse()
         res = min_gasvsr.gavsetresponse_info
-      
+
         assert res['variantSets'] == []
         assert res['nextPageToken'] == None
 
@@ -211,7 +211,7 @@ class TestGAtypes:
         gavsmd = GAVariantSetMetadata.GAVariantSetMetadata(key = 'mykey', value = 'myval', id = 'myid', type = 'mytype', number = 'mynum', description = 'mydesc', info = {'Test': 'True', 'Number': 5})
         res = min_gavsmd.gavariantsetmetadata_info
         tmp = loads(min_gavsmd.getJSON())
-   
+
         assert res['key'] == ''
         assert res['value'] == ''
         assert res['id'] == ''
@@ -223,7 +223,7 @@ class TestGAtypes:
 
         res = gavsmd.gavariantsetmetadata_info
         tmp = loads(gavsmd.getJSON())
-   
+
         assert res['key'] == 'mykey'
         assert res['value'] == 'myval'
         assert res['id'] == 'myid'
@@ -231,4 +231,3 @@ class TestGAtypes:
         assert res['number'] == 'mynum'
         assert res['description'] == 'mydesc'
         assert res['info'] == {'Test': 'True', 'Number': 5}
-

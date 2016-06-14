@@ -11,4 +11,3 @@ class GACSResponse(object):
             nextPageToken = str(nextPageToken)
 
         self.gacsresponse_info = {'callSets' : callSets, 'nextPageToken' : nextPageToken}
-

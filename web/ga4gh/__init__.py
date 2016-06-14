@@ -8,4 +8,3 @@ def create_app(config_object):
     if config_object:
         app.config.from_object(config_object)
     return app
-

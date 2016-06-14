@@ -19,9 +19,9 @@ import sqlalchemy as sa
 
 def upgrade():
     op.create_table(
-	'field',
-	sa.Column('id', sa.BigInteger, primary_key=True),
-	sa.Column('field', sa.Text, nullable=False)
+        'field',
+        sa.Column('id', sa.BigInteger, primary_key=True),
+        sa.Column('field', sa.Text, nullable=False)
     )
 
 

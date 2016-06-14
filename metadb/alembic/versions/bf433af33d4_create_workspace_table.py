@@ -18,10 +18,10 @@ import sqlalchemy as sa
 
 def upgrade():
     op.create_table(
-	'workspace',
-	sa.Column('id', sa.BigInteger, primary_key=True),
-	sa.Column('guid', sa.String(36), nullable=False, unique=True),
-	sa.Column('name', sa.Text, nullable=False)
+        'workspace',
+        sa.Column('id', sa.BigInteger, primary_key=True),
+        sa.Column('guid', sa.String(36), nullable=False, unique=True),
+        sa.Column('name', sa.Text, nullable=False)
     )
 
 

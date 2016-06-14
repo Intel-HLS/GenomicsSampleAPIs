@@ -8,11 +8,11 @@ configFile = os.path.join(basePath, "web/ga4gh_test.conf")
 parser = config.ConfigParser.RawConfigParser()
 parser.read(configFile)
 if parser.has_section('virtualenv'):
-   venv = parser.get('virtualenv', 'virtualenv')
+    venv = parser.get('virtualenv', 'virtualenv')
 
 if os.getenv('VIRUTAL_ENV') is None:
-	activate_this = venv+'/bin/activate_this.py'
-	execfile(activate_this, dict(__file__=activate_this))
+    activate_this = venv+'/bin/activate_this.py'
+    execfile(activate_this, dict(__file__=activate_this))
 
 from ga4gh import create_app
 from flask.ext.cors import CORS, cross_origin

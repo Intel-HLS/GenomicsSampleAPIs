@@ -1,13 +1,13 @@
 import pytest
-from flask import Flask		
-from flask.ext.sqlalchemy import SQLAlchemy		
-		
-@pytest.fixture(scope="session")		
-def app():		
-   app = Flask(__name__)		
-   db = SQLAlchemy(app)		
-   return app		
- 
+from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
+
+@pytest.fixture(scope="session")
+def app():
+    app = Flask(__name__)
+    db = SQLAlchemy(app)
+    return app
+
 app = app()
 
 def test_variant_search():

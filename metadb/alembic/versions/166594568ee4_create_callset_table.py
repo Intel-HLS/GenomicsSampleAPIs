@@ -27,7 +27,7 @@ def upgrade():
         sa.Column('name', sa.Text, nullable=False),
         sa.Column('created', sa.BigInteger, nullable=False),
         sa.Column('updated', sa.BigInteger, nullable=False),
-	sa.Column('info', sa.PickleType)
+        sa.Column('info', sa.PickleType)
     )
 
 def downgrade():
