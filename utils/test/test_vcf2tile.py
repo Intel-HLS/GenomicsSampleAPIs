@@ -1,4 +1,9 @@
-import pytest, uuid, time, json, os, sys
+import pytest
+import uuid
+import time
+import json
+import os
+import sys
 from sqlalchemy import create_engine, and_
 from sqlalchemy_utils import create_database, drop_database, database_exists
 import metadb.api.query as dbquery
@@ -11,14 +16,15 @@ import pysam.bcftools
 
 sampleN = 'sampleN'
 sampleT = 'sampleT'
-test_header = ["#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
+test_header = ["#CHROM", "POS", "ID", "REF",
+               "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
 normal_tag = '##SAMPLE=<ID=NORMAL,Description="Wild type",Platform=ILLUMINA,Protocol=WGS,SampleName=sampleN>'
-tumor_tag =  '##SAMPLE=<ID=TUMOUR,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=sampleT>'
-extra_tag =  '##SAMPLE=<ID=EXTRA,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=extra>'
+tumor_tag = '##SAMPLE=<ID=TUMOUR,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=sampleT>'
+extra_tag = '##SAMPLE=<ID=EXTRA,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=extra>'
 
 test_data = ["1", "10177", "rs367896724", "A", "AC", "100", "PASS",
-"AC=1;AF=0.425319;AN=6;NS=2504;DP=103152;EAS_AF=0.3363;AMR_AF=0.3602;AFR_AF=0.4909;EUR_AF=0.4056;SAS_AF=0.4949;AA=|||unknown(NO_COVERAGE);VT=INDEL",
-"GT", "1|0", "0|0"]
+             "AC=1;AF=0.425319;AN=6;NS=2504;DP=103152;EAS_AF=0.3363;AMR_AF=0.3602;AFR_AF=0.4909;EUR_AF=0.4056;SAS_AF=0.4949;AA=|||unknown(NO_COVERAGE);VT=INDEL",
+             "GT", "1|0", "0|0"]
 
 
 class TestVCFImporter(TestCase):
@@ -42,7 +48,8 @@ class TestVCFImporter(TestCase):
             self.header = f.read()
 
         # create the base config
-        self.config_path = os.path.abspath("utils/example_configs/vcf_import.config")
+        self.config_path = os.path.abspath(
+            "utils/example_configs/vcf_import.config")
         with open(self.config_path, 'r') as readFP:
             self.config = json.load(readFP)
             self.config["dburi"] = self.DBURI
@@ -68,7 +75,8 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test1_header)))
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
-        vcimp.multiprocess_import.parallelGen(str(conf), [str(vcfile)], str(self.tmpdir))
+        vcimp.multiprocess_import.parallelGen(
+            str(conf), [str(vcfile)], str(self.tmpdir))
 
         # check proper import into metadb
         with dbquery.DBQuery(self.DBURI).getSession() as session:
@@ -106,7 +114,8 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
         with pytest.raises(Exception) as exec_info:
-            vcimp.multiprocess_import.parallelGen(str(conf), [str(vcfile)], str(self.tmpdir))
+            vcimp.multiprocess_import.parallelGen(
+                str(conf), [str(vcfile)], str(self.tmpdir))
         assert "Execution failed" in str(exec_info.value)
 
     def test_poolImportVCF(self):
@@ -152,7 +161,8 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test1_header)))
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
-        result = vcimp.multiprocess_import.poolImportVCF((str(conf), str(vcfile)))
+        result = vcimp.multiprocess_import.poolImportVCF(
+            (str(conf), str(vcfile)))
         assert result[0] == -1
         # assert result[1] == str(vcfile)
 
@@ -179,7 +189,6 @@ class TestVCFImporter(TestCase):
             vc.toCallSetDict()
         assert "only single TN" in str(exec_info.value)
 
-
         conf = self.tmpdir.join("vcf6_import.config")
         conf.write(json.dumps(self.config))
 
@@ -193,11 +202,9 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test2_header)))
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
-
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.toCallSetDict()
         assert "Set callset_loc" in str(exec_info.value)
-
 
         conf = self.tmpdir.join("vcf7_import.config")
         self.config['callset_loc'] = 'SampleName'
@@ -210,7 +217,8 @@ class TestVCFImporter(TestCase):
         test3_header.append('EXTRA')
         with open(str(vcfile), 'w') as inVCF:
             inVCF.write("{0}\n".format(self.header))
-            inVCF.write("{0}\n".format("\n".join([normal_tag, tumor_tag, extra_tag])))
+            inVCF.write("{0}\n".format(
+                "\n".join([normal_tag, tumor_tag, extra_tag])))
             inVCF.write("{0}\n".format("\t".join(test3_header)))
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
@@ -234,7 +242,6 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test1_header)))
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
-
         with VCF(str(vcfile), str(conf)) as vc:
             results = vc.toCallSetDict()
         assert results[sampleT] == [sampleT, sampleN]
@@ -252,10 +259,12 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test1_header)))
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
-        vcfilegz = vcimp.multiprocess_import.sortAndIndex(str(vcfile), str(self.tmpdir))
+        vcfilegz = vcimp.multiprocess_import.sortAndIndex(
+            str(vcfile), str(self.tmpdir))
         assert 'sorted' in vcfilegz
 
-        testgz = vcimp.multiprocess_import.sortAndIndex(str(vcfilegz), str(self.tmpdir))
+        testgz = vcimp.multiprocess_import.sortAndIndex(
+            str(vcfilegz), str(self.tmpdir))
         assert 'sorted' in testgz
 
     def test_sortAndIndex_neg(self):
@@ -267,9 +276,9 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format(self.header))
 
         with pytest.raises(Exception) as exec_info:
-            fail = vcimp.multiprocess_import.sortAndIndex(str(badvcfile), str(self.tmpdir))
+            fail = vcimp.multiprocess_import.sortAndIndex(
+                str(badvcfile), str(self.tmpdir))
         assert "File extension" in str(exec_info.value)
-
 
     @classmethod
     def tearDownClass(self):

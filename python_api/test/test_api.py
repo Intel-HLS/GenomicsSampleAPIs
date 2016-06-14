@@ -1,34 +1,45 @@
-import pytest, json, os
+import pytest
+import json
+import os
 from mock import patch
 import python_api.config as config
 from python_api.mpi_service import Aggregator
 
 stub_result = "{\"indices\" : [0, 1], \"POSITION\": [100, 90], \"END\": [105, 105], \"REF\":[\"A\", \"T\"]}"
 
+
 class TestAggregator():
+
     def get_test_config(self, tmpdir):
         callset_file = tmpdir.mkdir("python_api_test").join("callset.json")
-        callset_file.write("{\"callsets\": {\"testSample1\" : {\"row_idx\": 0}, \"testSample2\" : {\"row_idx\": 1}}}")
+        callset_file.write(
+            "{\"callsets\": {\"testSample1\" : {\"row_idx\": 0}, \"testSample2\" : {\"row_idx\": 1}}}")
         loader_file = tmpdir.join("python_api_test").join("loader.json")
-        loader_file.write(json.dumps(dict({"callset_mapping_file": str(callset_file)})))
+        loader_file.write(json.dumps(
+            dict({"callset_mapping_file": str(callset_file)})))
         config.MPIConfig.ID_MAPPING = str(loader_file)
         config.MPIConfig.TEMP_DIR = str(tmpdir.join("python_api_test"))
         return config
 
     def test_init(self, tmpdir):
-        callset_file = tmpdir.mkdir("python_api_test").join("callset_basic.json")
-        callset_file.write("{\"callsets\": {\"testSample0\" : {\"row_idx\": 0}, \"testSample1\" : {\"row_idx\": 1}, \"testSample2\" : {\"row_idx\": 2}}}")
+        callset_file = tmpdir.mkdir(
+            "python_api_test").join("callset_basic.json")
+        callset_file.write(
+            "{\"callsets\": {\"testSample0\" : {\"row_idx\": 0}, \"testSample1\" : {\"row_idx\": 1}, \"testSample2\" : {\"row_idx\": 2}}}")
         loader_file = tmpdir.join("python_api_test").join("loader_simple.json")
-        loader_file.write(json.dumps(dict({"callset_mapping_file": str(callset_file)})))
+        loader_file.write(json.dumps(
+            dict({"callset_mapping_file": str(callset_file)})))
         config.MPIConfig.ID_MAPPING = str(loader_file)
 
         api = Aggregator(config)
         assert api.numSamples == 3
         assert api.getNumSamples() == 3
-        assert api.sampleId2Name == dict({0:'testSample0', 1:'testSample1', 2:'testSample2'})
+        assert api.sampleId2Name == dict(
+            {0: 'testSample0', 1: 'testSample1', 2: 'testSample2'})
 
         vid_mapping_file = tmpdir.join("python_api_test").join("vid.json")
-        vid_mapping_file.write(json.dumps(dict({"callset_mapping_file": str(callset_file)})))
+        vid_mapping_file.write(json.dumps(
+            dict({"callset_mapping_file": str(callset_file)})))
         loader_file = tmpdir.join("python_api_test").join("loader_vid.json")
         loader_dict = dict()
         loader_dict["vid_mapping_file"] = str(vid_mapping_file)
@@ -39,13 +50,15 @@ class TestAggregator():
         api = Aggregator(config)
         assert api.numSamples == 2
         assert api.getNumSamples() == 2
-        assert api.sampleId2Name == dict({0:'testSample0', 1:'testSample1'})
+        assert api.sampleId2Name == dict({0: 'testSample0', 1: 'testSample1'})
 
     def test_sample_names(self, tmpdir):
         api = Aggregator(self.get_test_config(tmpdir))
 
-        assert api.getSampleNames(range(0, 3)) == ['testSample1', 'testSample2', None]
-        assert api.getSampleNames([1, 2, 0]) == ['testSample2', None, 'testSample1']
+        assert api.getSampleNames(range(0, 3)) == [
+            'testSample1', 'testSample2', None]
+        assert api.getSampleNames([1, 2, 0]) == [
+            'testSample2', None, 'testSample1']
 
     @patch('python_api.mpi_service.Aggregator.runMPI', return_value=stub_result)
     def test_getPosition_single(self, runMPI_patch, tmpdir):
@@ -65,7 +78,8 @@ class TestAggregator():
             assert len(created_json["query_column_ranges"][0]) == 1
             assert isinstance(created_json["query_column_ranges"][0][0], dict)
             assert len(created_json["query_column_ranges"][0][0]) == 1
-            assert created_json["query_column_ranges"][0][0] == dict({"1": 100})
+            assert created_json["query_column_ranges"][
+                0][0] == dict({"1": 100})
 
         config.util.DEBUG = False
         result = api.getPosition("1", 100L, ["REF"])
@@ -78,7 +92,8 @@ class TestAggregator():
         config.util.DEBUG = True
         api = Aggregator(config)
 
-        result = api.getPosition(["1", "1"], [100L, 200L], ["REF", "END", "POSITION"])
+        result = api.getPosition(["1", "1"], [100L, 200L], [
+                                 "REF", "END", "POSITION"])
 
         args, kwargs = runMPI_patch.call_args
         assert result == stub_result
@@ -91,8 +106,10 @@ class TestAggregator():
             assert isinstance(created_json["query_column_ranges"][0][0], dict)
             assert isinstance(created_json["query_column_ranges"][0][1], dict)
             assert len(created_json["query_column_ranges"][0][0]) == 1
-            assert created_json["query_column_ranges"][0][0] == dict({"1": 100})
-            assert created_json["query_column_ranges"][0][1] == dict({"1": 200})
+            assert created_json["query_column_ranges"][
+                0][0] == dict({"1": 100})
+            assert created_json["query_column_ranges"][
+                0][1] == dict({"1": 200})
 
         with pytest.raises(ValueError) as exec_info:
             api.getPosition(["1"], [100L, 200L], ["REF"])
@@ -116,7 +133,8 @@ class TestAggregator():
             assert len(created_json["query_column_ranges"][0]) == 1
             assert isinstance(created_json["query_column_ranges"][0][0], dict)
             assert len(created_json["query_column_ranges"][0][0]) == 1
-            assert created_json["query_column_ranges"][0][0] == dict({"1": [100, 110]})
+            assert created_json["query_column_ranges"][
+                0][0] == dict({"1": [100, 110]})
 
         config.util.DEBUG = False
         result = api.getPositionRange("1", 100L, 110L, ["REF"])
@@ -129,7 +147,8 @@ class TestAggregator():
         config.util.DEBUG = True
         api = Aggregator(config)
 
-        result = api.getPositionRange(["1", "1"], [100L, 200L], [110L, 220L], ["REF", "END", "POSITION"])
+        result = api.getPositionRange(["1", "1"], [100L, 200L], [
+                                      110L, 220L], ["REF", "END", "POSITION"])
 
         args, kwargs = runMPI_patch.call_args
         assert result == stub_result
@@ -142,8 +161,10 @@ class TestAggregator():
             assert isinstance(created_json["query_column_ranges"][0][0], dict)
             assert isinstance(created_json["query_column_ranges"][0][1], dict)
             assert len(created_json["query_column_ranges"][0][0]) == 1
-            assert created_json["query_column_ranges"][0][0] == dict({"1": [100, 110]})
-            assert created_json["query_column_ranges"][0][1] == dict({"1": [200, 220]})
+            assert created_json["query_column_ranges"][
+                0][0] == dict({"1": [100, 110]})
+            assert created_json["query_column_ranges"][
+                0][1] == dict({"1": [200, 220]})
 
         with pytest.raises(ValueError) as exec_info:
             api.getPositionRange(["1"], [100L, 200L], [110L, 220L], ["REF"])

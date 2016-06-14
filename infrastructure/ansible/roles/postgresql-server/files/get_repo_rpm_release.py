@@ -25,10 +25,12 @@ pg_version = url.split('/')[3]
 if pg_version[0] == "8" and dist != "sl":
     re_pattern = 'href=[\'"](pgdg-%s-%s-[\d+].noarch.rpm)[\'"]' % (dist, pg_version)
 else:
-    re_pattern = 'href=[\'"](pgdg-%s%s-%s-[\d+].noarch.rpm)[\'"]' % (dist, pg_version.replace('.', ''), pg_version)
+    re_pattern = 'href=[\'"](pgdg-%s%s-%s-[\d+].noarch.rpm)[\'"]' % (dist,
+                                                                     pg_version.replace('.', ''), pg_version)
 match = re.findall(re_pattern, repo.read(), flags=re.I)
 
-assert match, "No matching %s pgdg repository packages found for version %s at %s" % (dist, pg_version, url)
+assert match, "No matching %s pgdg repository packages found for version %s at %s" % (
+    dist, pg_version, url)
 
 print match[0]
 

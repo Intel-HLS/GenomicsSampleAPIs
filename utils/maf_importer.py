@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-import sys, os, uuid, json, traceback
+import sys
+import os
+import uuid
+import json
+import traceback
 from multiprocessing import Pool
 
 import utils.csvline as csvline
@@ -12,6 +16,7 @@ from metadb.api import DBImport
 from metadb.models import CallSetToDBArrayAssociation
 
 CSVLine = csvline.CSVLine
+
 
 class MAF(File2Tile):
     """
@@ -60,7 +65,7 @@ class MAF(File2Tile):
         dba, vs, rs = helper.registerWithMetadb(self.config)
         self.prev_VariantSetId = vs.id
 
-    def generateCSV(self, inputFile, outFile, bVerbose = False):
+    def generateCSV(self, inputFile, outFile, bVerbose=False):
         """
         Implements the MAF specifics to generate a CSV output
         """
@@ -69,11 +74,12 @@ class MAF(File2Tile):
 
         nLine = 0L
         try:
-            while( self.parseNextLine() ):
+            while(self.parseNextLine()):
                 self.checkSample()
                 nLine += 1
-                if( bVerbose and (nLine % 50 == 0)):
-                    progressPrint("@Line {0} in file {1}".format(nLine, inputFile))
+                if(bVerbose and (nLine % 50 == 0)):
+                    progressPrint(
+                        "@Line {0} in file {1}".format(nLine, inputFile))
 
             # Cleanup and write the last CSV Line
             self.writeCSVLine()
@@ -95,16 +101,17 @@ class MAF(File2Tile):
         - If a new sample is identified, write the existing data, and copy current
         - If it is the same sample, then compare with previous and append if new
         """
-        if( self.prev_SourceSampleId == None or self.prev_TargetSampleId == None):
+        if(self.prev_SourceSampleId == None or self.prev_TargetSampleId == None):
             # first sample copy data
             self.saveCurrentData()
-        elif( self.prev_SourceSampleId != self.SourceSampleId or
-              self.prev_TargetSampleId != self.TargetSampleId or
-              self.prev_CallSetName != self.CallSetName or
-              self.prev_TileDBPosition != self.TileDBPosition or
-              self.prev_IndividualId != self.IndividualId):
+        elif(self.prev_SourceSampleId != self.SourceSampleId or
+             self.prev_TargetSampleId != self.TargetSampleId or
+             self.prev_CallSetName != self.CallSetName or
+             self.prev_TileDBPosition != self.TileDBPosition or
+             self.prev_IndividualId != self.IndividualId):
             # We have to write the current line and save a new line since the current
-            # data differs by the SampleId, CallSetName, VariantSetName or TileDBPosition
+            # data differs by the SampleId, CallSetName, VariantSetName or
+            # TileDBPosition
             self.writeCSVLine()
             self.saveCurrentData()
         else:
@@ -114,12 +121,13 @@ class MAF(File2Tile):
             # Picking ALT value at 0 since we know that MAF always has only one ALT per line.
             # If that is not the case, then this code needs to be updated
             if 'ALT' in self.TileDBValues.keys() \
-              and self.TileDBValues['ALT'][0] not in self.prev_TileDBValues['ALT']:
+                    and self.TileDBValues['ALT'][0] not in self.prev_TileDBValues['ALT']:
                 for key in self.TileDBValues.keys():
-                    if( key in CSVLine.arrayFields ):
+                    if(key in CSVLine.arrayFields):
                         for value in self.TileDBValues[key]:
                             if 'GT' == key:
-                                self.prev_TileDBValues[key].append(str(len(self.prev_TileDBValues[key]) + 1))
+                                self.prev_TileDBValues[key].append(
+                                    str(len(self.prev_TileDBValues[key]) + 1))
                                 continue
                             self.prev_TileDBValues[key].append(value)
 
@@ -128,9 +136,9 @@ class MAF(File2Tile):
         Copies the current data into the prev_ variables
         """
         if (self.prev_SourceSampleId != self.SourceSampleId or
-          self.prev_TargetSampleId != self.TargetSampleId or
-          self.prev_IndividualId != self.IndividualId or
-          self.prev_CallSetName != self.CallSetName):
+            self.prev_TargetSampleId != self.TargetSampleId or
+            self.prev_IndividualId != self.IndividualId or
+                self.prev_CallSetName != self.CallSetName):
 
             with self.dbimport.getSession() as metadb:
 
@@ -138,29 +146,35 @@ class MAF(File2Tile):
                 self.prev_SourceSampleId = self.SourceSampleId
                 self.prev_TargetSampleId = self.TargetSampleId
 
-                self.curr_Individual = metadb.registerIndividual(guid=str(uuid.uuid4()), name=self.prev_IndividualId)
-                self.curr_SourceSample = metadb.registerSample(guid=str(uuid.uuid4()), individual_guid=self.curr_Individual.guid, name=self.SourceSampleId, info={'type':'source'})
-                self.curr_TargetSample = metadb.registerSample(guid=str(uuid.uuid4()), individual_guid=self.curr_Individual.guid, name=self.TargetSampleId, info={'type':'target'})
+                self.curr_Individual = metadb.registerIndividual(
+                    guid=str(uuid.uuid4()), name=self.prev_IndividualId)
+                self.curr_SourceSample = metadb.registerSample(guid=str(uuid.uuid4(
+                )), individual_guid=self.curr_Individual.guid, name=self.SourceSampleId, info={'type': 'source'})
+                self.curr_TargetSample = metadb.registerSample(guid=str(uuid.uuid4(
+                )), individual_guid=self.curr_Individual.guid, name=self.TargetSampleId, info={'type': 'target'})
 
-                self.prev_CallSetName = self.CallSetName # "CallSet_"+self.prev_TargetSampleId+"_"+self.prev_SourceSampleId
+                # "CallSet_"+self.prev_TargetSampleId+"_"+self.prev_SourceSampleId
+                self.prev_CallSetName = self.CallSetName
 
                 self.curr_CallSet = metadb.registerCallSet(
-                  guid=str(uuid.uuid4()),
-                  source_sample_guid=self.curr_SourceSample.guid,
-                  target_sample_guid=self.curr_TargetSample.guid,
-                  workspace=self.config.TileDBSchema['workspace'],
-                  array_name=self.config.TileDBSchema['array'],
-                  name=self.prev_CallSetName,
-                  variant_set_ids=[self.prev_VariantSetId]
-                  )
+                    guid=str(uuid.uuid4()),
+                    source_sample_guid=self.curr_SourceSample.guid,
+                    target_sample_guid=self.curr_TargetSample.guid,
+                    workspace=self.config.TileDBSchema['workspace'],
+                    array_name=self.config.TileDBSchema['array'],
+                    name=self.prev_CallSetName,
+                    variant_set_ids=[self.prev_VariantSetId]
+                )
 
             row_id = None
             with self.dbquery.getSession() as query:
                 row_id = query.callSetIds2TileRowId([self.curr_CallSet.id],
-                                                  self.config.TileDBSchema['workspace'],
-                                                  self.config.TileDBSchema['array'],
-                                                  isGUID = False
-                                                  )[0]
+                                                    self.config.TileDBSchema[
+                                                        'workspace'],
+                                                    self.config.TileDBSchema[
+                                                        'array'],
+                                                    isGUID=False
+                                                    )[0]
             my_sample_name = "{0}-{1}-{2}-{3}".format(self.prev_IndividualId,
                                                       self.SourceSampleId,
                                                       self.TargetSampleId,
@@ -177,7 +191,7 @@ class MAF(File2Tile):
         """
         Creates the CSV object from the data set we have and writes it to disk
         """
-        if( self.prev_SourceSampleId == None or self.prev_TargetSampleId == None or self.prev_IndividualId == None):
+        if(self.prev_SourceSampleId == None or self.prev_TargetSampleId == None or self.prev_IndividualId == None):
             return
         """
         Since MAF represents insertions and deletions with a '-' it needs to
@@ -197,11 +211,11 @@ class MAF(File2Tile):
           End = MAF_End
         """
         # Insertion
-        if( self.prev_TileDBValues["REF"] == "-" ):
+        if(self.prev_TileDBValues["REF"] == "-"):
             assembly = self.prev_ChromosomePosition[IDX.CHR_ASSEMBLY]
             chromosome = self.prev_ChromosomePosition[IDX.CHR_CHR]
             start = self.prev_ChromosomePosition[IDX.CHR_START] - 1
-            end = start # self.prev_ChromosomePosition[IDX.CHR_END]
+            end = start  # self.prev_ChromosomePosition[IDX.CHR_END]
 
             ref = helper.getReference(assembly, chromosome, start, start)
             self.prev_TileDBValues["REF"] = ref
@@ -210,38 +224,43 @@ class MAF(File2Tile):
                 self.prev_TileDBValues["ALT"][index] = ref + value
                 index += 1
             with self.dbquery.getSession() as query:
-                self.prev_TileDBPosition = query.contig2Tile(self.array_idx, chromosome, [start, end])
+                self.prev_TileDBPosition = query.contig2Tile(
+                    self.array_idx, chromosome, [start, end])
         else:
             bFlag = False
             for value in self.prev_TileDBValues["ALT"]:
-                if( value == "-" ):
+                if(value == "-"):
                     bFlag = True
                     break
-            if( bFlag ):
+            if(bFlag):
                 assembly = self.prev_ChromosomePosition[IDX.CHR_ASSEMBLY]
                 chromosome = self.prev_ChromosomePosition[IDX.CHR_CHR]
                 start = self.prev_ChromosomePosition[IDX.CHR_START] - 1
                 end = self.prev_ChromosomePosition[IDX.CHR_END]
 
                 ref = helper.getReference(assembly, chromosome, start, start)
-                self.prev_TileDBValues["REF"] = ref + self.prev_TileDBValues["REF"]
+                self.prev_TileDBValues["REF"] = ref + \
+                    self.prev_TileDBValues["REF"]
                 index = 0
                 for value in self.prev_TileDBValues["ALT"]:
-                    if( value == "-" ):
+                    if(value == "-"):
                         self.prev_TileDBValues["ALT"][index] = ref
                     else:
                         self.prev_TileDBValues["ALT"][index] = ref + value
                     index += 1
 
                 with self.dbquery.getSession() as query:
-                    self.prev_TileDBPosition = query.contig2Tile(self.array_idx, chromosome, [start, end])
+                    self.prev_TileDBPosition = query.contig2Tile(
+                        self.array_idx, chromosome, [start, end])
 
         row_id = None
         with self.dbquery.getSession() as query:
             row_id = query.callSetIds2TileRowId([self.curr_CallSet.id],
-                                                self.config.TileDBSchema['workspace'],
-                                                self.config.TileDBSchema['array'],
-                                                isGUID = False
+                                                self.config.TileDBSchema[
+                                                    'workspace'],
+                                                self.config.TileDBSchema[
+                                                    'array'],
+                                                isGUID=False
                                                 )[0]
         self.m_csv_line.set("SampleId", row_id)
         self.m_csv_line.set("Location", self.prev_TileDBPosition[IDX.START])
@@ -253,28 +272,29 @@ class MAF(File2Tile):
         self.m_csv_line.set("PLOIDY", self.PLOIDY)
 
         for key in self.prev_TileDBValues.keys():
-            if( key == "ALT" ):
+            if(key == "ALT"):
                 continue
             value = self.prev_TileDBValues[key]
 
             # If the field is an array type and there are no entires then
-            # do not set it since the csvline.py would have taken care of it already
-            if key in CSVLine.arrayFields and len(value) == 0 :
+            # do not set it since the csvline.py would have taken care of it
+            # already
+            if key in CSVLine.arrayFields and len(value) == 0:
                 continue
 
             # For MAF the GT value from the MAF file is the first entry and
             # the second is always a 0
-            if( key == "GT" ):
+            if(key == "GT"):
                 if len(self.prev_TileDBValues['ALT']) > self.PLOIDY:
                     value = ['-1', '-1']
-                if len(value) == 1 :
+                if len(value) == 1:
                     value.append('0')
             # Cleanup Value
-            if( value == "" ):
-                value = csvline.EMPTYCHAR # Empty Char in Tile DB
+            if(value == ""):
+                value = csvline.EMPTYCHAR  # Empty Char in Tile DB
             self.m_csv_line.set(key, value)
         # Write the line into file
-        self.outFile.write(self.m_csv_line.getCSVLine() +  "\n")
+        self.outFile.write(self.m_csv_line.getCSVLine() + "\n")
 
     def checkCSV(self, inFile):
         """
@@ -289,7 +309,8 @@ class MAF(File2Tile):
         with open(inFile + ".original", 'w') as tmpFP:
             subprocess.call(["cat", inFile], stdout=tmpFP)
         with open(tmpFile, 'w') as tmpFP:
-            subprocess.call(["sort", "-k", "2", "-n", "-t", ",", inFile], stdout=tmpFP)
+            subprocess.call(["sort", "-k", "2", "-n", "-t",
+                             ",", inFile], stdout=tmpFP)
 
         p = subprocess.Popen(["wc", "-l", inFile], stdout=subprocess.PIPE)
         line_count = p.communicate()[0].split(' ')[0]
@@ -305,7 +326,7 @@ class MAF(File2Tile):
                 SId = csv.get('SampleId')
                 Location = csv.get('Location')
 
-                if Location != prev_Location :
+                if Location != prev_Location:
                     for l in csvMap.values():
                         outFP.write(l.getCSVLine())
                         outFP.write('\n')
@@ -365,6 +386,7 @@ class MAF(File2Tile):
         self.callset_mapping = dict()
         self.output_file = outFile
 
+
 def poolGenerateCSV((config_file, inputFile, outFile, bGzipped)):
     """
     This function is used by multiprocess.Pool to generate CSV for each input file
@@ -381,6 +403,7 @@ def poolGenerateCSV((config_file, inputFile, outFile, bGzipped)):
         print str(e)
         return (-1, inputFile)
     return (0, outFile, maf.callset_mapping)
+
 
 def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzipped):
     """
@@ -409,7 +432,7 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzip
             failed.append(returncode[1])
         else:
             print "Completed: {0} with {1} Call Sets".format(returncode[1], len(returncode[2]))
-            os.system('cat %s >> %s'%(returncode[1], combinedOutput))
+            os.system('cat %s >> %s' % (returncode[1], combinedOutput))
             callset_mapping["unsorted_csv_files"].append(returncode[1])
             callsets.update(returncode[2])
 
@@ -419,4 +442,5 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzip
             print "\t{0}".format(f)
         raise Exception("Execution failed on {0}".format(failed))
 
-    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config.DB_URI, combinedOutputFile=combinedOutputFile)
+    helper.createMappingFiles(outputDir, callset_mapping, rs.id,
+                              config.DB_URI, combinedOutputFile=combinedOutputFile)

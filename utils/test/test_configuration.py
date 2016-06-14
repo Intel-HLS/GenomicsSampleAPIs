@@ -1,15 +1,26 @@
-import pytest, unittest, os, sys, json
+import pytest
+import unittest
+import os
+import sys
+import json
 import utils.configuration as configuration
 
-config_path = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_config.json")
+config_path = os.path.join(os.path.realpath(
+    sys.argv[-1]), "utils/example_configs/icgc_config.json")
+
+
 class TestConfigReader(unittest.TestCase):
+
     @classmethod
     def setUpClass(self):
         with open(config_path, 'r') as readFP:
             config_json = json.load(readFP)
-            config_json["TileDBConfig"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/tiledb_config.json")
-            config_json["TileDBAssembly"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/hg19.json")
-            config_json["VariantSetMap"]["VariantConfig"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_variants.json")
+            config_json["TileDBConfig"] = os.path.join(os.path.realpath(
+                sys.argv[-1]), "utils/example_configs/tiledb_config.json")
+            config_json["TileDBAssembly"] = os.path.join(
+                os.path.realpath(sys.argv[-1]), "utils/example_configs/hg19.json")
+            config_json["VariantSetMap"]["VariantConfig"] = os.path.join(
+                os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_variants.json")
         with open(config_path, 'w') as writeFP:
             writeFP.write(json.dumps(config_json))
 

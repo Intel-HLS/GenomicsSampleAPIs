@@ -2,21 +2,22 @@ import pytest
 import metadb.api.query as query
 import metadb.models as models
 
+
 class TestQuery:
     DBURI = "postgresql+psycopg2://@:5432/metadb"
     workspace = "/home/variantdb/DB"
     arrayName = "test"
     numRows = 8
     chromosomes = ["1", "2", "3", "4", "5", "6", "7",
-                  "8", "9", "10", "11", "12", "13", "14",
-                  "15", "16", "17", "18", "19", "20", "21",
-                  "22", "X", "Y", "M"]
+                   "8", "9", "10", "11", "12", "13", "14",
+                   "15", "16", "17", "18", "19", "20", "21",
+                   "22", "X", "Y", "M"]
     chromosome_lengths = {
-      "1":249250621, "2":243199373, "3":198022430, "4":191154276, "5":180915260,
-      "6":171115067, "7":159138663, "8":146364022, "9":141213431, "10":135534747,
-      "11":135006516, "12":133851895, "13":115169878, "14":107349540, "15":102531392,
-      "16":90354753, "17":81195210, "18":78077248, "19":59128983, "20":63025520,
-      "21":48129895, "22":51304566, "X":155270560, "Y":59373566, "M":16571
+        "1": 249250621, "2": 243199373, "3": 198022430, "4": 191154276, "5": 180915260,
+        "6": 171115067, "7": 159138663, "8": 146364022, "9": 141213431, "10": 135534747,
+        "11": 135006516, "12": 133851895, "13": 115169878, "14": 107349540, "15": 102531392,
+        "16": 90354753, "17": 81195210, "18": 78077248, "19": 59128983, "20": 63025520,
+        "21": 48129895, "22": 51304566, "X": 155270560, "Y": 59373566, "M": 16571
     }
     dataset_id = "TileDB"
 
@@ -35,7 +36,7 @@ class TestQuery:
     def test_individualId2Name_range_idx(self):
         with query.DBQuery(self.DBURI).getSession() as session:
             # Using range that is greater than # samples in the test db
-            idx = range(1,self.numRows + 2)
+            idx = range(1, self.numRows + 2)
             result = session.individualId2Name(idx)
             self.typeCheck(result, list, unicode, len(idx))
             assert result[-1] == None
@@ -51,7 +52,7 @@ class TestQuery:
     def test_individualName2Id_range_idx(self):
         with query.DBQuery(self.DBURI).getSession() as session:
             # Using range that is greater than # samples in the test db
-            idx = range(1,self.numRows + 2)
+            idx = range(1, self.numRows + 2)
             name = session.individualId2Name(idx)[0:4]
             name.append("invalid_name")
             result = session.individualName2Id(name)
@@ -79,7 +80,8 @@ class TestQuery:
             result = session.tileNames2ArrayIdx(self.workspace, self.arrayName)
             assert result == 1
 
-            result = session.tileNames2ArrayIdx(self.workspace + '/', self.arrayName)
+            result = session.tileNames2ArrayIdx(
+                self.workspace + '/', self.arrayName)
             assert result == 1
 
     def test_tileNames2ArrayIdx_neg_test_workspace(self):
@@ -129,7 +131,8 @@ class TestQuery:
                     self.typeCheck(MT_result, list, long, 1)
                     assert MT_result == result
 
-                resultContigList, resultPositionList = session.tile2Contig(idx, result)
+                resultContigList, resultPositionList = session.tile2Contig(
+                    idx, result)
                 self.typeCheck(resultContigList, list, str, 1)
                 self.typeCheck(resultPositionList, list, long, 1)
                 assert resultContigList[0] == contig
@@ -225,12 +228,12 @@ class TestQuery:
     def test_getArrayRows_idx(self):
         idx = 1
         with query.DBQuery(self.DBURI).getSession() as session:
-            result = session.getArrayRows(array_idx = idx)
+            result = session.getArrayRows(array_idx=idx)
             assert isinstance(result, dict)
             self.typeCheck(result[idx], list, long, self.numRows)
             assert result[idx] == range(0, self.numRows)
 
-            result = session.getArrayRows(array_idx = -1)
+            result = session.getArrayRows(array_idx=-1)
             assert isinstance(result, dict)
             assert len(result) == 0
 
@@ -242,12 +245,12 @@ class TestQuery:
                 result = session.tileRow2CallSet(idx, tile_row_id)
                 callset_guid[tile_row_id] = result[1]
 
-            result = session.getArrayRows(callSets = callset_guid)
+            result = session.getArrayRows(callSets=callset_guid)
             assert isinstance(result, dict)
             self.typeCheck(result[idx], list, long, self.numRows)
             assert result[idx] == range(0, self.numRows)
 
-            result = session.getArrayRows(callSets = ["invalid"])
+            result = session.getArrayRows(callSets=["invalid"])
             assert isinstance(result, dict)
             assert len(result) == 0
 
@@ -257,12 +260,12 @@ class TestQuery:
             result = session.datasetId2VariantSets(self.dataset_id)
             vs = result[0]
 
-            result = session.getArrayRows(variantSets = [vs.guid])
+            result = session.getArrayRows(variantSets=[vs.guid])
             assert isinstance(result, dict)
             self.typeCheck(result[idx], list, long, self.numRows)
             assert result[idx] == range(0, self.numRows)
 
-            result = session.getArrayRows(variantSets = ["invalid"])
+            result = session.getArrayRows(variantSets=["invalid"])
             assert isinstance(result, dict)
             assert len(result) == 0
 
@@ -277,22 +280,24 @@ class TestQuery:
             result = session.datasetId2VariantSets(self.dataset_id)
             vs = result[0]
 
-            result = session.getArrayRows(array_idx = idx, variantSets = [vs.guid])
+            result = session.getArrayRows(array_idx=idx, variantSets=[vs.guid])
             assert isinstance(result, dict)
             self.typeCheck(result[idx], list, long, self.numRows)
             assert result[idx] == range(0, self.numRows)
 
-            result = session.getArrayRows(array_idx = idx, callSets = callset_guid)
+            result = session.getArrayRows(array_idx=idx, callSets=callset_guid)
             assert isinstance(result, dict)
             self.typeCheck(result[idx], list, long, self.numRows)
             assert result[idx] == range(0, self.numRows)
 
-            result = session.getArrayRows(variantSets = [vs.guid], callSets = callset_guid)
+            result = session.getArrayRows(
+                variantSets=[vs.guid], callSets=callset_guid)
             assert isinstance(result, dict)
             self.typeCheck(result[idx], list, long, self.numRows)
             assert result[idx] == range(0, self.numRows)
 
-            result = session.getArrayRows(array_idx = idx, callSets = callset_guid, variantSets = [vs.guid])
+            result = session.getArrayRows(
+                array_idx=idx, callSets=callset_guid, variantSets=[vs.guid])
             assert isinstance(result, dict)
             self.typeCheck(result[idx], list, long, self.numRows)
             assert result[idx] == range(0, self.numRows)
@@ -310,23 +315,24 @@ class TestQuery:
             tile_rows_for_callset_id = session.callSetIds2TileRowId(callset_id,
                                                                     self.workspace,
                                                                     self.arrayName,
-                                                                    isGUID = False)
+                                                                    isGUID=False)
             self.typeCheck(tile_rows_for_callset_id, list, str, self.numRows)
 
             tile_rows_for_callset_guid = session.callSetIds2TileRowId(callset_guid,
-                                                                    self.workspace + '/',
-                                                                    self.arrayName,
-                                                                    isGUID = True)
+                                                                      self.workspace + '/',
+                                                                      self.arrayName,
+                                                                      isGUID=True)
             self.typeCheck(tile_rows_for_callset_guid, list, str, self.numRows)
 
             assert tile_rows_for_callset_id == tile_rows_for_callset_guid
 
             callset_id.append(-1)
             neg_tile_rows_for_callset_id = session.callSetIds2TileRowId(callset_id,
-                                                                    self.workspace,
-                                                                    self.arrayName,
-                                                                    isGUID = False)
-            self.typeCheck(neg_tile_rows_for_callset_id, list, str, self.numRows)
+                                                                        self.workspace,
+                                                                        self.arrayName,
+                                                                        isGUID=False)
+            self.typeCheck(neg_tile_rows_for_callset_id,
+                           list, str, self.numRows)
 
             assert neg_tile_rows_for_callset_id == tile_rows_for_callset_id
 
@@ -345,9 +351,10 @@ class TestQuery:
         with query.DBQuery(self.DBURI).getSession() as session:
             idx = session.tileNames2ArrayIdx(self.workspace, self.arrayName)
             for tile_row_id in range(0, self.numRows):
-                s_idx = 2*tile_row_id + 1
+                s_idx = 2 * tile_row_id + 1
                 callset_guid = session.tileRow2CallSet(idx, tile_row_id)[1]
-                callsets_samples[tile_row_id] = (callset_guid, long(s_idx), long(s_idx+1))
+                callsets_samples[tile_row_id] = (
+                    callset_guid, long(s_idx), long(s_idx + 1))
 
             result = session.arrayIdx2CallSets(idx)
             self.typeCheck(result, list, tuple, self.numRows)

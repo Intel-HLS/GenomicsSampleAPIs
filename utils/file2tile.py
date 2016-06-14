@@ -2,16 +2,17 @@ import csvline
 from utils.configuration import ConfigReader
 from metadb.api.query import DBQuery
 
+
 class IDX:
     """
     Class that defines the constants
     """
     # Test and use type tuples
-    FLAG          = 0
-    VALUE         = 1
+    FLAG = 0
+    VALUE = 1
     VARIANTLOOKUP = 2
     VARIANTCONFIG = 3
-    LOOKUPIDX     = 4
+    LOOKUPIDX = 4
 
     # Position Indices
     START = 0
@@ -23,6 +24,7 @@ class IDX:
     CHR_START = 2
     CHR_END = 3
 
+
 class File2Tile(object):
 
     def __init__(self, config_file):
@@ -33,7 +35,8 @@ class File2Tile(object):
         self.TargetSampleId = None
 
         # CallSetId is a list of length 2 where the first element says whether the
-        # CallSetId is a constant for the input file or based on a field in the input
+        # CallSetId is a constant for the input file or based on a field in the
+        # input
         self.CallSetIdMap = None
 
         self.VariantSetName = None
@@ -60,7 +63,8 @@ class File2Tile(object):
 
         # Seperators in the input file
         # Required to have "line" as one of the entires in the map
-        # List fields can have their own seperators and they are defined in this map
+        # List fields can have their own seperators and they are defined in
+        # this map
         self.SeperatorMap = None
 
         # File Name without the extension
@@ -78,14 +82,14 @@ class File2Tile(object):
         # Values is the list of values from the input file
         self.values = None
 
-        self.IndividualIdMap   = self.config.IndividualIdMap
+        self.IndividualIdMap = self.config.IndividualIdMap
         self.SourceSampleIdMap = self.config.SourceSampleIdMap
         self.TargetSampleIdMap = self.config.TargetSampleIdMap
-        self.CallSetIdMap      = self.config.CallSetIdMap
-        self.PositionMap       = self.config.PositionMap
-        self.TileDBMap         = self.config.TileDBMap
-        self.SeperatorMap      = self.config.SeperatorMap
-        self.VariantNameMap    = self.config.VariantNameMap
+        self.CallSetIdMap = self.config.CallSetIdMap
+        self.PositionMap = self.config.PositionMap
+        self.TileDBMap = self.config.TileDBMap
+        self.SeperatorMap = self.config.SeperatorMap
+        self.VariantNameMap = self.config.VariantNameMap
 
         self.dbquery = DBQuery(self.config.DB_URI)
         # Save array_idx since it is used multiple times
@@ -123,36 +127,43 @@ class File2Tile(object):
             line = self.inFile.readline().strip()
         self.header = line.split(self.SeperatorMap["line"])
 
-        if( self.SourceSampleIdMap not in self.header ):
-            raise ValueError(self.SourceSampleIdMap + " is not a valid field in input file's header")
-        if( self.TargetSampleIdMap not in self.header ):
-            raise ValueError(self.TargetSampleIdMap + " is not a valid field in input file's header")
+        if(self.SourceSampleIdMap not in self.header):
+            raise ValueError(self.SourceSampleIdMap +
+                             " is not a valid field in input file's header")
+        if(self.TargetSampleIdMap not in self.header):
+            raise ValueError(self.TargetSampleIdMap +
+                             " is not a valid field in input file's header")
 
-        if( self.CallSetIdMap[IDX.FLAG] and self.CallSetIdMap[IDX.VALUE] not in self.header ):
-            raise ValueError(self.CallSetIdMap[IDX.VALUE] + " is not a valid field in input file's header")
+        if(self.CallSetIdMap[IDX.FLAG] and self.CallSetIdMap[IDX.VALUE] not in self.header):
+            raise ValueError(self.CallSetIdMap[
+                             IDX.VALUE] + " is not a valid field in input file's header")
 
-        for key in self.PositionMap.keys() :
-            if( key == "assembly" and self.PositionMap[key][IDX.FLAG] and
-                self.PositionMap[key][IDX.VALUE] not in self.header):
-                raise ValueError(self.PositionMap[key][IDX.VALUE] + " is not a valid field in input file's header")
+        for key in self.PositionMap.keys():
+            if(key == "assembly" and self.PositionMap[key][IDX.FLAG] and
+                    self.PositionMap[key][IDX.VALUE] not in self.header):
+                raise ValueError(self.PositionMap[key][
+                                 IDX.VALUE] + " is not a valid field in input file's header")
 
-            if( key != "assembly" and self.PositionMap[key] not in self.header ):
-                raise ValueError(self.PositionMap[key] + " is not a valid field in input file's header")
+            if(key != "assembly" and self.PositionMap[key] not in self.header):
+                raise ValueError(self.PositionMap[
+                                 key] + " is not a valid field in input file's header")
 
-        for value in self.TileDBMap.values() :
-            if( value not in self.header ):
-                raise ValueError(value + " is not a valid field in input file's header")
+        for value in self.TileDBMap.values():
+            if(value not in self.header):
+                raise ValueError(
+                    value + " is not a valid field in input file's header")
 
     def parseNextLine(self):
         """
         reads next line from the file and populates the values, and other fields
         """
-        if( self.header == None ):
+        if(self.header == None):
             self.getHeader()
 
-        self.values = self.inFile.readline().strip().split(self.SeperatorMap["line"])
+        self.values = self.inFile.readline().strip().split(
+            self.SeperatorMap["line"])
         # If we reach the end of file then return False
-        if( len(self.values) == 1 ):
+        if(len(self.values) == 1):
             return False
 
         self.SourceSampleId = self.getValue(self.SourceSampleIdMap)
@@ -160,7 +171,7 @@ class File2Tile(object):
         if self.IndividualIdMap == None:
             # work around incase indiviudal is not defined
             # assumes one normal sample per individual
-            self.IndividualId = 'Individual_'+self.SourceSampleId
+            self.IndividualId = 'Individual_' + self.SourceSampleId
         else:
             self.IndividualId = self.getValue(self.IndividualIdMap)
         self.updatePosition()
@@ -175,7 +186,7 @@ class File2Tile(object):
         getValue gets the value given a name of the column (stored in header)
         """
         index = self.header.index(name)
-        if( index < len(self.values) ):
+        if(index < len(self.values)):
             return self.values[index]
         else:
             return ""
@@ -187,7 +198,7 @@ class File2Tile(object):
         """
         assembly = self.PositionMap["assembly"]
         assemblyName = None
-        if( assembly[IDX.FLAG] ):
+        if(assembly[IDX.FLAG]):
             assemblyName = self.getValue(assembly[IDX.VALUE])
         else:
             assemblyName = assembly[IDX.VALUE]
@@ -198,7 +209,8 @@ class File2Tile(object):
 
         self.ChromosomePosition = [assemblyName, chromosome, Location, End]
         with self.dbquery.getSession() as query:
-            self.TileDBPosition = query.contig2Tile(self.array_idx, chromosome, [Location, End])
+            self.TileDBPosition = query.contig2Tile(
+                self.array_idx, chromosome, [Location, End])
 
     def updateCallSet(self):
         """
@@ -207,10 +219,10 @@ class File2Tile(object):
         """
         # If call set is static for the file then populate the CallSetName field and return
         # Else, pull from the values object
-        if( self.CallSetIdMap[IDX.FLAG] ):
+        if(self.CallSetIdMap[IDX.FLAG]):
             self.CallSetName = self.getValue(self.CallSetIdMap[IDX.VALUE])
         else:
-            if( self.CallSetName != None ):
+            if(self.CallSetName != None):
                 return
             else:
                 self.CallSetName = self.CallSetIdMap[IDX.VALUE]
@@ -222,15 +234,17 @@ class File2Tile(object):
         """
         # If call set is static for the file then populate the VariantName field and return
         # Else, pull from the values object
-        if( self.VariantNameMap[IDX.FLAG] ):
+        if(self.VariantNameMap[IDX.FLAG]):
             if self.VariantNameMap[IDX.VARIANTLOOKUP]:
                 VariantConfig = self.VariantNameMap[IDX.VARIANTCONFIG]
                 valueFromFile = self.getValue(self.VariantNameMap[IDX.VALUE])
-                self.VariantSetName = VariantConfig[valueFromFile][self.VariantNameMap[IDX.LOOKUPIDX]]
+                self.VariantSetName = VariantConfig[valueFromFile][
+                    self.VariantNameMap[IDX.LOOKUPIDX]]
             else:
-                self.VariantSetName = self.getValue(self.VariantNameMap[IDX.VALUE])
+                self.VariantSetName = self.getValue(
+                    self.VariantNameMap[IDX.VALUE])
         else:
-            if( self.VariantSetName != None ):
+            if(self.VariantSetName != None):
                 return
             else:
                 self.VariantSetName = self.VariantNameMap[IDX.VALUE]
@@ -243,11 +257,11 @@ class File2Tile(object):
         self.TileDBValues = dict()
         for key, token in self.TileDBMap.items():
             value = self.getValue(token)
-            if( key in csvline.CSVLine.arrayFields ):
+            if(key in csvline.CSVLine.arrayFields):
                 value = value.split(self.SeperatorMap.get(key, None))
                 if len(value) == 0:
                     value = [csvline.EMPTYCHAR]
-                if key == 'GT' :
+                if key == 'GT':
                     for j in xrange(0, len(value)):
                         if value[j] in self.config.GTMap.keys():
                             value[j] = self.config.GTMap[value[j]]

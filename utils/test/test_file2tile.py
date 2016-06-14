@@ -1,24 +1,34 @@
-import pytest, unittest, os, sys, json
+import pytest
+import unittest
+import os
+import sys
+import json
 from utils import file2tile
 
-config_path = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_config.json")
+config_path = os.path.join(os.path.realpath(
+    sys.argv[-1]), "utils/example_configs/icgc_config.json")
 test_header = ["icgc_mutation_id", "project_code", "icgc_donor_id",
-        "icgc_sample_id", "matched_icgc_sample_id", "variation_calling_algorithm",
-        "assembly_version", "chromosome", "chromosome_start",
-        "chromosome_end", "reference_genome_allele", "mutated_to_allele",
-        "quality_score", "probability", "total_read_count",
-        "mutant_allele_read_count", "chromosome_strand"]
+               "icgc_sample_id", "matched_icgc_sample_id", "variation_calling_algorithm",
+               "assembly_version", "chromosome", "chromosome_start",
+               "chromosome_end", "reference_genome_allele", "mutated_to_allele",
+               "quality_score", "probability", "total_read_count",
+               "mutant_allele_read_count", "chromosome_strand"]
 test_data = ["pytest", "ALL-US", "test_person", "target_id", "source_id", "caller",
-        "GRCh37", "1", "100", "150", "T", "A", "0.35", "0.9", "100", "90", "0|1"]
+             "GRCh37", "1", "100", "150", "T", "A", "0.35", "0.9", "100", "90", "0|1"]
+
 
 class TestFile2Tile(unittest.TestCase):
+
     @classmethod
     def setUpClass(self):
         with open(config_path, 'r') as readFP:
             config_json = json.load(readFP)
-            config_json["TileDBConfig"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/tiledb_config.json")
-            config_json["TileDBAssembly"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/hg19.json")
-            config_json["VariantSetMap"]["VariantConfig"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_variants.json")
+            config_json["TileDBConfig"] = os.path.join(os.path.realpath(
+                sys.argv[-1]), "utils/example_configs/tiledb_config.json")
+            config_json["TileDBAssembly"] = os.path.join(
+                os.path.realpath(sys.argv[-1]), "utils/example_configs/hg19.json")
+            config_json["VariantSetMap"]["VariantConfig"] = os.path.join(
+                os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_variants.json")
         with open(config_path, 'w') as writeFP:
             writeFP.write(json.dumps(config_json))
 
@@ -68,10 +78,10 @@ class TestFile2Tile(unittest.TestCase):
 
     def test_getHeader_negative_testing(self):
         fields_to_remove = ["icgc_sample_id", "matched_icgc_sample_id", "variation_calling_algorithm",
-            "assembly_version", "chromosome", "chromosome_start",
-            "chromosome_end", "reference_genome_allele", "mutated_to_allele",
-            "quality_score", "probability", "total_read_count",
-            "mutant_allele_read_count", "chromosome_strand"]
+                            "assembly_version", "chromosome", "chromosome_start",
+                            "chromosome_end", "reference_genome_allele", "mutated_to_allele",
+                            "quality_score", "probability", "total_read_count",
+                            "mutant_allele_read_count", "chromosome_strand"]
         for field_to_remove in fields_to_remove:
             self.helper(field_to_remove, self.tmpdir)
 
@@ -93,7 +103,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.header == None
             with pytest.raises(ValueError) as exec_info:
                 f2t.getHeader()
-            assert "{0} is not a valid field in input file's header".format(field_to_remove) in str(exec_info.value)
+            assert "{0} is not a valid field in input file's header".format(
+                field_to_remove) in str(exec_info.value)
 
     def test_parseNextLine(self):
         input_file = self.tmpdir.join("in.txt")
@@ -118,7 +129,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == test_data[5]
             assert f2t.VariantSetName == "Blood"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["90"], "GT": ["0|1"]})
 
@@ -148,7 +160,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == test_data[5]
             assert f2t.VariantSetName == "Blood"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["*"], "GT": ["0|1"]})
 
@@ -184,7 +197,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == test_data[5]
             assert f2t.VariantSetName == "Blood"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["90"], "GT": ["y", "x"]})
 
@@ -223,7 +237,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == test_data[5]
             assert f2t.VariantSetName == "my_test_variant"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["90"], "GT": ["0|1"]})
 
@@ -259,7 +274,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == test_data[5]
             assert f2t.VariantSetName == "ALL-US"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["90"], "GT": ["0|1"]})
 
@@ -298,7 +314,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == "my_test_callset"
             assert f2t.VariantSetName == "Blood"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["90"], "GT": ["0|1"]})
 
@@ -338,7 +355,8 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == test_data[5]
             assert f2t.VariantSetName == "Blood"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["90"], "GT": ["0|1"]})
 
@@ -376,6 +394,7 @@ class TestFile2Tile(unittest.TestCase):
             assert f2t.SourceSampleId == test_data[4]
             assert f2t.CallSetName == test_data[5]
             assert f2t.VariantSetName == "Blood"
-            assert f2t.TileDBPosition == [int(test_data[8]) - 1, int(test_data[9]) - 1]
+            assert f2t.TileDBPosition == [
+                int(test_data[8]) - 1, int(test_data[9]) - 1]
             assert f2t.TileDBValues == dict({"REF": "T", "ALT": ["A"], "QUAL": "0.35",
                                              "AF": ["0.9"], "AN": "100", "AC": ["90"], "GT": ["0|1"]})

@@ -1,7 +1,9 @@
 import pytest
 import python_api.util as util
 
+
 class TestUtil:
+
     def test_flattenStartEnd_simple(self):
         result = util.flattenStartEnd([1, 10, 20], [5, 15, 25])
         assert result[0] == [1, 10, 20]
