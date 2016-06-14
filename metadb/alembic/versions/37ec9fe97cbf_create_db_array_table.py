@@ -21,10 +21,13 @@ def upgrade():
         'db_array',
         sa.Column('id', sa.BigInteger, primary_key=True),
         sa.Column('guid', sa.String(36), nullable=False, unique=True),
-        sa.Column('reference_set_id', sa.BigInteger, sa.ForeignKey('reference_set.id'), nullable=False),
-        sa.Column('workspace_id', sa.BigInteger, sa.ForeignKey('workspace.id'), nullable=False),
+        sa.Column('reference_set_id', sa.BigInteger,
+                  sa.ForeignKey('reference_set.id'), nullable=False),
+        sa.Column('workspace_id', sa.BigInteger,
+                  sa.ForeignKey('workspace.id'), nullable=False),
         sa.Column('name', sa.Text, nullable=False)
     )
+
 
 def downgrade():
     op.drop_table('db_array')

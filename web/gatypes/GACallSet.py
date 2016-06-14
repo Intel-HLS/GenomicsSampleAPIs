@@ -1,7 +1,10 @@
 import json
+
+
 class GACallSet(object):
     """Base GACallSet representation for ga4gh responses"""
-    def __init__(self, id="", name=None, sampleId="", variantSetIds=[], created = None, updated = None, info={}):
+
+    def __init__(self, id="", name=None, sampleId="", variantSetIds=[], created=None, updated=None, info={}):
 
         id = str(id)
         sampleId = str(sampleId)
@@ -13,9 +16,10 @@ class GACallSet(object):
             created = long(created)
 
         if updated:
-            updated= long(updated)
+            updated = long(updated)
 
-        self.gacallset_info = {'id': id, 'name':name, 'sampleId':sampleId, 'variantSetIds':variantSetIds, 'created':created, 'updated':updated, 'info':info}
+        self.gacallset_info = {'id': id, 'name': name, 'sampleId': sampleId,
+                               'variantSetIds': variantSetIds, 'created': created, 'updated': updated, 'info': info}
 
     def getJSON(self):
         return json.dumps(self.gacallset_info)

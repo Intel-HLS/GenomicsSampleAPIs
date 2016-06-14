@@ -19,5 +19,6 @@ import sqlalchemy as sa
 def upgrade():
     op.alter_column('individual', 'name', nullable=False)
 
+
 def downgrade():
     op.alter_column('individual', 'name', nullable=None)

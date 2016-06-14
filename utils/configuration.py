@@ -1,6 +1,8 @@
 import json
 
+
 class ConfigReader:
+
     def __init__(self, config_file):
         with open(config_file, "r") as fp:
             jsonMap = json.load(fp)
@@ -11,18 +13,18 @@ class ConfigReader:
         getDictValue(self.TileDBSchema, "workspace")
         getDictValue(self.TileDBSchema, "array")
 
-
         getDictValue(self.TileDBSchema, "fields_list")
         getDictValue(self.TileDBSchema, "ftypes_list")
 
         # if the name ends with a / then remove it from the name.
         # This is done only for consistency in workspace name
         # since users could have / or not for the workspace.
-        self.TileDBSchema['workspace'] = self.TileDBSchema['workspace'].rstrip('/')
+        self.TileDBSchema['workspace'] = self.TileDBSchema[
+            'workspace'].rstrip('/')
 
         self.HeaderStartsWith = getDictValue(jsonMap, "HeaderStartsWith")
 
-        #Individual defaults to None
+        # Individual defaults to None
         self.IndividualIdMap = jsonMap.get("IndividualId", None)
         self.SourceSampleIdMap = getDictValue(jsonMap, "SourceSampleId")
         self.TargetSampleIdMap = getDictValue(jsonMap, "TargetSampleId")
@@ -45,7 +47,8 @@ class ConfigReader:
             fp = open(VariantConfig, 'r')
             VariantConfig = json.load(fp)
             fp.close()
-        self.VariantNameMap = [bDynamic, VariantName, bVariantLookup, VariantConfig, LookupIdx]
+        self.VariantNameMap = [bDynamic, VariantName,
+                               bVariantLookup, VariantConfig, LookupIdx]
 
         # Setup PositionMap
         self.PositionMap = getDictValue(jsonMap, "Position")
@@ -76,6 +79,7 @@ class ConfigReader:
         self.Constants = getDictValue(jsonMap, 'Constants')
         getDictValue(self.Constants, 'PLOIDY')
 
+
 def getDictValue(inDictionary, inString):
     """
     Takes a dictionary object and looks for inString in the dictionary
@@ -83,6 +87,6 @@ def getDictValue(inDictionary, inString):
     Else, the object is returned
     """
     returnObject = inDictionary.get(inString, None)
-    if( returnObject == None ):
+    if(returnObject == None):
         raise ValueError(inString + " is a required field")
     return returnObject

@@ -23,5 +23,6 @@ def upgrade():
         sa.Column('accession_id', sa.Text, nullable=False)
     )
 
+
 def downgrade():
     op.drop_table('source_accession')

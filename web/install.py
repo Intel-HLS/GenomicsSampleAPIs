@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 
-import ConfigParser, os, sys, site, grp, argparse
+import ConfigParser
+import os
+import sys
+import site
+import grp
+import argparse
+
 
 def installPaths(ga4ghPath):
     # Add path into the python site-packages of this user
     py_site_packages = site.USER_SITE
 
-    if not os.path.exists(py_site_packages) :
+    if not os.path.exists(py_site_packages):
         os.makedirs(py_site_packages)
 
     pathFile = os.path.join(py_site_packages, "GA4GHAPI.pth")
@@ -16,11 +22,14 @@ def installPaths(ga4ghPath):
     fp.write(ga4ghPath + "\n")
     fp.close()
 
+
 def main():
     # Get the installation path for the APIs repo
     apar = argparse.ArgumentParser()
-    apar.add_argument("-p", "--port", type=int, default=8008,  help="port for web server")
-    apar.add_argument("-s", "--socket", type=str, default="unix:/var/uwsgi/ga4gh.sock",  help="string with socket information fo uwsgi")
+    apar.add_argument("-p", "--port", type=int, default=8008,
+                      help="port for web server")
+    apar.add_argument("-s", "--socket", type=str, default="unix:/var/uwsgi/ga4gh.sock",
+                      help="string with socket information fo uwsgi")
     args = apar.parse_args()
     listenPort = args.port
     socket = args.socket
@@ -30,9 +39,10 @@ def main():
 
     installPaths(ga4ghPath)
     virtualenv = updateConfigs(basePath, ga4ghPath)
-    getHttpdConf(sockpath = socket, port=listenPort)
+    getHttpdConf(sockpath=socket, port=listenPort)
     getuwsgiConf(basePath)
     print "DONE"
+
 
 def updateConfigs(basePath, ga4ghPath):
     configFile = os.path.join(ga4ghPath, "ga4gh.conf")
@@ -43,20 +53,22 @@ def updateConfigs(basePath, ga4ghPath):
     parser.read(configFile)
 
     # consider having this part fill from the import process
-    if( parser.has_section('auto_configuration')):
+    if(parser.has_section('auto_configuration')):
         parser.set('auto_configuration', 'SEARCHLIB',
-                    getPath(basePath, "search_library/lib/libquery.so"))
+                   getPath(basePath, "search_library/lib/libquery.so"))
 
     with open(configFile, 'w') as fp:
         parser.write(fp)
 
     return parser.get('virtualenv', 'site_packages')
 
+
 def getPath(basePath, appendPath):
     set_file = os.path.join(basePath, appendPath)
-    if not os.path.exists(set_file) :
+    if not os.path.exists(set_file):
         raise Exception("{0} does not exist".format(set_file))
     return set_file
+
 
 def getHttpdConf(sockpath="unix:/var/uwsgi/ga4gh.sock", port=8008):
     print ""
@@ -74,10 +86,11 @@ def getHttpdConf(sockpath="unix:/var/uwsgi/ga4gh.sock", port=8008):
           uwsgi_pass %s;
       }
   }
-  """% (port, sockpath)
+  """ % (port, sockpath)
 
     print "copy ga4gh.service to your /etc/systemd/system/ga4gh.service"
     print ""
+
 
 def getuwsgiConf(basePath, sockpath="/var/uwsgi/ga4gh.sock"):
 
@@ -106,7 +119,7 @@ def getuwsgiConf(basePath, sockpath="/var/uwsgi/ga4gh.sock"):
     parser.set('uwsgi', 'socket', sockpath)
     parser.set('uwsgi', 'base', iniPath)
     parser.set('uwsgi', 'home', virtualenv)
-    parser.set('uwsgi', 'env', "PYTHONPATH="+iniPath)
+    parser.set('uwsgi', 'env', "PYTHONPATH=" + iniPath)
     parser.set('uwsgi', 'uid', myuser)
     parser.set('uwsgi', 'gid', grp.getgrnam(myuser).gr_name)
     parser.set('uwsgi', 'wsgi_file', 'wsgi.py')
@@ -122,7 +135,7 @@ def getuwsgiConf(basePath, sockpath="/var/uwsgi/ga4gh.sock"):
 
     configFile = os.path.join(iniPath, "ga4gh.service")
 
-    bindir=os.path.join(virtualenv,"bin")
+    bindir = os.path.join(virtualenv, "bin")
 
     parser = ConfigParser.ConfigParser()
     parser.optionxform = str
@@ -134,8 +147,10 @@ def getuwsgiConf(basePath, sockpath="/var/uwsgi/ga4gh.sock"):
     parser.set('Service', 'User', myuser)
     parser.set('Service', 'Group', grp.getgrnam(myuser).gr_name)
     parser.set('Service', 'WorkdingDirectory', basePath)
-    parser.set('Service', 'Environment', "PATH="+bindir+' LD_LIBRARY_PATH=/usr/lib64/openmpi/lib')
-    parser.set('Service', 'ExecStart', os.path.join(bindir,"uwsgi")+" --ini "+os.path.join(iniPath,"ga4gh.ini"))
+    parser.set('Service', 'Environment', "PATH=" + bindir +
+               ' LD_LIBRARY_PATH=/usr/lib64/openmpi/lib')
+    parser.set('Service', 'ExecStart', os.path.join(
+        bindir, "uwsgi") + " --ini " + os.path.join(iniPath, "ga4gh.ini"))
 
     with open(configFile, 'w') as fp:
         parser.write(fp)

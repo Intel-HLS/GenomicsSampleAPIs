@@ -19,10 +19,11 @@ import sqlalchemy as sa
 def upgrade():
     op.create_table(
         'reference',
-        sa.Column('id', sa.BigInteger, primary_key = True),
+        sa.Column('id', sa.BigInteger, primary_key=True),
         sa.Column('guid', sa.String(36), nullable=False, unique=True),
         sa.Column('length', sa.BigInteger),
-        sa.Column('reference_set_id', sa.BigInteger, sa.ForeignKey('reference_set.id'), nullable=False),
+        sa.Column('reference_set_id', sa.BigInteger,
+                  sa.ForeignKey('reference_set.id'), nullable=False),
         sa.Column('md5_checksum', sa.String(32)),
         sa.Column('name', sa.Text),
         sa.Column('source_uri', sa.Text),
@@ -31,6 +32,7 @@ def upgrade():
         sa.Column('ncbi_taxon_id', sa.Integer),
         sa.Column('offset', sa.BigInteger)
     )
+
 
 def downgrade():
     op.drop_table('reference')

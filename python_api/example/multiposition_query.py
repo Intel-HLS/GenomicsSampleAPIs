@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 
-import os, sys
+import os
+import sys
 import json
 
-import Pyro4, Pyro4.util
+import Pyro4
+import Pyro4.util
 sys.excepthook = Pyro4.util.excepthook
+
 
 def process(chromosome, position, attributes):
     nameServer = Pyro4.locateNS()
-    nodes = nameServer.list(regex = "tile.master*")
+    nodes = nameServer.list(regex="tile.master*")
 
     for name, uri in nodes.items():
         api = Pyro4.Proxy(uri)
 
         print "Results from {0} ".format(name)
 
-        data =  api.getPosition(chromosome, position, attributes)
+        data = api.getPosition(chromosome, position, attributes)
         data = json.loads(data)
 
         totalSamples = 0
@@ -47,9 +50,10 @@ if __name__ == '__main__':
     description = "Example on how to use the Python API. "
     description += "Sample Query: {0} -c 1 -p 100 \
                     -a ALT REF QUAL PL".format(sys.argv[0])
-    parser = argparse.ArgumentParser(description = description)
+    parser = argparse.ArgumentParser(description=description)
 
-    parser.add_argument("-c", "--chromosome", required=True, type=str, nargs='+', help="Chromosome")
+    parser.add_argument("-c", "--chromosome", required=True,
+                        type=str, nargs='+', help="Chromosome")
     parser.add_argument("-p", "--position", required=True, type=long, nargs='+',
                         help="position in the chromosome")
     parser.add_argument("-a", "--attributes", nargs='+', required=True, type=str,

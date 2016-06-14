@@ -6,6 +6,7 @@ file that tiledb can load.
 EMPTYCHAR = '*'
 NUM_SB = 4
 
+
 class CSVLine:
     """
     Holds data required to build a CSV Line.
@@ -15,12 +16,13 @@ class CSVLine:
     num_versions = 1
 
     # Fields in Tile DB CSV
-    # It is a 2D array, and each element is an array represents the fields of a version
-    fieldNames = [["SampleId","Location","End","REF",
-                "ALT","QUAL","numFilter",
-                "FilterId","BaseQRankSum","ClippingRankSum",
-                "MQRankSum","ReadPosRankSum","MQ","MQ0","AF","AN","AC","DP",
-                "DP_FMT","MIN_DP","GQ","SB","AD","PL","PLOIDY","GT","PS"]]
+    # It is a 2D array, and each element is an array represents the fields of
+    # a version
+    fieldNames = [["SampleId", "Location", "End", "REF",
+                   "ALT", "QUAL", "numFilter",
+                   "FilterId", "BaseQRankSum", "ClippingRankSum",
+                   "MQRankSum", "ReadPosRankSum", "MQ", "MQ0", "AF", "AN", "AC", "DP",
+                   "DP_FMT", "MIN_DP", "GQ", "SB", "AD", "PL", "PLOIDY", "GT", "PS"]]
     arrayFields = ["ALT", "FilterId", "SB", "AD", "PL", "GT", "AF", "AC"]
 
     def __init__(self, version=1):
@@ -42,7 +44,7 @@ class CSVLine:
         self.error = None
 
         # Init fields based on the version
-        for i in range (0, self.version):
+        for i in range(0, self.version):
             self.fields.extend(self.fieldNames[i])
 
         # Init the values array based on the len of fields
@@ -59,54 +61,71 @@ class CSVLine:
         set is used to populate the CSV Line.
         It performs basic checks before adding the data into the CSV Line.
         """
-        if( attr in self.fields ):
+        if(attr in self.fields):
             index = self.fields.index(attr)
-            if( attr == "PLOIDY" ) :
+            if(attr == "PLOIDY"):
                 self.ploidy = value
                 self.values[self.fields.index("GT")] = [EMPTYCHAR] * value
-            elif( attr in self.arrayFields ):
-                if( isinstance(value, list)):
-                    if( attr == "SB" ):
-                        if( len(value) != NUM_SB ):
-                            raise ValueError("SB must have {0} entries".format(NUM_SB))
-                    elif( attr == "FilterId" ):
-                        self.values[self.fields.index("numFilter")] = len(value)
-                    elif( attr == "ALT" ):
+            elif(attr in self.arrayFields):
+                if(isinstance(value, list)):
+                    if(attr == "SB"):
+                        if(len(value) != NUM_SB):
+                            raise ValueError(
+                                "SB must have {0} entries".format(NUM_SB))
+                    elif(attr == "FilterId"):
+                        self.values[self.fields.index(
+                            "numFilter")] = len(value)
+                    elif(attr == "ALT"):
                         self.numALT = len(value)
                         self.numAD = self.numALT + 1
-                        self.numPL = ((self.numALT + 1) * (self.numALT + 2)) / 2
+                        self.numPL = ((self.numALT + 1) *
+                                      (self.numALT + 2)) / 2
 
                         # Init PL values to nulls
-                        self.values[self.fields.index("PL")] = [EMPTYCHAR] * self.numPL
+                        self.values[self.fields.index("PL")] = [
+                            EMPTYCHAR] * self.numPL
                         # Init AD values to nulls EMPTYCHAR
-                        self.values[self.fields.index("AD")] = [EMPTYCHAR] * self.numAD
-                        self.values[self.fields.index("AF")] = [EMPTYCHAR] * self.numALT
-                        self.values[self.fields.index("AC")] = [EMPTYCHAR] * self.numALT
-                    elif( attr == "AD" ):
-                        if( self.numALT == 0 ):
-                            raise SyntaxError("ALT must be set before calling set AD")
-                        elif( len(value) != self.numAD ):
-                            raise ValueError("AD[] must be of length {0} but given {1}".format((str)(self.numAD), value))
-                    elif( attr == "AF" ):
-                        if( self.numALT == 0 ):
-                            raise SyntaxError("ALT must be set before calling set AF")
-                        elif( len(value) != self.numALT ):
-                            raise ValueError("AF[] must be of length {0} but given {1} ".format((str)(self.numALT), value))
-                    elif( attr == "AC" ):
-                        if( self.numALT == 0 ):
-                            raise SyntaxError("ALT must be set before calling set AC")
-                        elif( len(value) != self.numALT ):
-                            raise ValueError("AC[] must be of length {0} but given {1}".format((str)(self.numALT), value))
-                    elif( attr == "PL" ):
-                        if( self.numALT == 0 ):
-                            raise SyntaxError("ALT must be set before calling set PL")
-                        elif( len(value) != self.numPL ):
-                            raise ValueError("PL[] must be of length {0} but given {1}".format((str)(self.numPL), value))
-                    elif( attr == "GT" ):
-                        if( self.ploidy == 0 ):
-                            raise SyntaxError("PLOIDY must be set before calling set GT")
-                        elif( len(value) != self.ploidy):
-                            raise ValueError("GT[] must be of length {0} but given {1}".format((str)(self.ploidy), value))
+                        self.values[self.fields.index("AD")] = [
+                            EMPTYCHAR] * self.numAD
+                        self.values[self.fields.index("AF")] = [
+                            EMPTYCHAR] * self.numALT
+                        self.values[self.fields.index("AC")] = [
+                            EMPTYCHAR] * self.numALT
+                    elif(attr == "AD"):
+                        if(self.numALT == 0):
+                            raise SyntaxError(
+                                "ALT must be set before calling set AD")
+                        elif(len(value) != self.numAD):
+                            raise ValueError("AD[] must be of length {0} but given {1}".format(
+                                (str)(self.numAD), value))
+                    elif(attr == "AF"):
+                        if(self.numALT == 0):
+                            raise SyntaxError(
+                                "ALT must be set before calling set AF")
+                        elif(len(value) != self.numALT):
+                            raise ValueError("AF[] must be of length {0} but given {1} ".format(
+                                (str)(self.numALT), value))
+                    elif(attr == "AC"):
+                        if(self.numALT == 0):
+                            raise SyntaxError(
+                                "ALT must be set before calling set AC")
+                        elif(len(value) != self.numALT):
+                            raise ValueError("AC[] must be of length {0} but given {1}".format(
+                                (str)(self.numALT), value))
+                    elif(attr == "PL"):
+                        if(self.numALT == 0):
+                            raise SyntaxError(
+                                "ALT must be set before calling set PL")
+                        elif(len(value) != self.numPL):
+                            raise ValueError("PL[] must be of length {0} but given {1}".format(
+                                (str)(self.numPL), value))
+                    elif(attr == "GT"):
+                        if(self.ploidy == 0):
+                            raise SyntaxError(
+                                "PLOIDY must be set before calling set GT")
+                        elif(len(value) != self.ploidy):
+                            raise ValueError("GT[] must be of length {0} but given {1}".format(
+                                (str)(self.ploidy), value))
                     else:
                         # Will never reach here
                         raise ValueError("Logic Error in name matching")
@@ -120,7 +139,7 @@ class CSVLine:
         """
         Gets the value that is currently stored
         """
-        if( attr in self.fields ):
+        if(attr in self.fields):
             index = self.fields.index(attr)
             return self.values[index]
         return None
@@ -132,7 +151,7 @@ class CSVLine:
         """
         bReturn = True
         value = self.get(attr)
-        if( value == EMPTYCHAR or long(value) < 0 ):
+        if(value == EMPTYCHAR or long(value) < 0):
             bReturn = False
 
         return (bReturn, value)
@@ -145,31 +164,32 @@ class CSVLine:
         returnString = ""
         # Sample Id should be valid
         (bIsValid, SampleId) = self.checkValidLong("SampleId")
-        if( not bIsValid ):
+        if(not bIsValid):
             returnString += "SampleId :" + str(SampleId) + " is invalid\n"
             bPass = False
 
         # Start Location should be valid
         (bIsValid, Location) = self.checkValidLong("Location")
-        if( not bIsValid ):
+        if(not bIsValid):
             returnString += "Location :" + str(Location) + " is invalid\n"
             bPass = False
 
         # End should be valid and = start
         (bIsValid, End) = self.checkValidLong("End")
-        if( not bIsValid ):
+        if(not bIsValid):
             returnString += "End :" + str(End) + " is invalid\n"
             bPass = False
-        elif( long(End) < long(Location) ):
-            returnString += "End :" + str(End) + " < Start :" + str(Location) +"\n"
+        elif(long(End) < long(Location)):
+            returnString += "End :" + \
+                str(End) + " < Start :" + str(Location) + "\n"
             bPass = False
 
         # numALT cannot be 0
-        if( self.numALT == 0 ):
+        if(self.numALT == 0):
             returnString += "ALT must be set\n"
             bPass = False
 
-        if( not  bPass ):
+        if(not bPass):
             returnString = "Following checks failed: \n" + returnString
 
         return (bPass, returnString)
@@ -180,13 +200,13 @@ class CSVLine:
         loader in TileDB to create the DB
         """
         # Run the checker to make sure the minimal conditions are met
-        (bPass, errorString) =  self.runChecks()
-        if( not bPass ):
+        (bPass, errorString) = self.runChecks()
+        if(not bPass):
             return errorString
 
         # FilterId field needs to be skipped if it is an empty field
         numFilter = self.get("numFilter")
-        bSkipFilterId = ( numFilter == EMPTYCHAR or int(numFilter) == 0 )
+        bSkipFilterId = (numFilter == EMPTYCHAR or int(numFilter) == 0)
         FilterIdIndex = self.fields.index("FilterId")
 
         GTIndex = self.fields.index('GT')
@@ -194,7 +214,7 @@ class CSVLine:
         outCSVLine = ""
         for index in range(0, len(self.fields)):
             # Special handling for FilterId
-            if( FilterIdIndex == index and bSkipFilterId ):
+            if(FilterIdIndex == index and bSkipFilterId):
                 continue
             # Handling for GT field
             if self.fields[index] == 'GT' and self.ploidy == 0:
@@ -203,14 +223,14 @@ class CSVLine:
             value = self.values[index]
             if self.fields[index] == 'PLOIDY' and self.ploidy == 0:
                 value = EMPTYCHAR
-            if( self.fields[index] in self.arrayFields and isinstance(value, list)):
+            if(self.fields[index] in self.arrayFields and isinstance(value, list)):
                 # ALT is read as 1 string that is separated by |
-                if self.fields[index] == 'ALT' :
+                if self.fields[index] == 'ALT':
                     outCSVLine += '|'.join(value)
                     outCSVLine += ','
                     continue
                 # Variable length fields need to have the # elements prefixed
-                elif self.fields[index] == 'AD' :
+                elif self.fields[index] == 'AD':
                     if self.numAD > 0:
                         countEmpty = 0
                         for c in value:
@@ -220,7 +240,7 @@ class CSVLine:
                             outCSVLine += '0,'
                             continue
                     outCSVLine += str(self.numAD) + ','
-                elif self.fields[index] == 'AF' :
+                elif self.fields[index] == 'AF':
                     if self.numALT > 0:
                         countEmpty = 0
                         for c in value:
@@ -230,7 +250,7 @@ class CSVLine:
                             outCSVLine += '0,'
                             continue
                     outCSVLine += str(self.numALT) + ','
-                elif self.fields[index] == 'AC' :
+                elif self.fields[index] == 'AC':
                     if self.numALT > 0:
                         countEmpty = 0
                         for c in value:
@@ -240,7 +260,7 @@ class CSVLine:
                             outCSVLine += '0,'
                             continue
                     outCSVLine += str(self.numALT) + ','
-                elif self.fields[index] == 'PL' :
+                elif self.fields[index] == 'PL':
                     if self.numPL > 0:
                         countEmpty = 0
                         for c in value:
@@ -251,13 +271,12 @@ class CSVLine:
                             continue
                     outCSVLine += str(self.numPL) + ','
 
-
-                for v in value :
+                for v in value:
                     outCSVLine += str(v) + ","
             else:
                 outCSVLine += str(value) + ","
 
-        if( clear ):
+        if(clear):
             self.reinit()
 
         # remove the last , and return
@@ -286,7 +305,7 @@ class CSVLine:
                 index += 1
                 # Continue so that GT is handled automatically
                 continue
-            elif attribute in self.arrayFields :
+            elif attribute in self.arrayFields:
                 if attribute == 'SB':
                     num_values = NUM_SB
                     index -= 1
@@ -306,7 +325,7 @@ class CSVLine:
                     index += (num_values + 1)
                     continue
                 else:
-                    index +=1
+                    index += 1
                     continue
             self.set(attribute, values[index])
             index += 1

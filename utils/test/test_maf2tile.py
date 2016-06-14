@@ -1,4 +1,8 @@
-import pytest, unittest, os, sys, json
+import pytest
+import unittest
+import os
+import sys
+import json
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
 from metadb import models
@@ -8,15 +12,17 @@ from metadb.api.query import DBQuery
 from utils.configuration import ConfigReader
 
 test_header = ["icgc_mutation_id", "project_code", "icgc_donor_id",
-        "icgc_sample_id", "matched_icgc_sample_id", "variation_calling_algorithm",
-        "assembly_version", "chromosome", "chromosome_start",
-        "chromosome_end", "reference_genome_allele", "mutated_to_allele",
-        "quality_score", "probability", "total_read_count",
-        "mutant_allele_read_count", "chromosome_strand"]
+               "icgc_sample_id", "matched_icgc_sample_id", "variation_calling_algorithm",
+               "assembly_version", "chromosome", "chromosome_start",
+               "chromosome_end", "reference_genome_allele", "mutated_to_allele",
+               "quality_score", "probability", "total_read_count",
+               "mutant_allele_read_count", "chromosome_strand"]
 test_data = ["pytest", "ALL-US", "test_person", "target_id", "source_id", "caller",
-        "GRCh37", "1", "100", "101", "T", "A", "0.35", "0.9", "100", "90", "0"]
+             "GRCh37", "1", "100", "101", "T", "A", "0.35", "0.9", "100", "90", "0"]
+
 
 class TestMAF(unittest.TestCase):
+
     @classmethod
     def setUpClass(self):
         self.TESTDB_URI = "postgresql+psycopg2://@:5432/mafend2end"
@@ -25,12 +31,16 @@ class TestMAF(unittest.TestCase):
 
         engine = create_engine(self.TESTDB_URI)
         models.bind_engine(engine)
-        self.config_path = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_config.json")
+        self.config_path = os.path.join(os.path.realpath(
+            sys.argv[-1]), "utils/example_configs/icgc_config.json")
         with open(self.config_path, 'r') as readFP:
             config_json = json.load(readFP)
-            config_json["TileDBConfig"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/tiledb_config.json")
-            config_json["TileDBAssembly"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/hg19.json")
-            config_json["VariantSetMap"]["VariantConfig"] = os.path.join(os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_variants.json")
+            config_json["TileDBConfig"] = os.path.join(os.path.realpath(
+                sys.argv[-1]), "utils/example_configs/tiledb_config.json")
+            config_json["TileDBAssembly"] = os.path.join(
+                os.path.realpath(sys.argv[-1]), "utils/example_configs/hg19.json")
+            config_json["VariantSetMap"]["VariantConfig"] = os.path.join(
+                os.path.realpath(sys.argv[-1]), "utils/example_configs/icgc_variants.json")
         with open(self.config_path, 'w') as writeFP:
             writeFP.write(json.dumps(config_json))
 
@@ -55,7 +65,8 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(test_data)))
             csvlines[0] = [self.getCSVLine(test_data, 0)]
             # Introduce new Source Sample
-            new_data = self.setAndGet(test_data, "matched_icgc_sample_id", "source_id1")
+            new_data = self.setAndGet(
+                test_data, "matched_icgc_sample_id", "source_id1")
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
@@ -67,15 +78,19 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(new_data)))
             csvlines[2] = [self.getCSVLine(new_data, 2)]
             # Introduce new callset
-            new_data = self.setAndGet(new_data, "variation_calling_algorithm", "caller1")
+            new_data = self.setAndGet(
+                new_data, "variation_calling_algorithm", "caller1")
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             csvlines[3] = [self.getCSVLine(new_data, 3)]
             # Introduce new individual
-            new_data = self.setAndGet(new_data, "icgc_donor_id", "test_person1")
-            new_data = self.setAndGet(new_data, "matched_icgc_sample_id", "source_id_tp1")
-            new_data = self.setAndGet(new_data, "icgc_sample_id", "target_id_tp1")
+            new_data = self.setAndGet(
+                new_data, "icgc_donor_id", "test_person1")
+            new_data = self.setAndGet(
+                new_data, "matched_icgc_sample_id", "source_id_tp1")
+            new_data = self.setAndGet(
+                new_data, "icgc_sample_id", "target_id_tp1")
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
@@ -85,28 +100,36 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
-            csvlines[4] = [self.getCSVLine(new_data, 4, ALT=["A", "G"], GT=["0", "2"])]
+            csvlines[4] = [self.getCSVLine(
+                new_data, 4, ALT=["A", "G"], GT=["0", "2"])]
             # Introduce REF with '-', change to new tile row
-            new_data = self.setAndGet(test_data, "matched_icgc_sample_id", "source_id2")
+            new_data = self.setAndGet(
+                test_data, "matched_icgc_sample_id", "source_id2")
             new_data = self.setAndGet(new_data, "reference_genome_allele", "-")
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
-            csvlines[5] = [self.getCSVLine(new_data, 5, Location=(99 - 1), End=(99 - 1), REF="N", ALT=["NA"])]
+            csvlines[5] = [self.getCSVLine(new_data, 5, Location=(
+                99 - 1), End=(99 - 1), REF="N", ALT=["NA"])]
             # Introduce REF with '-', change to new tile row
-            new_data = self.setAndGet(test_data, "matched_icgc_sample_id", "source_id3")
+            new_data = self.setAndGet(
+                test_data, "matched_icgc_sample_id", "source_id3")
             new_data = self.setAndGet(new_data, "mutated_to_allele", "-")
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
-            csvlines[6] = [self.getCSVLine(new_data, 6, Location=(99 - 1), REF="NT", ALT=["N"])]
+            csvlines[6] = [self.getCSVLine(
+                new_data, 6, Location=(99 - 1), REF="NT", ALT=["N"])]
             # Introduce new chromosome, change to new tile row
-            contigs = [str(i) for i in range(2,23)]
+            contigs = [str(i) for i in range(2, 23)]
             #contigs.extend(["X", "Y", "M"])
             contigs.extend(["M", "X", "Y"])
-            new_data = self.setAndGet(test_data, "icgc_donor_id", "test_person2")
-            new_data = self.setAndGet(new_data, "matched_icgc_sample_id", "source_id_tp2")
-            new_data = self.setAndGet(new_data, "icgc_sample_id", "target_id_tp2")
+            new_data = self.setAndGet(
+                test_data, "icgc_donor_id", "test_person2")
+            new_data = self.setAndGet(
+                new_data, "matched_icgc_sample_id", "source_id_tp2")
+            new_data = self.setAndGet(
+                new_data, "icgc_sample_id", "target_id_tp2")
             new_data = self.setAndGet(new_data, "chromosome_start", "600")
             new_data = self.setAndGet(new_data, "chromosome_end", "601")
             csvlines[7] = list()
@@ -115,8 +138,10 @@ class TestMAF(unittest.TestCase):
                 inFP.write("{0}\n".format("\t".join(new_data)))
                 inFP.write("{0}\n".format("\t".join(new_data)))
                 inFP.write("{0}\n".format("\t".join(new_data)))
-                Location, End = metadb.contig2Tile(1, contig, [long(new_data[8]), long(new_data[9])])
-                csvlines[7].append(self.getCSVLine(new_data, 7, Location=Location, End=End))
+                Location, End = metadb.contig2Tile(
+                    1, contig, [long(new_data[8]), long(new_data[9])])
+                csvlines[7].append(self.getCSVLine(
+                    new_data, 7, Location=Location, End=End))
             # Repeat the same test_data line a couple of times
             inFP.write("{0}\n".format("\t".join(test_data)))
             inFP.write("{0}\n".format("\t".join(test_data)))
@@ -128,16 +153,20 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
-            Location, End = metadb.contig2Tile(1, "2", [long(new_data[8]), long(new_data[9])])
-            csvlines[0].append(self.getCSVLine(new_data, 0, Location=Location, End=End))
+            Location, End = metadb.contig2Tile(
+                1, "2", [long(new_data[8]), long(new_data[9])])
+            csvlines[0].append(self.getCSVLine(
+                new_data, 0, Location=Location, End=End))
             # Introduce the prev new Source Sample but with different ALT
-            new_data = self.setAndGet(test_data, "matched_icgc_sample_id", "source_id1")
+            new_data = self.setAndGet(
+                test_data, "matched_icgc_sample_id", "source_id1")
             new_data = self.setAndGet(new_data, "mutated_to_allele", "G")
             new_data = self.setAndGet(new_data, "chromosome_strand", "1")
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
-            csvlines[1] = [self.getCSVLine(new_data, 1, ALT=["A", "G"], GT=["-1", "-1"])]
+            csvlines[1] = [self.getCSVLine(
+                new_data, 1, ALT=["A", "G"], GT=["-1", "-1"])]
 
         output_file = self.tmpdir.join("out.txt")
         output_file.write("")
@@ -152,7 +181,8 @@ class TestMAF(unittest.TestCase):
 
         test_output_dir = self.tmpdir.mkdir("output")
 
-        imp.multiprocess_import.poolGenerateCSV((str(test_config), str(input_file), str(test_output_dir) + "/" + "out.txt", False))
+        imp.multiprocess_import.poolGenerateCSV((str(test_config), str(
+            input_file), str(test_output_dir) + "/" + "out.txt", False))
 
         total_csv_lines = 0
         for tile_sample in csvlines.values():
@@ -202,7 +232,8 @@ class TestMAF(unittest.TestCase):
 
         test_output_dir = self.tmpdir.mkdir("output")
 
-        result = imp.multiprocess_import.poolGenerateCSV((str(test_config), str(input_file), str(test_output_dir) + '/' + "out.txt", False))
+        result = imp.multiprocess_import.poolGenerateCSV((str(test_config), str(
+            input_file), str(test_output_dir) + '/' + "out.txt", False))
         assert result[0] == -1
         assert result[1] == str(input_file)
 
@@ -228,7 +259,8 @@ class TestMAF(unittest.TestCase):
 
         test_output_dir = self.tmpdir.mkdir("output")
 
-        imp.multiprocess_import.poolGenerateCSV((str(test_config), str(input_file), str(test_output_dir) + '/' + "out.txt", True))
+        imp.multiprocess_import.poolGenerateCSV((str(test_config), str(
+            input_file), str(test_output_dir) + '/' + "out.txt", True))
 
         output_file = test_output_dir.join("out.txt")
         with open(str(output_file), 'r') as outputFP:
@@ -258,7 +290,8 @@ class TestMAF(unittest.TestCase):
 
         test_output_dir = self.tmpdir.mkdir("output")
 
-        imp.multiprocess_import.parallelGen(str(test_config), [str(input_file)], str(test_output_dir), "out.txt", True)
+        imp.multiprocess_import.parallelGen(
+            str(test_config), [str(input_file)], str(test_output_dir), "out.txt", True)
 
         output_file = test_output_dir.join("out.txt")
         with open(str(output_file), 'r') as outputFP:
@@ -290,11 +323,12 @@ class TestMAF(unittest.TestCase):
         test_output_dir = self.tmpdir.mkdir("output")
 
         with pytest.raises(Exception) as exec_info:
-            imp.multiprocess_import.parallelGen(str(test_config), [str(input_file)], str(test_output_dir), "out.txt", False)
+            imp.multiprocess_import.parallelGen(str(test_config), [str(
+                input_file)], str(test_output_dir), "out.txt", False)
         assert "Execution failed" in str(exec_info.value)
 
     def getCSVLine(self, input_list, SampleId,
-      Location=None, End=None, REF=None, ALT=None, GT=None):
+                   Location=None, End=None, REF=None, ALT=None, GT=None):
         csv = CSVLine()
         csv.set("SampleId", SampleId)
         if Location == None:
@@ -317,7 +351,7 @@ class TestMAF(unittest.TestCase):
             csv.set("ALT", ALT)
             AF = [input_list[13]]
             AC = [input_list[15]]
-            for x in xrange(1,len(ALT)):
+            for x in xrange(1, len(ALT)):
                 AF.append(input_list[13])
                 AC.append(input_list[15])
             csv.set("AF", AF)

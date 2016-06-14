@@ -1,6 +1,7 @@
 import pytest
 import utils.csvline as csvline
 
+
 class TestCSVLine:
 
     def test_init_versions(self):
@@ -14,7 +15,8 @@ class TestCSVLine:
                 attribute = test_csvobj.fieldNames[version][0]
             with pytest.raises(ValueError) as exec_info:
                 test_csvobj.set(attribute, "any")
-            assert "{0} is not a valid attribute".format(attribute) in str(exec_info.value)
+            assert "{0} is not a valid attribute".format(
+                attribute) in str(exec_info.value)
             assert test_csvobj.get(attribute) == None
 
     def test_set_GT_PLOIDY(self):
@@ -23,13 +25,14 @@ class TestCSVLine:
         assert test_csvobj.ploidy == 0
         with pytest.raises(SyntaxError) as exec_info:
             test_csvobj.set('GT', [])
-        assert "PLOIDY must be set before calling set GT" in str(exec_info.value)
+        assert "PLOIDY must be set before calling set GT" in str(
+            exec_info.value)
 
         with pytest.raises(TypeError) as exec_info:
             test_csvobj.set('GT', "value")
         assert "GT takes a list as input" in str(exec_info.value)
 
-        for ploidy in xrange(1,4):
+        for ploidy in xrange(1, 4):
             test_csvobj.set('PLOIDY', ploidy)
             assert test_csvobj.ploidy == ploidy
             assert test_csvobj.get('GT') == [csvline.EMPTYCHAR] * ploidy
@@ -54,7 +57,8 @@ class TestCSVLine:
 
         with pytest.raises(ValueError) as exec_info:
             test_csvobj.set('SB', [csvline.EMPTYCHAR] * (csvline.NUM_SB - 1))
-        assert "SB must have {0} entries".format(csvline.NUM_SB) in str(exec_info.value)
+        assert "SB must have {0} entries".format(
+            csvline.NUM_SB) in str(exec_info.value)
 
         value = [1] * csvline.NUM_SB
         test_csvobj.set('SB', value)
@@ -83,7 +87,8 @@ class TestCSVLine:
         test_csvobj.set('ALT', value)
         assert test_csvobj.numALT == len(value)
         assert test_csvobj.get('ALT') == value
-        assert test_csvobj.get('PL') == [csvline.EMPTYCHAR] * (((len(value) + 1) * (len(value) + 2)) / 2)
+        assert test_csvobj.get('PL') == [
+            csvline.EMPTYCHAR] * (((len(value) + 1) * (len(value) + 2)) / 2)
 
     def test_AD(self):
         test_csvobj = csvline.CSVLine()
@@ -238,51 +243,74 @@ class TestCSVLine:
         test_csvobj.set('Location', 100)
         test_csvobj.set('End', 100)
         test_csvobj.set('ALT', ['A'])
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,*,A,*,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,*,A,*,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('REF', 'T')
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,*,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,*,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('QUAL', 5.45)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
-        test_csvobj.set('FilterId', [1,2])
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        test_csvobj.set('FilterId', [1, 2])
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('BaseQRankSum', 35.7)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('ClippingRankSum', 5.7)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('MQRankSum', 15.7)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('ReadPosRankSum', 17.7)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('MQ', 8.5)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('MQ0', 9)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('AF', [3.14])
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('AN', 100)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,0,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('AC', [90])
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,*,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,*,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('DP', 7)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,*,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,*,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('DP_FMT', 2)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,*,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,*,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('MIN_DP', 1)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,*,*,*,*,*,0,0,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,*,*,*,*,*,0,0,*,*"
         test_csvobj.set('GQ', 10)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,*,*,*,*,0,0,*,*"
-        test_csvobj.set('SB', range(21,25))
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,0,0,*,*"
-        test_csvobj.set('AD', range(25,27))
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,0,*,*"
-        test_csvobj.set('PL', range(70,73))
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,*,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,*,*,*,*,0,0,*,*"
+        test_csvobj.set('SB', range(21, 25))
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,0,0,*,*"
+        test_csvobj.set('AD', range(25, 27))
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,0,*,*"
+        test_csvobj.set('PL', range(70, 73))
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,*,*"
         test_csvobj.set('PLOIDY', 2)
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,*,*,*"
-        test_csvobj.set('GT', [1,2])
-        assert test_csvobj.getCSVLine(clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,*"
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,*,*,*"
+        test_csvobj.set('GT', [1, 2])
+        assert test_csvobj.getCSVLine(
+            clear=False) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,*"
         test_csvobj.set('PS', 12345)
-        assert test_csvobj.getCSVLine(clear=True) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,12345"
+        assert test_csvobj.getCSVLine(
+            clear=True) == "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,12345"
 
         assert test_csvobj.numALT == 0
 
@@ -334,7 +362,7 @@ class TestCSVLine:
         assert test_csvobj.get('ALT') == ['A']
         assert test_csvobj.get('REF') == 'T'
         assert test_csvobj.get('QUAL') == '5.45'
-        assert test_csvobj.get('FilterId') == ['1','2']
+        assert test_csvobj.get('FilterId') == ['1', '2']
         assert test_csvobj.get('BaseQRankSum') == '35.7'
         assert test_csvobj.get('ClippingRankSum') == '5.7'
         assert test_csvobj.get('MQRankSum') == '15.7'
@@ -364,7 +392,7 @@ class TestCSVLine:
         assert test_csvobj.get('ALT') == ['A']
         assert test_csvobj.get('REF') == 'T'
         assert test_csvobj.get('QUAL') == '5.45'
-        assert test_csvobj.get('FilterId') == ['1','2']
+        assert test_csvobj.get('FilterId') == ['1', '2']
         assert test_csvobj.get('BaseQRankSum') == '35.7'
         assert test_csvobj.get('ClippingRankSum') == '5.7'
         assert test_csvobj.get('MQRankSum') == '15.7'
@@ -394,7 +422,7 @@ class TestCSVLine:
         assert test_csvobj.get('ALT') == ['A']
         assert test_csvobj.get('REF') == 'T'
         assert test_csvobj.get('QUAL') == '5.45'
-        assert test_csvobj.get('FilterId') == ['1','2']
+        assert test_csvobj.get('FilterId') == ['1', '2']
         assert test_csvobj.get('BaseQRankSum') == '35.7'
         assert test_csvobj.get('ClippingRankSum') == '5.7'
         assert test_csvobj.get('MQRankSum') == '15.7'
@@ -412,7 +440,7 @@ class TestCSVLine:
         assert test_csvobj.get('AN') == '100'
         assert test_csvobj.get('AC') == ['90']
         assert test_csvobj.get('PLOIDY') == 2
-        assert test_csvobj.get('GT') == ['1','2']
+        assert test_csvobj.get('GT') == ['1', '2']
         assert test_csvobj.get('PS') == '*'
         assert test_csvobj.getCSVLine(True) == csv
 
@@ -424,7 +452,7 @@ class TestCSVLine:
         assert test_csvobj.get('ALT') == ['A']
         assert test_csvobj.get('REF') == 'T'
         assert test_csvobj.get('QUAL') == '5.45'
-        assert test_csvobj.get('FilterId') == ['1','2']
+        assert test_csvobj.get('FilterId') == ['1', '2']
         assert test_csvobj.get('BaseQRankSum') == '35.7'
         assert test_csvobj.get('ClippingRankSum') == '5.7'
         assert test_csvobj.get('MQRankSum') == '15.7'
@@ -442,6 +470,6 @@ class TestCSVLine:
         assert test_csvobj.get('AN') == '100'
         assert test_csvobj.get('AC') == ['90']
         assert test_csvobj.get('PLOIDY') == 2
-        assert test_csvobj.get('GT') == ['1','2']
+        assert test_csvobj.get('GT') == ['1', '2']
         assert test_csvobj.get('PS') == '12345'
         assert test_csvobj.getCSVLine(True) == csv
