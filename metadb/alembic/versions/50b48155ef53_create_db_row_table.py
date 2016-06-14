@@ -18,14 +18,14 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.schema import CreateSequence, Sequence
 
 def upgrade():
-	op.execute(CreateSequence(Sequence('db_row_tile_row_id_seq', minvalue=0, start=0, increment=1)))
-	op.create_table(
-	'db_row',
-	sa.Column('id', sa.BigInteger, primary_key=True),
-	sa.Column('db_array_id', sa.BigInteger, sa.ForeignKey('db_array.id'), nullable=False),
-	sa.Column('tile_row_id', sa.BigInteger, Sequence('db_row_tile_row_id_seq'), nullable=False)
-	)		    
+    op.execute(CreateSequence(Sequence('db_row_tile_row_id_seq', minvalue=0, start=0, increment=1)))
+    op.create_table(
+    'db_row',
+    sa.Column('id', sa.BigInteger, primary_key=True),
+    sa.Column('db_array_id', sa.BigInteger, sa.ForeignKey('db_array.id'), nullable=False),
+    sa.Column('tile_row_id', sa.BigInteger, Sequence('db_row_tile_row_id_seq'), nullable=False)
+    )
 
 def downgrade():
-	op.execute(DropSequence('db_row_tile_row_id_seq'))
-	op.drop_table('db_row')
+    op.execute(DropSequence('db_row_tile_row_id_seq'))
+    op.drop_table('db_row')

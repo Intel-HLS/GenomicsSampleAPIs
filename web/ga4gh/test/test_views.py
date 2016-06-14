@@ -44,35 +44,35 @@ class TestViews(unittest.TestCase):
         response = self.tester.post('/variants/search', data=badData, content_type='application/json')
         my_res = json.loads(response.data)
         assert my_res == empty_res
-        
+
         badData = json.dumps({ "pageToken": None, "start": 1, "callSetIds": None, "referenceName": "1", "variantSetIds": ["testing"]})
         response = self.tester.post('/variants/search', data=badData, content_type='application/json')
         my_res = json.loads(response.data)
         assert my_res['error_code'] == -1
         assert my_res['message'] == 'Required field missing: variantSetIds, referenceName, start, and end are required'
-        
+
         badData = json.dumps({ "end": 75908600, "pageToken": None, "callSetIds": None, "referenceName": "1", "variantSetIds": ["testing"]})
         response = self.tester.post('/variants/search', data=badData, content_type='application/json')
         my_res = json.loads(response.data)
         assert my_res['error_code'] == -1
         assert my_res['message'] == 'Required field missing: variantSetIds, referenceName, start, and end are required'
-        
+
         badData = json.dumps({ "end": 75908600, "pageToken": None, "start": 1, "callSetIds": None, "variantSetIds": ["testing"]})
         response = self.tester.post('/variants/search', data=badData, content_type='application/json')
         my_res = json.loads(response.data)
         assert my_res['error_code'] == -1
         assert my_res['message'] == 'Required field missing: variantSetIds, referenceName, start, and end are required'
-        
+
         response = self.tester.post('/variants/search', data=myDataPayload, content_type='application/json')
         my_res = json.loads(response.data)
         assert my_res == dataGold
-   
+
         content_payload['variantSetIds'] = None
         myDataPayload = json.dumps(content_payload)
         response = self.tester.post('/variants/search', data=myDataPayload, content_type='application/json')
         my_res = json.loads(response.data)
         assert my_res == dataGold
-   
+
         content_payload['pageSize'] = -2
         myDataPayload = json.dumps(content_payload)
         response = self.tester.post('/variants/search', data=myDataPayload, content_type='application/json')
@@ -96,7 +96,7 @@ class TestViews(unittest.TestCase):
         response = self.tester.post('/variants/search', data=myDataPayload, content_type='application/json')
         my_res = json.loads(response.data)
         assert my_res == dataGold
-        
+
         content_res['nextPageToken'] = 'test_1_115060270_1'
         dataGold = json.loads(json.dumps(content_res))
         content_payload['pageSize'] = 1

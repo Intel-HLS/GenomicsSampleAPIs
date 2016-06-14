@@ -36,7 +36,7 @@ def variants_search():
         return makeGAException(message = 'Required field missing: variantSetIds, referenceName, start, and end are required', ecode = -1, rcode = 400)
     if not (referenceName and startWindow and endWindow):
         return makeGAException(message = 'Required field missing: variantSetIds, referenceName, start, and end are required', ecode = -1, rcode = 400)
-    
+
     callSetIds = request.json.get('callSetIds', None)
     pageSize = request.json.get('pageSize', None)
     pageToken = request.json.get('pageToken', None)
@@ -65,7 +65,7 @@ def callset_search():
 
     try:
         search_lib = tileSearch.connectSearchLib(current_app.config['SEARCHLIB'])
-        garesp = tileSearch.searchCallSets(workspace = current_app.config['WORKSPACE'], arrayName = current_app.config['ARRAYNAME'], name = name, searchLib = search_lib) 
+        garesp = tileSearch.searchCallSets(workspace = current_app.config['WORKSPACE'], arrayName = current_app.config['ARRAYNAME'], name = name, searchLib = search_lib)
 
     except:
         return makeGAException(message = 'search command exited abnormally', ecode = 500, rcode = 500)
@@ -83,10 +83,9 @@ def variantset_search():
 
 
     try:
-        garesp = tileSearch.searchVariantSets(datasetId = datasetId, pageSize = pageSize, pageToken = pageToken) 
+        garesp = tileSearch.searchVariantSets(datasetId = datasetId, pageSize = pageSize, pageToken = pageToken)
 
     except:
         return makeGAException(message = 'search command exited abnormally', ecode = 500, rcode = 500)
 
     return jsonify(garesp.gavsetresponse_info)
-

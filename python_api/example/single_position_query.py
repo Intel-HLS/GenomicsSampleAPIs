@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
 import os, sys
 import json
@@ -7,47 +7,47 @@ import Pyro4, Pyro4.util
 sys.excepthook = Pyro4.util.excepthook
 
 def process(chromosome, position, attributes):
-  nameServer = Pyro4.locateNS()
-  nodes = nameServer.list(regex = "tile.master*")
+    nameServer = Pyro4.locateNS()
+    nodes = nameServer.list(regex = "tile.master*")
 
-  for name, uri in nodes.items():
-    api = Pyro4.Proxy(uri)
+    for name, uri in nodes.items():
+        api = Pyro4.Proxy(uri)
 
-    print "Results from {0} ".format(name)
+        print "Results from {0} ".format(name)
 
-    data =  api.getPosition(chromosome, position, attributes)
-    data = json.loads(data)
-    totalSamples = len(data['indices'])
-    print "Total Samples Received : {0} ".format(totalSamples)
+        data =  api.getPosition(chromosome, position, attributes)
+        data = json.loads(data)
+        totalSamples = len(data['indices'])
+        print "Total Samples Received : {0} ".format(totalSamples)
 
-    if totalSamples == 0:
-      return 0
-    print "Example: "
+        if totalSamples == 0:
+            return 0
+        print "Example: "
 
-    # Using sample index 0 as an example
-    sample_index = 0
-    print "\t Sample Id : {0} ".format(data['indices'][sample_index])
-    print "\t Attribute \tValue"
-    for attribute in attributes:
-      print "\t {0} \t\t {1} ".format(attribute, data[attribute][sample_index])
+        # Using sample index 0 as an example
+        sample_index = 0
+        print "\t Sample Id : {0} ".format(data['indices'][sample_index])
+        print "\t Attribute \tValue"
+        for attribute in attributes:
+            print "\t {0} \t\t {1} ".format(attribute, data[attribute][sample_index])
 
-    print 
+        print
 
-  return 0
+    return 0
 
 if __name__ == '__main__':
-  import argparse 
-  description = "Example on how to use the Python API. "
-  description += "Sample Query: {0} -c 1 -p 100 \
-                  -a ALT REF QUAL PL".format(sys.argv[0])
-  parser = argparse.ArgumentParser(description = description)
+    import argparse
+    description = "Example on how to use the Python API. "
+    description += "Sample Query: {0} -c 1 -p 100 \
+                    -a ALT REF QUAL PL".format(sys.argv[0])
+    parser = argparse.ArgumentParser(description = description)
 
-  parser.add_argument("-c", "--chromosome", required=True, type=str, help="Chromosome")
-  parser.add_argument("-p", "--position", required=True, type=long, 
-                      help="position in the chromosome")
-  parser.add_argument("-a", "--attributes", nargs='+', required=True, type=str, 
-                      help="List of attributes to fetch")
+    parser.add_argument("-c", "--chromosome", required=True, type=str, help="Chromosome")
+    parser.add_argument("-p", "--position", required=True, type=long,
+                        help="position in the chromosome")
+    parser.add_argument("-a", "--attributes", nargs='+', required=True, type=str,
+                        help="List of attributes to fetch")
 
-  args = parser.parse_args()
+    args = parser.parse_args()
 
-  process(args.chromosome, args.position, args.attributes)
+    process(args.chromosome, args.position, args.attributes)

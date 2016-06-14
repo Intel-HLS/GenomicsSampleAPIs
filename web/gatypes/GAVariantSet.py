@@ -14,4 +14,3 @@ class GAVariantSet(object):
 
     def getJSON(self):
         return json.dumps(self.gavariantset_info)
-

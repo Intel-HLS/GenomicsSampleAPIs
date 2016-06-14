@@ -42,7 +42,7 @@ def upgrade():
     FOR EACH ROW EXECUTE PROCEDURE increment_num_rows_in_db_array_pgsql();
     ''')
     #drop and re-create trigger
-    op.execute('DROP TRIGGER IF EXISTS increment_next_column_in_reference_set ON reference CASCADE'); 
+    op.execute('DROP TRIGGER IF EXISTS increment_next_column_in_reference_set ON reference CASCADE');
     op.execute('''\
     CREATE OR REPLACE FUNCTION increment_next_column_in_reference_set_pgsql()
       RETURNS trigger AS $increment_next_column_in_reference_set_pgsql$

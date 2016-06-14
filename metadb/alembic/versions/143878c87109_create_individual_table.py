@@ -20,13 +20,13 @@ def upgrade():
     # making ontology terms strings for now
     # leaving out externalId, diseases, pheno, etc. mappings for now
     op.create_table(
-	'individual',
-	sa.Column('id', sa.BigInteger, primary_key=True),
-	sa.Column('guid', sa.String(36), nullable=False, unique=True),
-	sa.Column('name', sa.Text),
-	sa.Column('info', sa.PickleType),
-	sa.Column('record_create_time', sa.Text),
-	sa.Column('record_update_time', sa.Text),
+        'individual',
+        sa.Column('id', sa.BigInteger, primary_key=True),
+        sa.Column('guid', sa.String(36), nullable=False, unique=True),
+        sa.Column('name', sa.Text),
+        sa.Column('info', sa.PickleType),
+        sa.Column('record_create_time', sa.Text),
+        sa.Column('record_update_time', sa.Text),
     )
 
 
