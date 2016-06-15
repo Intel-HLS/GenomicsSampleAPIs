@@ -6,7 +6,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 @pytest.fixture(scope="session")
 def app():
     app = Flask(__name__)
-    db = SQLAlchemy(app)
+    SQLAlchemy(app)
     return app
 
 app = app()

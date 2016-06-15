@@ -1,7 +1,9 @@
 from ..models import _Base, TextPickleType, BigInteger, autoinc_handler
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import CreateSequence, Sequence
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
+from sqlalchemy.schema import CreateSequence
+from sqlalchemy.schema import Sequence
 import json
 
 

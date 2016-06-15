@@ -2,8 +2,10 @@ from ..models import _Base, BigInteger
 import sqlalchemy as sa
 from sqlalchemy import UniqueConstraint
 from sqlalchemy import PrimaryKeyConstraint
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import CreateSequence, Sequence
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
+from sqlalchemy.schema import CreateSequence
+from sqlalchemy.schema import Sequence
 
 
 class CallSetToDBArrayAssociation(_Base):

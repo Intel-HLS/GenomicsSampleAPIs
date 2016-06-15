@@ -38,7 +38,7 @@ def main():
     ga4ghPath = os.path.join(basePath, "web")
 
     installPaths(ga4ghPath)
-    virtualenv = updateConfigs(basePath, ga4ghPath)
+    updateConfigs(basePath, ga4ghPath)
     getHttpdConf(sockpath=socket, port=listenPort)
     getuwsgiConf(basePath)
     print "DONE"

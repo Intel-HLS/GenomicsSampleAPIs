@@ -1,5 +1,4 @@
 from pyspark import SparkContext, SparkConf
-import json
 import uuid
 import os
 import sys

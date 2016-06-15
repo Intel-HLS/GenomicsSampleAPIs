@@ -15,7 +15,8 @@ depends_on = None
 from alembic import op
 import sqlalchemy as sa
 
-from metadb.models import TextPickleType, autoinc_handler
+from metadb.models import TextPickleType
+from metadb.models import autoinc_handler
 
 
 def upgrade():

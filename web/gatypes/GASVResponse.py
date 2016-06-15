@@ -1,5 +1,4 @@
 import GAVariant
-import json
 
 
 class GASVResponse(object):

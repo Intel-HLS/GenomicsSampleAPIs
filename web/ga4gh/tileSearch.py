@@ -1,10 +1,16 @@
-from gatypes import GACall, GACallSet, GAVariant, GAVariantSet, GASVResponse, GACSResponse, GASVSetResponse, GAVariantSetMetadata
-from flask import json, jsonify
+from gatypes import GACSResponse
+from gatypes import GACall
+from gatypes import GACallSet
+from gatypes import GASVResponse
+from gatypes import GASVSetResponse
+from gatypes import GAVariant
+from gatypes import GAVariantSet
+from gatypes import GAVariantSetMetadata
+from flask import json
+from flask import jsonify
 from ctypes import *
-from string import split, join
+from string import join
 
-import sys
-import os
 
 from metadb.api import DBQuery
 from metadb.models import VariantSet

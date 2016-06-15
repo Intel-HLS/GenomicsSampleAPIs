@@ -27,7 +27,7 @@ class TestMAF(unittest.TestCase):
     def setUpClass(self):
         self.TESTDB_URI = "postgresql+psycopg2://@:5432/mafend2end"
         if not database_exists(self.TESTDB_URI):
-            db = create_database(self.TESTDB_URI)
+            create_database(self.TESTDB_URI)
 
         engine = create_engine(self.TESTDB_URI)
         models.bind_engine(engine)
@@ -210,7 +210,6 @@ class TestMAF(unittest.TestCase):
             assert total_csv_lines == verified_csv_lines
 
     def test_poolGenerateCSV_neg(self):
-        csvlines = dict()
         input_file = self.tmpdir.join("in.txt")
         with open(str(input_file), 'w') as inFP:
             inFP.write("# Comment line\n")
@@ -238,7 +237,6 @@ class TestMAF(unittest.TestCase):
         assert result[1] == str(input_file)
 
     def test_poolGenerateCSV_gzip(self):
-        csvlines = dict()
         input_file = self.tmpdir.join("in.txt.gz")
         import gzip
         with gzip.open(str(input_file), 'w') as inFP:
@@ -268,7 +266,6 @@ class TestMAF(unittest.TestCase):
         assert line == self.getCSVLine(test_data, 0)
 
     def test_end2end_gzip(self):
-        csvlines = dict()
         input_file = self.tmpdir.join("in.txt.gz")
         import gzip
         with gzip.open(str(input_file), 'w') as inFP:
@@ -299,7 +296,6 @@ class TestMAF(unittest.TestCase):
         assert line == self.getCSVLine(test_data, 0)
 
     def test_end2end_neg(self):
-        csvlines = dict()
         input_file = self.tmpdir.join("in.txt")
         with open(str(input_file), 'w') as inFP:
             inFP.write("# Comment line\n")

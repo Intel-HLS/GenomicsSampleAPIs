@@ -1,10 +1,8 @@
 import pytest
-import uuid
-import time
 import json
 import os
-import sys
-from sqlalchemy import create_engine, and_
+from sqlalchemy import and_
+from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, drop_database, database_exists
 import metadb.api.query as dbquery
 import metadb.models as models
@@ -36,7 +34,7 @@ class TestVCFImporter(TestCase):
         if database_exists(self.DBURI):
             drop_database(self.DBURI)
 
-        db = create_database(self.DBURI)
+        create_database(self.DBURI)
 
         engine = create_engine(self.DBURI)
         models.bind_engine(engine)

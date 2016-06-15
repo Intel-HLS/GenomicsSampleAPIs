@@ -1,7 +1,12 @@
-from flask import current_app, Blueprint, Flask, request, Response, json, jsonify
+from flask import Blueprint
+from flask import Flask
+from flask import Response
+from flask import current_app
+from flask import json
+from flask import jsonify
+from flask import request
 from ga4gh import tileSearch
 from ga4gh import create_app
-import config
 
 ga4gh = Blueprint('ga4gh', __name__)
 
@@ -64,10 +69,10 @@ def callset_search():
     if not request.json:
         return makeGAException(message='Bad Content Type, please send application/json', ecode=-1, rcode=415)
 
-    variantSetIds = request.json.get('variantSetIds', [])
+    request.json.get('variantSetIds', [])
     name = request.json.get('name', None)
-    pageSize = request.json.get('pageSize', None)
-    pageToken = request.json.get('pageToken', None)
+    request.json.get('pageSize', None)
+    request.json.get('pageToken', None)
 
     try:
         search_lib = tileSearch.connectSearchLib(

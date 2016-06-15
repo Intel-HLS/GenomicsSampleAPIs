@@ -1,5 +1,4 @@
 import GAVariantSet
-import json
 
 
 class GASVSetResponse(object):

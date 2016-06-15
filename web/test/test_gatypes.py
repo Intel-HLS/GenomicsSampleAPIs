@@ -8,7 +8,7 @@ class TestGAtypes:
         gac = GACall.GACall(callSetId="callId", callSetName="cname", genotype=[
                             0, 1, 2], phaseset="phase", genotypeLikelihood=[1, 2, 3], info={'Test': 'True', 'Number': 5})
         res = gac.gacall_info
-        tmp = loads(gac.getJSON())
+        loads(gac.getJSON())
 
         assert res['callSetId'] == "callId"
         assert res['callSetName'] == "cname"
@@ -19,7 +19,7 @@ class TestGAtypes:
 
         min_gac = GACall.GACall(callSetId="justcallId")
         res = min_gac.gacall_info
-        tmp = loads(min_gac.getJSON())
+        loads(min_gac.getJSON())
 
         assert res['callSetId'] == "justcallId"
         assert res['callSetName'] == None
@@ -31,7 +31,7 @@ class TestGAtypes:
     def test_GACallSet(self):
         min_gacs = GACallSet.GACallSet()
         res = min_gacs.gacallset_info
-        tmp = loads(min_gacs.getJSON())
+        loads(min_gacs.getJSON())
 
         assert res['id'] == ""
         assert res['name'] == None
@@ -44,7 +44,7 @@ class TestGAtypes:
         gacs = GACallSet.GACallSet(id='csid', name='myName', sampleId='12', variantSetIds=[
                                    0, 1, 2], created=1234, updated=2345, info={'Test': 'True', 'Number': 5})
         res = gacs.gacallset_info
-        tmp = loads(gacs.getJSON())
+        loads(gacs.getJSON())
 
         assert res['id'] == 'csid'
         assert res['name'] == 'myName'
@@ -58,7 +58,7 @@ class TestGAtypes:
         min_gav = GAVariant.GAVariant(
             id='myid', variantSetId='myvsid', start=1, end=4, referenceBases='myref')
         res = min_gav.gavariant_info
-        tmp = loads(min_gav.getJSON())
+        loads(min_gav.getJSON())
 
         assert res['id'] == 'myid'
         assert res['variantSetId'] == 'myvsid'
@@ -75,7 +75,7 @@ class TestGAtypes:
         gav = GAVariant.GAVariant(id='myid', variantSetId='myvsid', start=1, end=4, referenceBases='myref', names=[
                                   'a', 'b'], created=12, updated=16, referenceName='myrefname', alternateBases=['G', 'T'], info={'Test': 'True', 'Number': 5})
         res = gav.gavariant_info
-        tmp = loads(gav.getJSON())
+        loads(gav.getJSON())
 
         assert res['id'] == 'myid'
         assert res['variantSetId'] == 'myvsid'
@@ -92,7 +92,7 @@ class TestGAtypes:
     def test_GAVariantSet(self):
         min_gavs = GAVariantSet.GAVariantSet()
         res = min_gavs.gavariantset_info
-        tmp = loads(min_gavs.getJSON())
+        loads(min_gavs.getJSON())
 
         assert res['id'] == ''
         assert res['name'] == ''
@@ -103,7 +103,7 @@ class TestGAtypes:
         gavs = GAVariantSet.GAVariantSet(
             id='myid', name='myname', referenceSetId='myrefsetid', datasetId='mydsit', metadata=[1, 2, 3, 4])
         res = gavs.gavariantset_info
-        tmp = loads(gavs.getJSON())
+        loads(gavs.getJSON())
         assert res['id'] == 'myid'
         assert res['name'] == 'myname'
         assert res['referenceSetId'] == 'myrefsetid'
@@ -224,7 +224,7 @@ class TestGAtypes:
         gavsmd = GAVariantSetMetadata.GAVariantSetMetadata(
             key='mykey', value='myval', id='myid', type='mytype', number='mynum', description='mydesc', info={'Test': 'True', 'Number': 5})
         res = min_gavsmd.gavariantsetmetadata_info
-        tmp = loads(min_gavsmd.getJSON())
+        loads(min_gavsmd.getJSON())
 
         assert res['key'] == ''
         assert res['value'] == ''
@@ -235,7 +235,7 @@ class TestGAtypes:
         assert res['info'] == {}
 
         res = gavsmd.gavariantsetmetadata_info
-        tmp = loads(gavsmd.getJSON())
+        loads(gavsmd.getJSON())
 
         assert res['key'] == 'mykey'
         assert res['value'] == 'myval'

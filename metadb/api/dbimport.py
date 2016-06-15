@@ -3,7 +3,16 @@ import uuid
 from time import strftime
 from sqlalchemy import create_engine, and_, or_, exc
 from sqlalchemy.orm import sessionmaker
-from metadb.models import bind_engine, Individual, Sample, CallSet, DBArray, ReferenceSet, Reference, Workspace, VariantSet, CallSetToDBArrayAssociation
+from metadb.models import CallSet
+from metadb.models import CallSetToDBArrayAssociation
+from metadb.models import DBArray
+from metadb.models import Individual
+from metadb.models import Reference
+from metadb.models import ReferenceSet
+from metadb.models import Sample
+from metadb.models import VariantSet
+from metadb.models import Workspace
+from metadb.models import bind_engine
 from collections import OrderedDict, namedtuple
 
 

@@ -1,6 +1,7 @@
 from ..models import _Base, BigInteger
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
 
 
 class DBArray(_Base):

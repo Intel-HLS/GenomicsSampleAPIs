@@ -14,7 +14,8 @@ def get_tiledb_padded_reference_length_string_default(reference_length_str):
     return ('CAST( CAST(%s AS DOUBLE PRECISION)*%.1f AS BIGINT)' % (reference_length_str, tiledb_reference_offset_padding_factor_default))
 
 from .textpickletype import TextPickleType
-from .inc_counter import BigInteger, autoinc_handler
+from .inc_counter import BigInteger
+from .inc_counter import autoinc_handler
 from .field import Field
 from .reference_set import ReferenceSet
 from .reference import Reference

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import subprocess
 import json
 import utils.vcf_importer as multiprocess_import
 import utils.helper as helper
