@@ -18,11 +18,33 @@ class CSVLine:
     # Fields in Tile DB CSV
     # It is a 2D array, and each element is an array represents the fields of
     # a version
-    fieldNames = [["SampleId", "Location", "End", "REF",
-                   "ALT", "QUAL", "numFilter",
-                   "FilterId", "BaseQRankSum", "ClippingRankSum",
-                   "MQRankSum", "ReadPosRankSum", "MQ", "MQ0", "AF", "AN", "AC", "DP",
-                   "DP_FMT", "MIN_DP", "GQ", "SB", "AD", "PL", "PLOIDY", "GT", "PS"]]
+    fieldNames = [["SampleId",
+                   "Location",
+                   "End",
+                   "REF",
+                   "ALT",
+                   "QUAL",
+                   "numFilter",
+                   "FilterId",
+                   "BaseQRankSum",
+                   "ClippingRankSum",
+                   "MQRankSum",
+                   "ReadPosRankSum",
+                   "MQ",
+                   "MQ0",
+                   "AF",
+                   "AN",
+                   "AC",
+                   "DP",
+                   "DP_FMT",
+                   "MIN_DP",
+                   "GQ",
+                   "SB",
+                   "AD",
+                   "PL",
+                   "PLOIDY",
+                   "GT",
+                   "PS"]]
     arrayFields = ["ALT", "FilterId", "SB", "AD", "PL", "GT", "AF", "AC"]
 
     def __init__(self, version=1):
@@ -96,36 +118,46 @@ class CSVLine:
                             raise SyntaxError(
                                 "ALT must be set before calling set AD")
                         elif(len(value) != self.numAD):
-                            raise ValueError("AD[] must be of length {0} but given {1}".format(
-                                (str)(self.numAD), value))
+                            raise ValueError(
+                                "AD[] must be of length {0} but given {1}".format(
+                                    (str)(
+                                        self.numAD), value))
                     elif(attr == "AF"):
                         if(self.numALT == 0):
                             raise SyntaxError(
                                 "ALT must be set before calling set AF")
                         elif(len(value) != self.numALT):
-                            raise ValueError("AF[] must be of length {0} but given {1} ".format(
-                                (str)(self.numALT), value))
+                            raise ValueError(
+                                "AF[] must be of length {0} but given {1} ".format(
+                                    (str)(
+                                        self.numALT), value))
                     elif(attr == "AC"):
                         if(self.numALT == 0):
                             raise SyntaxError(
                                 "ALT must be set before calling set AC")
                         elif(len(value) != self.numALT):
-                            raise ValueError("AC[] must be of length {0} but given {1}".format(
-                                (str)(self.numALT), value))
+                            raise ValueError(
+                                "AC[] must be of length {0} but given {1}".format(
+                                    (str)(
+                                        self.numALT), value))
                     elif(attr == "PL"):
                         if(self.numALT == 0):
                             raise SyntaxError(
                                 "ALT must be set before calling set PL")
                         elif(len(value) != self.numPL):
-                            raise ValueError("PL[] must be of length {0} but given {1}".format(
-                                (str)(self.numPL), value))
+                            raise ValueError(
+                                "PL[] must be of length {0} but given {1}".format(
+                                    (str)(
+                                        self.numPL), value))
                     elif(attr == "GT"):
                         if(self.ploidy == 0):
                             raise SyntaxError(
                                 "PLOIDY must be set before calling set GT")
                         elif(len(value) != self.ploidy):
-                            raise ValueError("GT[] must be of length {0} but given {1}".format(
-                                (str)(self.ploidy), value))
+                            raise ValueError(
+                                "GT[] must be of length {0} but given {1}".format(
+                                    (str)(
+                                        self.ploidy), value))
                     else:
                         # Will never reach here
                         raise ValueError("Logic Error in name matching")

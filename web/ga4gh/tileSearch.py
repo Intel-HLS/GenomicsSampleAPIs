@@ -124,7 +124,25 @@ def gtDecode(count, gtarray):
     return all_elems
 
 
-def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, variantSetIds, callSetIds=None, attrList=['GT', 'REF', 'ALT', 'PL', 'AF', 'AN', 'AC'], pageSize=-1, pageToken=None):
+def searchVariants(
+        workspace,
+        arrayName,
+        referenceName,
+        start,
+        end,
+        searchLib,
+        variantSetIds,
+        callSetIds=None,
+        attrList=[
+            'GT',
+            'REF',
+            'ALT',
+            'PL',
+            'AF',
+            'AN',
+            'AC'],
+    pageSize=-1,
+        pageToken=None):
     gavlist = list()
     attrs = join(attrList, ',')
     if not pageSize:
@@ -138,7 +156,7 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
     with dbqWrapper.dbquery.getSession() as metadb:
 
         # set row query restriction
-        if ((callSetIds != None) and callSetIds):
+        if ((callSetIds is not None) and callSetIds):
             rowIds = metadb.callSetIds2TileRowId(
                 callSetIds, workspace, arrayName)
             rowIds = ",".join(rowIds)
@@ -154,8 +172,14 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
         array_idx = metadb.tileNames2ArrayIdx(workspace, arrayName)
         tileStart, tileEnd = metadb.contig2Tile(
             array_idx, referenceName, [start, end])
-        qresp = searchLib.query_column(workspace, arrayName, c_ulonglong(
-            tileStart), c_ulonglong(tileEnd), c_ulonglong(token), c_longlong(pageSize), pageToken)
+        qresp = searchLib.query_column(
+            workspace,
+            arrayName,
+            c_ulonglong(tileStart),
+            c_ulonglong(tileEnd),
+            c_ulonglong(token),
+            c_longlong(pageSize),
+            pageToken)
         nextPageToken = qresp.contents.nextPageToken
         varcount = qresp.contents.varcount
         vArray = qresp.contents.VariantArray
@@ -243,8 +267,12 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
                         for value in callInfo[iname]:
                             callInfo[iname][index] = str(value)
                             index += 1
-                gac = GACall.GACall(callSetId=callId, callSetName=cname,
-                                    genotype=gtlist, genotypeLikelihood=plist, info=callInfo)
+                gac = GACall.GACall(
+                    callSetId=callId,
+                    callSetName=cname,
+                    genotype=gtlist,
+                    genotypeLikelihood=plist,
+                    info=callInfo)
 
                 callMatch = True
 
@@ -262,21 +290,32 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
 
             # if variant is valid and meets the variantSetId filter
             if(variantValid):
-                gavlist.append((GAVariant.GAVariant(id=variantSetIdx, variantSetId=variantSetGuid, referenceName=referenceName, start=startp,
-                                                    end=endp, referenceBases=reflist, alternateBases=altlist, calls=gaclist)).gavariant_info)
+                gavlist.append(
+                    (GAVariant.GAVariant(
+                        id=variantSetIdx,
+                        variantSetId=variantSetGuid,
+                        referenceName=referenceName,
+                        start=startp,
+                        end=endp,
+                        referenceBases=reflist,
+                        alternateBases=altlist,
+                        calls=gaclist)).gavariant_info)
 
     searchLib.cleanup(token)
-    return (GASVResponse.GASVResponse(variants=gavlist, nextPageToken=nextPageToken))
+    return (GASVResponse.GASVResponse(
+        variants=gavlist, nextPageToken=nextPageToken))
 
 
-def searchCallSets(workspace, arrayName, searchLib, variantSetIds=[], name=None, pageSize=None, pageToken=None):
+def searchCallSets(workspace, arrayName, searchLib, variantSetIds=[
+], name=None, pageSize=None, pageToken=None):
 
     cslist = list()
     callSet = GACallSet.GACallSet().gacallset_info
     nextPageToken = None
     cslist.append(callSet)
 
-    return (GACSResponse.GACSResponse(callSets=cslist, nextPageToken=nextPageToken))
+    return (GACSResponse.GACSResponse(
+        callSets=cslist, nextPageToken=nextPageToken))
 
 
 def searchVariantSets(datasetId="", pageSize=None, pageToken=None):
@@ -291,9 +330,13 @@ def searchVariantSets(datasetId="", pageSize=None, pageToken=None):
             referenceSetId = metadb.referenceSetIdx2ReferenceSetGUID(
                 vs.reference_set_id)
 
-            variantSet = GAVariantSet\
-                .GAVariantSet(id=vs.guid, name=vs.name, referenceSetId=referenceSetId, datasetId=vs.dataset_id, metadata=vs.variant_set_metadata)\
-                .gavariantset_info
+            variantSet = GAVariantSet .GAVariantSet(
+                id=vs.guid,
+                name=vs.name,
+                referenceSetId=referenceSetId,
+                datasetId=vs.dataset_id,
+                metadata=vs.variant_set_metadata) .gavariantset_info
             vslist.append(variantSet)
 
-    return (GASVSetResponse.GASVSetResponse(variantSets=vslist, nextPageToken=nextPageToken))
+    return (GASVSetResponse.GASVSetResponse(
+        variantSets=vslist, nextPageToken=nextPageToken))

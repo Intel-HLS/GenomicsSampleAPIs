@@ -7,11 +7,14 @@ tiledb_reference_offset_padding_factor_default = 1.1
 
 
 def get_tiledb_padded_reference_length_string(reference_length_str):
-    return ('CAST( CAST(%s AS DOUBLE PRECISION)*(SELECT tiledb_reference_offset_padding_factor FROM reference_set WHERE id=NEW.reference_set_id) AS BIGINT)' % (reference_length_str))
+    return (
+        'CAST( CAST(%s AS DOUBLE PRECISION)*(SELECT tiledb_reference_offset_padding_factor FROM reference_set WHERE id=NEW.reference_set_id) AS BIGINT)' %
+        (reference_length_str))
 
 
 def get_tiledb_padded_reference_length_string_default(reference_length_str):
-    return ('CAST( CAST(%s AS DOUBLE PRECISION)*%.1f AS BIGINT)' % (reference_length_str, tiledb_reference_offset_padding_factor_default))
+    return ('CAST( CAST(%s AS DOUBLE PRECISION)*%.1f AS BIGINT)' %
+            (reference_length_str, tiledb_reference_offset_padding_factor_default))
 
 from .textpickletype import TextPickleType
 from .inc_counter import BigInteger

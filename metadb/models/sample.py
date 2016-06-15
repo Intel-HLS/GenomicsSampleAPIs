@@ -18,5 +18,13 @@ class Sample(_Base):
     info = sa.Column(TextPickleType(pickler=json))
 
 # Handle auto-increment
-autoinc_handler(Sample.__table__, '%(table)s', id_column_name='id', id_seq_name='sample_id_seq',
-                insert_dict={'id': -1, 'individual_id': -1, 'name': None, 'guid': None})
+autoinc_handler(
+    Sample.__table__,
+    '%(table)s',
+    id_column_name='id',
+    id_seq_name='sample_id_seq',
+    insert_dict={
+        'id': -1,
+        'individual_id': -1,
+        'name': None,
+        'guid': None})

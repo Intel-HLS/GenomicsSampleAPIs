@@ -59,9 +59,10 @@ class Query():
         if not isinstance(idx, list):
             idx = [idx]
 
-        resultTuple = self.session.query(models.Individual.id, models.Individual.name)\
-            .filter(models.Individual.id.in_(idx))\
-            .all()
+        resultTuple = self.session.query(
+            models.Individual.id,
+            models.Individual.name) .filter(
+            models.Individual.id.in_(idx)) .all()
         resultDict = dict(resultTuple)
         del resultTuple
         return fillResults(idx, resultDict)
@@ -76,9 +77,10 @@ class Query():
         if not isinstance(name, list):
             name = [name]
 
-        resultTuple = self.session.query(models.Individual.name, models.Individual.id)\
-            .filter(models.Individual.name.in_(name))\
-            .all()
+        resultTuple = self.session.query(
+            models.Individual.name,
+            models.Individual.id) .filter(
+            models.Individual.name.in_(name)) .all()
         resultDict = dict(resultTuple)
         del resultTuple
         return fillResults(name, resultDict)
@@ -87,9 +89,10 @@ class Query():
         """
         Given a array idx, returns a tuple of workspace and array name
         """
-        result = self.session.query(models.Workspace.name, models.DBArray.name)\
-                             .filter(models.DBArray.id == array_idx)\
-                             .all()
+        result = self.session.query(
+            models.Workspace.name,
+            models.DBArray.name) .filter(
+            models.DBArray.id == array_idx) .all()
         if len(result) != 1:
             raise ValueError("Invalid Array Id : {0} ".format(array_idx))
         return result[0]
@@ -111,16 +114,17 @@ class Query():
 
         if len(result) != 1:
             raise ValueError(
-                "Invalid workspace: {0} or array name: {1}".format(workspace, arrayName))
+                "Invalid workspace: {0} or array name: {1}".format(
+                    workspace, arrayName))
         return result[0][0]
 
     def arrayId2TileRows(self, array_idx):
         """
         Given a array_idx return a list of tile row ids that are valid
         """
-        result = self.session.query(models.CallSetToDBArrayAssociation.tile_row_id)\
-            .filter(models.CallSetToDBArrayAssociation.db_array_id == array_idx)\
-            .all()
+        result = self.session.query(
+            models.CallSetToDBArrayAssociation.tile_row_id) .filter(
+            models.CallSetToDBArrayAssociation.db_array_id == array_idx) .all()
         return toList(result)
 
     def fieldId2Name(self, fieldID):
@@ -138,15 +142,18 @@ class Query():
             contig = 'M'
         if not isinstance(positionList, list):
             positionList = [positionList]
-        result = self.session.query(models.Reference.tiledb_column_offset, models.Reference.length)\
-                             .join(models.ReferenceSet, models.DBArray)\
-                             .filter(models.DBArray.id == array_idx)\
-                             .filter(models.Reference.name == contig)\
-                             .all()
+        result = self.session.query(
+            models.Reference.tiledb_column_offset,
+            models.Reference.length) .join(
+            models.ReferenceSet,
+            models.DBArray) .filter(
+            models.DBArray.id == array_idx) .filter(
+                models.Reference.name == contig) .all()
 
         if len(result) != 1:
             raise ValueError(
-                "Invalid array id: {0} or contig: {1}".format(array_idx, contig))
+                "Invalid array id: {0} or contig: {1}".format(
+                    array_idx, contig))
 
         self.contig = contig
         self.offset = result[0][0]
@@ -158,11 +165,13 @@ class Query():
 
         for i in xrange(0, count):
             if positionList[i] > self.length:
-                raise ValueError("Invalid Query. Position {0} is > length of contig: {1} ".format(
-                    positionList[i], self.length))
+                raise ValueError(
+                    "Invalid Query. Position {0} is > length of contig: {1} ".format(
+                        positionList[i], self.length))
             elif positionList[i] < 0:
                 raise ValueError(
-                    "Invalid Query. Position {0} should be positive ".format(positionList[i]))
+                    "Invalid Query. Position {0} should be positive ".format(
+                        positionList[i]))
             # Contig, position is 1-based (in other words VCF is 1-based) and
             # tile db is 0 based so subtract 1
             resultList[i] = self.offset + positionList[i] - 1
@@ -178,7 +187,8 @@ class Query():
 
         for i in xrange(0, count):
             # Check if we can optimize the translation without going to the DB
-            if self.offset != None and positionList[i] >= self.offset and (positionList[i] - self.offset) <= self.length:
+            if self.offset is not None and positionList[i] >= self.offset and (
+                    positionList[i] - self.offset) <= self.length:
                 # Since the all positions in the input list is greater than or equal to offset and
                 # less than or equal to the lenth of the contig, use the current result from the DB to
                 # translate all the positions
@@ -189,15 +199,19 @@ class Query():
                 continue
             # Get the info from DB since the cache is not available or
             # the cached values are not relevant to the current request
-            result = self.session.query(models.Reference.name, models.Reference.tiledb_column_offset, models.Reference.length)\
-                                 .join(models.ReferenceSet, models.DBArray)\
-                                 .filter(models.DBArray.id == array_idx)\
-                                 .filter(models.Reference.tiledb_column_offset <= positionList[i])\
-                                 .order_by(models.Reference.tiledb_column_offset.desc())\
-                                 .first()
-            if result == None or len(result) != 3:
-                raise ValueError("Invalid Position {0} for array id {1}".format(
-                    positionList[i], array_idx))
+            result = self.session.query(
+                models.Reference.name,
+                models.Reference.tiledb_column_offset,
+                models.Reference.length) .join(
+                models.ReferenceSet,
+                models.DBArray) .filter(
+                models.DBArray.id == array_idx) .filter(
+                models.Reference.tiledb_column_offset <= positionList[i]) .order_by(
+                    models.Reference.tiledb_column_offset.desc()) .first()
+            if result is None or len(result) != 3:
+                raise ValueError(
+                    "Invalid Position {0} for array id {1}".format(
+                        positionList[i], array_idx))
             # Update cache
             self.contig = result[0]
             self.offset = result[1]
@@ -207,8 +221,9 @@ class Query():
             # tile db is 0 based so add 1
             resultPositionList[i] = positionList[i] - self.offset + 1
             if resultPositionList[i] > self.length:
-                raise ValueError("Invalid Position {0} > total length for array id {1}".format(
-                    positionList[i], array_idx))
+                raise ValueError(
+                    "Invalid Position {0} > total length for array id {1}".format(
+                        positionList[i], array_idx))
         return resultContigList, resultPositionList
 
     def getArrayRows(self, array_idx=None, variantSets=[], callSets=[]):
@@ -218,19 +233,22 @@ class Query():
         Both variantSets and callsets list takes guid.
         """
         queryStatement = self.session.query(
-            models.CallSetToDBArrayAssociation.db_array_id, models.CallSetToDBArrayAssociation.tile_row_id)
+            models.CallSetToDBArrayAssociation.db_array_id,
+            models.CallSetToDBArrayAssociation.tile_row_id)
         if array_idx:
             queryStatement = queryStatement.filter(
                 models.CallSetToDBArrayAssociation.db_array_id == array_idx)
         if callSets and len(callSets):
-            queryStatement = queryStatement.join(models.CallSet)\
-                                           .filter(models.CallSet.guid.in_(callSets))
+            queryStatement = queryStatement.join(
+                models.CallSet) .filter(
+                models.CallSet.guid.in_(callSets))
         if variantSets and len(variantSets):
             if not (callSets and len(callSets)):
                 queryStatement = queryStatement.join(models.CallSet)
-            queryStatement = queryStatement.join(models.CallSetVariantSet)\
-                                           .join(models.VariantSet)\
-                                           .filter(models.VariantSet.guid.in_(variantSets))
+            queryStatement = queryStatement.join(
+                models.CallSetVariantSet) .join(
+                models.VariantSet) .filter(
+                models.VariantSet.guid.in_(variantSets))
 
         resultDict = Dictlist()
         for k, v in queryStatement.all():
@@ -242,11 +260,13 @@ class Query():
         Given a array id and tile row, returns a tuple of
         (call set id, call set guid, call set name)
         """
-        result = self.session.query(models.CallSet.id, models.CallSet.guid, models.CallSet.name)\
-                             .join(models.CallSetToDBArrayAssociation)\
-                             .filter(models.CallSetToDBArrayAssociation.tile_row_id == tile_row_id)\
-                             .filter(models.CallSetToDBArrayAssociation.db_array_id == array_idx)\
-                             .all()
+        result = self.session.query(
+            models.CallSet.id,
+            models.CallSet.guid,
+            models.CallSet.name) .join(
+            models.CallSetToDBArrayAssociation) .filter(
+            models.CallSetToDBArrayAssociation.tile_row_id == tile_row_id) .filter(
+                models.CallSetToDBArrayAssociation.db_array_id == array_idx) .all()
 
         if len(result) != 1:
             raise ValueError(
@@ -267,9 +287,9 @@ class Query():
         """
         Given a reference set idx return a reference set GUID
         """
-        result = self.session.query(models.ReferenceSet.guid)\
-                             .filter(models.ReferenceSet.id == referenceSetIdx)\
-                             .all()
+        result = self.session.query(
+            models.ReferenceSet.guid) .filter(
+            models.ReferenceSet.id == referenceSetIdx) .all()
 
         if len(result) != 1:
             raise ValueError(
@@ -282,16 +302,18 @@ class Query():
         (variant set idx, variant set guid)
         """
         # TODO ommitting this function since variant set is not being used
-        result = self.session.query(models.VariantSet.id, models.VariantSet.guid)\
-                             .join(models.CallSetVariantSet)\
-                             .filter(models.CallSetVariantSet.callset_id == callSetId)\
-                             .all()
+        result = self.session.query(
+            models.VariantSet.id,
+            models.VariantSet.guid) .join(
+            models.CallSetVariantSet) .filter(
+            models.CallSetVariantSet.callset_id == callSetId) .all()
 
         if len(result) != 1:
             raise ValueError("Invalid call set Id: {0}".format(callSetId))
         return result[0]
 
-    def callSetIds2TileRowId(self, callSetIds, workspace, arrayName, isGUID=True):
+    def callSetIds2TileRowId(
+            self, callSetIds, workspace, arrayName, isGUID=True):
         """
         Given a list of call set ids (guids), workspace, and arrayName
         returns the tile row ids that are valid
@@ -302,12 +324,13 @@ class Query():
         # since users could have / or not for the workspace.
         workspace = workspace.rstrip('/')
 
-        queryStatement = self.session.query(models.CallSetToDBArrayAssociation.tile_row_id)\
-                             .join(models.DBArray)\
-                             .join(models.Workspace)\
-                             .join(models.CallSet)\
-                             .filter(models.DBArray.name == arrayName)\
-                             .filter(models.Workspace.name == workspace)
+        queryStatement = self.session.query(
+            models.CallSetToDBArrayAssociation.tile_row_id) .join(
+            models.DBArray) .join(
+            models.Workspace) .join(
+                models.CallSet) .filter(
+                    models.DBArray.name == arrayName) .filter(
+                        models.Workspace.name == workspace)
         if isGUID:
             queryStatement = queryStatement.filter(
                 models.CallSet.guid.in_(callSetIds))
@@ -339,10 +362,12 @@ class Query():
         Returns a tuple of (callset, sourceSampleId, targetSampleId) from callsets belonging to a single array..
         Example: [(f408d471-fe65-4a13-8ea6-cdd75adf6214, SourceSampleId, TargetSampleId)]
         """
-        result = self.session.query(models.CallSet.guid, models.CallSet.source_sample_id, models.CallSet.target_sample_id)\
-            .join(models.CallSetToDBArrayAssociation)\
-            .filter(models.CallSetToDBArrayAssociation.db_array_id == array_idx)\
-            .all()
+        result = self.session.query(
+            models.CallSet.guid,
+            models.CallSet.source_sample_id,
+            models.CallSet.target_sample_id) .join(
+            models.CallSetToDBArrayAssociation) .filter(
+            models.CallSetToDBArrayAssociation.db_array_id == array_idx) .all()
 
         if len(result) == 0:
             raise ValueError("Invalid array idx: {0}".format(array_idx))
@@ -375,7 +400,7 @@ def fillResults(sourceList, mapper):
     for v in sourceList:
         try:
             result[index] = mapper[v]
-        except Exception, e:
+        except Exception as e:
             # If we have an exception then value v is invalid.
             # Leave value as None, and continue
             pass

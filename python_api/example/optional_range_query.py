@@ -21,7 +21,7 @@ def process(chromosome, start, end, attributes):
 
         util.log("Results from {0}".format(name))
 
-        if end != None:
+        if end is not None:
             data = api.getValidPositions(chromosome, start, end)
             data = json.loads(data)
             print "Valid indices : {0}".format(data['indices'])
@@ -59,8 +59,13 @@ if __name__ == '__main__':
                         type=long, help="start position")
     parser.add_argument("-e", "--end", required=False,
                         type=long, help="end position")
-    parser.add_argument("-a", "--attributes", nargs='+', required=True, type=str,
-                        help="List of attributes to fetch")
+    parser.add_argument(
+        "-a",
+        "--attributes",
+        nargs='+',
+        required=True,
+        type=str,
+        help="List of attributes to fetch")
 
     args = parser.parse_args()
 

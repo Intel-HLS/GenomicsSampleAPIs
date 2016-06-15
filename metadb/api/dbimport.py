@@ -48,7 +48,13 @@ class Import():
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
 
-    def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=None):
+    def registerReferenceSet(
+            self,
+            guid,
+            assembly_id,
+            source_accessions=None,
+            description=None,
+            references=None):
         """
         ReferenceSet registration occurs from a assembly config file. See hg19.json for example.
         Requires assembly ids and guids to be unique.
@@ -89,13 +95,18 @@ class Import():
         if name == 'MT':
             name = 'M'
 
-        thisReference = self.session.query(Reference).filter(and_(
-            Reference.reference_set_id == reference_set_id, Reference.name == name)).first()
+        thisReference = self.session.query(Reference).filter(
+            and_(
+                Reference.reference_set_id == reference_set_id,
+                Reference.name == name)).first()
 
         if thisReference is None:
             try:
                 thisReference = Reference(
-                    name=name, reference_set_id=reference_set_id, length=length, guid=guid)
+                    name=name,
+                    reference_set_id=reference_set_id,
+                    length=length,
+                    guid=guid)
                 self.session.add(thisReference)
                 self.session.commit()
 
@@ -139,14 +150,19 @@ class Import():
 
         # array is a unique set of workspace, array, and reference set
         # association
-        thisDBArray = self.session.query(DBArray)\
-            .filter(and_(DBArray.reference_set_id == reference_set_id, DBArray.workspace_id == workspace_id, DBArray.name == name))\
-            .first()
+        thisDBArray = self.session.query(DBArray) .filter(
+            and_(
+                DBArray.reference_set_id == reference_set_id,
+                DBArray.workspace_id == workspace_id,
+                DBArray.name == name)) .first()
 
         if thisDBArray is None:
             try:
                 thisDBArray = DBArray(
-                    guid=guid, reference_set_id=reference_set_id, workspace_id=workspace_id, name=name)
+                    guid=guid,
+                    reference_set_id=reference_set_id,
+                    workspace_id=workspace_id,
+                    name=name)
                 self.session.add(thisDBArray)
                 self.session.commit()
 
@@ -157,13 +173,14 @@ class Import():
 
         return thisDBArray
 
-    def registerVariantSet(self, guid, reference_set_id, dataset_id=None, metadata=None):
+    def registerVariantSet(self, guid, reference_set_id,
+                           dataset_id=None, metadata=None):
         """
         Register variant set.
         """
 
-        thisReferenceSet = self.session.query(ReferenceSet)\
-                               .filter(ReferenceSet.id == reference_set_id).first()
+        thisReferenceSet = self.session.query(ReferenceSet) .filter(
+            ReferenceSet.id == reference_set_id).first()
 
         if thisReferenceSet is None:
             raise ValueError(
@@ -218,9 +235,10 @@ class Import():
         """
 
         # check if callset is registered to array already
-        thisCallSetToDBArrayAssociation = self.session.query(CallSetToDBArrayAssociation)\
-            .filter(and_(CallSetToDBArrayAssociation.db_array_id == db_array_id, CallSetToDBArrayAssociation.callset_id == callset_id))\
-            .first()
+        thisCallSetToDBArrayAssociation = self.session.query(CallSetToDBArrayAssociation) .filter(
+            and_(
+                CallSetToDBArrayAssociation.db_array_id == db_array_id,
+                CallSetToDBArrayAssociation.callset_id == callset_id)) .first()
 
         if thisCallSetToDBArrayAssociation is None:
 
@@ -229,7 +247,16 @@ class Import():
             self.session.add(thisCallSetToDBArrayAssociation)
             self.session.commit()
 
-    def registerCallSet(self, guid, source_sample_guid, target_sample_guid, workspace, array_name, variant_set_ids=None, info=None, name=None):
+    def registerCallSet(
+            self,
+            guid,
+            source_sample_guid,
+            target_sample_guid,
+            workspace,
+            array_name,
+            variant_set_ids=None,
+            info=None,
+            name=None):
         """
         Register a callset.
         Associate a new or already existing callset to a variant set.
@@ -249,8 +276,9 @@ class Import():
             Sample.guid == target_sample_guid).first()
 
         if thisSourceSample is None or thisTargetSample is None:
-            raise ValueError("Issue retrieving Sample info, check: source sample {0}, or target sample {1}".format(
-                source_sample_guid, target_sample_guid))
+            raise ValueError(
+                "Issue retrieving Sample info, check: source sample {0}, or target sample {1}".format(
+                    source_sample_guid, target_sample_guid))
 
         # get array
         thisDBArray = self.session.query(DBArray)\
@@ -263,11 +291,13 @@ class Import():
             raise ValueError(
                 "DBArray needs to exist for CallSet Registration : {0} ".format(array_name))
 
-        thisCallSet = self.session.query(CallSet)\
-            .filter(or_(CallSet.guid == guid,
-                        and_(CallSet.name == name,
-                             CallSet.source_sample_id == thisSourceSample[0],
-                             CallSet.target_sample_id == thisTargetSample[0]))).first()
+        thisCallSet = self.session.query(CallSet) .filter(
+            or_(
+                CallSet.guid == guid,
+                and_(
+                    CallSet.name == name,
+                    CallSet.source_sample_id == thisSourceSample[0],
+                    CallSet.target_sample_id == thisTargetSample[0]))).first()
 
         if thisCallSet is None:
             if variant_set_ids is None:
@@ -330,7 +360,10 @@ class Import():
         if thisSample is None:
             try:
                 thisSample = Sample(
-                    guid=guid, individual_id=thisIndividual.id, name=name, info=info)
+                    guid=guid,
+                    individual_id=thisIndividual.id,
+                    name=name,
+                    info=info)
                 self.session.add(thisSample)
                 self.session.commit()
 
@@ -346,18 +379,18 @@ class Import():
         Registration of an individual requires a guid and a name.
         Name can be None to support retrival from registerSample
         """
-        individual = self.session.query(Individual)\
-            .filter(or_(Individual.guid == guid, Individual.name == name)).first()
+        individual = self.session.query(Individual) .filter(
+            or_(Individual.guid == guid, Individual.name == name)).first()
 
         if individual is None:
 
             try:
-                individual = Individual(name=name,
-                                        guid=guid,
-                                        info=info,
-                                        record_update_time=strftime(
-                                            "%Y-%m-%d %H:%M:%S%S.%S%S%S"),
-                                        record_create_time=strftime("%Y-%m-%d %H:%M:%S%S.%S%S%S"))
+                individual = Individual(
+                    name=name,
+                    guid=guid,
+                    info=info,
+                    record_update_time=strftime("%Y-%m-%d %H:%M:%S%S.%S%S%S"),
+                    record_create_time=strftime("%Y-%m-%d %H:%M:%S%S.%S%S%S"))
                 self.session.add(individual)
                 self.session.commit()
 
@@ -380,8 +413,11 @@ def sortReferences(references):
     if references.__class__ != OrderedDict().__class__:
         vcflike_refs = {str(key): Contig(id=str(key), length=value)
                         for (key, value) in references.items()}
-        references = OrderedDict(sorted(vcflike_refs.items(), key=lambda (
-            key, value): int(key) if key.isdigit() else key))
+        references = OrderedDict(
+            sorted(
+                vcflike_refs.items(),
+                key=lambda key_value: int(
+                    key_value[0]) if key_value[0].isdigit() else key_value[0]))
 
     if 'MT' in references:
         references['M'] = references.pop('MT')

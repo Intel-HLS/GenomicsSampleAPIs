@@ -48,8 +48,13 @@ if __name__ == '__main__':
                         type=str, help="Chromosome")
     parser.add_argument("-p", "--position", required=True, type=long,
                         help="position in the chromosome")
-    parser.add_argument("-a", "--attributes", nargs='+', required=True, type=str,
-                        help="List of attributes to fetch")
+    parser.add_argument(
+        "-a",
+        "--attributes",
+        nargs='+',
+        required=True,
+        type=str,
+        help="List of attributes to fetch")
 
     args = parser.parse_args()
 

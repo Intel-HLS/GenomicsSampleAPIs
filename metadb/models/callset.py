@@ -23,8 +23,21 @@ class CallSet(_Base):
     db_array_associations = relationship(
         "CallSetToDBArrayAssociation", backref="callset")
     variant_sets = relationship(
-        'VariantSet', secondary='callset_variant_set', backref=backref('CallSet'))
+        'VariantSet',
+        secondary='callset_variant_set',
+        backref=backref('CallSet'))
 
 # Handle auto-increment
-autoinc_handler(CallSet.__table__, '%(table)s', id_column_name='id', id_seq_name='callset_id_seq',
-                insert_dict={'id': -1, 'name': None, 'guid': None, 'source_sample_id': -1, 'target_sample_id': -1, 'created': -1, 'updated': -1})
+autoinc_handler(
+    CallSet.__table__,
+    '%(table)s',
+    id_column_name='id',
+    id_seq_name='callset_id_seq',
+    insert_dict={
+        'id': -1,
+        'name': None,
+        'guid': None,
+        'source_sample_id': -1,
+        'target_sample_id': -1,
+        'created': -1,
+        'updated': -1})

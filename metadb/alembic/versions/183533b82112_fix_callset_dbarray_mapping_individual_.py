@@ -45,8 +45,9 @@ def upgrade():
                     sa.PrimaryKeyConstraint(
                         'callset_id', 'db_array_id', name='primary_key')
                     )
-    op.create_index('db_array_id_tile_row_id_idx', 'callset_to_db_array_association', [
-                    'db_array_id', 'tile_row_id'], unique=True)
+    op.create_index(
+        'db_array_id_tile_row_id_idx', 'callset_to_db_array_association', [
+            'db_array_id', 'tile_row_id'], unique=True)
     # Trigger for auto-incrementing tile_row_idx and num_rows
     op.execute('''\
     CREATE OR REPLACE FUNCTION increment_num_rows_in_db_array_pgsql()
@@ -83,18 +84,36 @@ def downgrade():
     op.execute(
         'DROP TRIGGER increment_num_rows_in_db_array ON callset_to_db_array_association CASCADE')
     op.drop_column(u'db_array', 'num_rows')
-    op.create_table('db_row',
-                    sa.Column('id', sa.BIGINT(), nullable=False),
-                    sa.Column('db_array_id', sa.BIGINT(),
-                              autoincrement=False, nullable=False),
-                    sa.Column('tile_row_id', sa.BIGINT(),
-                              autoincrement=False, nullable=False),
-                    sa.ForeignKeyConstraint(
-                        ['db_array_id'], [u'db_array.id'], name=u'db_row_db_array_id_fkey'),
-                    sa.PrimaryKeyConstraint('id', name=u'db_row_pkey')
-                    )
-    op.add_column(u'callset', sa.Column('individual_id',
-                                        sa.BIGINT(), autoincrement=False, nullable=False))
+    op.create_table(
+        'db_row',
+        sa.Column(
+            'id',
+            sa.BIGINT(),
+            nullable=False),
+        sa.Column(
+            'db_array_id',
+            sa.BIGINT(),
+            autoincrement=False,
+            nullable=False),
+        sa.Column(
+            'tile_row_id',
+            sa.BIGINT(),
+            autoincrement=False,
+            nullable=False),
+        sa.ForeignKeyConstraint(
+            ['db_array_id'],
+            [u'db_array.id'],
+            name=u'db_row_db_array_id_fkey'),
+        sa.PrimaryKeyConstraint(
+            'id',
+            name=u'db_row_pkey'))
+    op.add_column(
+        u'callset',
+        sa.Column(
+            'individual_id',
+            sa.BIGINT(),
+            autoincrement=False,
+            nullable=False))
     op.add_column(u'callset', sa.Column('dbrow_id', sa.BIGINT(),
                                         autoincrement=False, nullable=False))
     op.drop_constraint('callset_source_sample_id_fkey',

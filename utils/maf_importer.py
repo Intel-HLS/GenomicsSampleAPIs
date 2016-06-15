@@ -71,7 +71,7 @@ class MAF(File2Tile):
 
         self.initFilePointers(inputFile, outFile)
 
-        nLine = 0L
+        nLine = 0
         try:
             while(self.parseNextLine()):
                 self.checkSample()
@@ -100,7 +100,7 @@ class MAF(File2Tile):
         - If a new sample is identified, write the existing data, and copy current
         - If it is the same sample, then compare with previous and append if new
         """
-        if(self.prev_SourceSampleId == None or self.prev_TargetSampleId == None):
+        if(self.prev_SourceSampleId is None or self.prev_TargetSampleId is None):
             # first sample copy data
             self.saveCurrentData()
         elif(self.prev_SourceSampleId != self.SourceSampleId or
@@ -119,8 +119,8 @@ class MAF(File2Tile):
             # append new data for fields whose type is an array
             # Picking ALT value at 0 since we know that MAF always has only one ALT per line.
             # If that is not the case, then this code needs to be updated
-            if 'ALT' in self.TileDBValues.keys() \
-                    and self.TileDBValues['ALT'][0] not in self.prev_TileDBValues['ALT']:
+            if 'ALT' in self.TileDBValues.keys() and self.TileDBValues['ALT'][
+                    0] not in self.prev_TileDBValues['ALT']:
                 for key in self.TileDBValues.keys():
                     if(key in CSVLine.arrayFields):
                         for value in self.TileDBValues[key]:
@@ -147,10 +147,20 @@ class MAF(File2Tile):
 
                 self.curr_Individual = metadb.registerIndividual(
                     guid=str(uuid.uuid4()), name=self.prev_IndividualId)
-                self.curr_SourceSample = metadb.registerSample(guid=str(uuid.uuid4(
-                )), individual_guid=self.curr_Individual.guid, name=self.SourceSampleId, info={'type': 'source'})
-                self.curr_TargetSample = metadb.registerSample(guid=str(uuid.uuid4(
-                )), individual_guid=self.curr_Individual.guid, name=self.TargetSampleId, info={'type': 'target'})
+                self.curr_SourceSample = metadb.registerSample(
+                    guid=str(
+                        uuid.uuid4()),
+                    individual_guid=self.curr_Individual.guid,
+                    name=self.SourceSampleId,
+                    info={
+                        'type': 'source'})
+                self.curr_TargetSample = metadb.registerSample(
+                    guid=str(
+                        uuid.uuid4()),
+                    individual_guid=self.curr_Individual.guid,
+                    name=self.TargetSampleId,
+                    info={
+                        'type': 'target'})
 
                 # "CallSet_"+self.prev_TargetSampleId+"_"+self.prev_SourceSampleId
                 self.prev_CallSetName = self.CallSetName
@@ -178,9 +188,10 @@ class MAF(File2Tile):
                                                       self.SourceSampleId,
                                                       self.TargetSampleId,
                                                       self.curr_CallSet.id)
-            self.callset_mapping[my_sample_name] = {"row_idx": long(row_id),
-                                                    "idx_in_file": long(row_id),
-                                                    "filename": self.output_file}
+            self.callset_mapping[my_sample_name] = {
+                "row_idx": long(row_id),
+                "idx_in_file": long(row_id),
+                "filename": self.output_file}
 
         self.prev_ChromosomePosition = self.ChromosomePosition
         self.prev_TileDBPosition = self.TileDBPosition
@@ -190,7 +201,7 @@ class MAF(File2Tile):
         """
         Creates the CSV object from the data set we have and writes it to disk
         """
-        if(self.prev_SourceSampleId == None or self.prev_TargetSampleId == None or self.prev_IndividualId == None):
+        if(self.prev_SourceSampleId is None or self.prev_TargetSampleId is None or self.prev_IndividualId is None):
             return
         """
         Since MAF represents insertions and deletions with a '-' it needs to
@@ -377,7 +388,7 @@ class MAF(File2Tile):
 
             for (attr, val) in updateList:
                 aggCSV.set(attr, val)
-        except Exception, e:
+        except Exception as e:
             print attribute, zip(aggCSV.fields, aggCSV.values), zip(newCSV.fields, newCSV.values)
             raise e
 
@@ -386,17 +397,20 @@ class MAF(File2Tile):
         self.output_file = outFile
 
 
-def poolGenerateCSV((config_file, inputFile, outFile, bGzipped)):
+def poolGenerateCSV(file_params):
     """
     This function is used by multiprocess.Pool to generate CSV for each input file
     """
+    (config_file, inputFile, outFile, bGzipped) = file_params
     try:
         maf = MAF(config_file)
         maf.setupCallSetMapping(outFile)
-        maf.generateCSV(helper.getFilePointer(inputFile, bGzipped, 'r'),
-                        helper.getFilePointer(outFile, False, 'w'), bVerbose=False)
+        maf.generateCSV(
+            helper.getFilePointer(
+                inputFile, bGzipped, 'r'), helper.getFilePointer(
+                outFile, False, 'w'), bVerbose=False)
         maf.checkCSV(outFile)
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc(file=sys.stdout)
         print "Error processing {0}".format(inputFile)
         print str(e)
@@ -404,7 +418,8 @@ def poolGenerateCSV((config_file, inputFile, outFile, bGzipped)):
     return (0, outFile, maf.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzipped):
+def parallelGen(config_file, inputFileList, outputDir,
+                combinedOutputFile, bGzipped):
     """
     Function that spawns the Pool of MAF objects to work on each of the input files
     Once the BookKeeping support moves to a real DB, move from threads to multiprocessing.Pool
@@ -441,5 +456,9 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzip
             print "\t{0}".format(f)
         raise Exception("Execution failed on {0}".format(failed))
 
-    helper.createMappingFiles(outputDir, callset_mapping, rs.id,
-                              config.DB_URI, combinedOutputFile=combinedOutputFile)
+    helper.createMappingFiles(
+        outputDir,
+        callset_mapping,
+        rs.id,
+        config.DB_URI,
+        combinedOutputFile=combinedOutputFile)

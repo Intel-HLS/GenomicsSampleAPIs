@@ -60,13 +60,15 @@ class TestAggregator():
         assert api.getSampleNames([1, 2, 0]) == [
             'testSample2', None, 'testSample1']
 
-    @patch('python_api.mpi_service.Aggregator.runMPI', return_value=stub_result)
+    @patch(
+        'python_api.mpi_service.Aggregator.runMPI',
+        return_value=stub_result)
     def test_getPosition_single(self, runMPI_patch, tmpdir):
         self.get_test_config(tmpdir)
         config.util.DEBUG = True
         api = Aggregator(config)
 
-        result = api.getPosition("1", 100L, ["REF"])
+        result = api.getPosition("1", 100, ["REF"])
 
         args, kwargs = runMPI_patch.call_args
         assert result == stub_result
@@ -82,17 +84,19 @@ class TestAggregator():
                 0][0] == dict({"1": 100})
 
         config.util.DEBUG = False
-        result = api.getPosition("1", 100L, ["REF"])
+        result = api.getPosition("1", 100, ["REF"])
         args, kwargs = runMPI_patch.call_args
         assert os.path.exists(args[0]) == False
 
-    @patch('python_api.mpi_service.Aggregator.runMPI', return_value=stub_result)
+    @patch(
+        'python_api.mpi_service.Aggregator.runMPI',
+        return_value=stub_result)
     def test_getPosition_multi(self, runMPI_patch, tmpdir):
         self.get_test_config(tmpdir)
         config.util.DEBUG = True
         api = Aggregator(config)
 
-        result = api.getPosition(["1", "1"], [100L, 200L], [
+        result = api.getPosition(["1", "1"], [100, 200], [
                                  "REF", "END", "POSITION"])
 
         args, kwargs = runMPI_patch.call_args
@@ -112,16 +116,18 @@ class TestAggregator():
                 0][1] == dict({"1": 200})
 
         with pytest.raises(ValueError) as exec_info:
-            api.getPosition(["1"], [100L, 200L], ["REF"])
+            api.getPosition(["1"], [100, 200], ["REF"])
         assert "!= len" in str(exec_info.value)
 
-    @patch('python_api.mpi_service.Aggregator.runMPI', return_value=stub_result)
+    @patch(
+        'python_api.mpi_service.Aggregator.runMPI',
+        return_value=stub_result)
     def test_getPositionRange_single(self, runMPI_patch, tmpdir):
         self.get_test_config(tmpdir)
         config.util.DEBUG = True
         api = Aggregator(config)
 
-        result = api.getPositionRange("1", 100L, 110L, ["REF"])
+        result = api.getPositionRange("1", 100, 110, ["REF"])
 
         args, kwargs = runMPI_patch.call_args
         assert result == stub_result
@@ -137,18 +143,20 @@ class TestAggregator():
                 0][0] == dict({"1": [100, 110]})
 
         config.util.DEBUG = False
-        result = api.getPositionRange("1", 100L, 110L, ["REF"])
+        result = api.getPositionRange("1", 100, 110, ["REF"])
         args, kwargs = runMPI_patch.call_args
         assert os.path.exists(args[0]) == False
 
-    @patch('python_api.mpi_service.Aggregator.runMPI', return_value=stub_result)
+    @patch(
+        'python_api.mpi_service.Aggregator.runMPI',
+        return_value=stub_result)
     def test_getPositionRange_multi(self, runMPI_patch, tmpdir):
         self.get_test_config(tmpdir)
         config.util.DEBUG = True
         api = Aggregator(config)
 
-        result = api.getPositionRange(["1", "1"], [100L, 200L], [
-                                      110L, 220L], ["REF", "END", "POSITION"])
+        result = api.getPositionRange(["1", "1"], [100, 200], [
+                                      110, 220], ["REF", "END", "POSITION"])
 
         args, kwargs = runMPI_patch.call_args
         assert result == stub_result
@@ -167,16 +175,18 @@ class TestAggregator():
                 0][1] == dict({"1": [200, 220]})
 
         with pytest.raises(ValueError) as exec_info:
-            api.getPositionRange(["1"], [100L, 200L], [110L, 220L], ["REF"])
+            api.getPositionRange(["1"], [100, 200], [110, 220], ["REF"])
         assert "len(end)" in str(exec_info.value)
 
-    @patch('python_api.mpi_service.Aggregator.runMPI', return_value=stub_result)
+    @patch(
+        'python_api.mpi_service.Aggregator.runMPI',
+        return_value=stub_result)
     def test_getValidPositions(self, runMPI_patch, tmpdir):
         self.get_test_config(tmpdir)
         config.util.DEBUG = True
         api = Aggregator(config)
 
-        result = json.loads(api.getValidPositions("1", 100L, ["REF"]))
+        result = json.loads(api.getValidPositions("1", 100, ["REF"]))
         assert len(result) == 3
         assert result["POSITION"] == [90]
         assert result["END"] == [105]

@@ -17,41 +17,41 @@ NUM_RETRIES = 10
 
 CONST_TILEDB_FIELDS = OrderedDict()
 CONST_TILEDB_FIELDS["END"] = {
-    "vcf_field_class": ["INFO"],          "type": "int"}
+    "vcf_field_class": ["INFO"], "type": "int"}
 CONST_TILEDB_FIELDS["BaseQRankSum"] = {
-    "vcf_field_class": ["INFO"],          "type": "float"}
+    "vcf_field_class": ["INFO"], "type": "float"}
 CONST_TILEDB_FIELDS["ClippingRankSum"] = {
-    "vcf_field_class": ["INFO"],          "type": "float"}
+    "vcf_field_class": ["INFO"], "type": "float"}
 CONST_TILEDB_FIELDS["MQRankSum"] = {
-    "vcf_field_class": ["INFO"],          "type": "float"}
+    "vcf_field_class": ["INFO"], "type": "float"}
 CONST_TILEDB_FIELDS["ReadPosRankSum"] = {
-    "vcf_field_class": ["INFO"],          "type": "float"}
+    "vcf_field_class": ["INFO"], "type": "float"}
 CONST_TILEDB_FIELDS["MQ"] = {
-    "vcf_field_class": ["INFO"],          "type": "float"}
+    "vcf_field_class": ["INFO"], "type": "float"}
 CONST_TILEDB_FIELDS["MQ0"] = {
-    "vcf_field_class": ["INFO"],          "type": "int"}
+    "vcf_field_class": ["INFO"], "type": "int"}
 CONST_TILEDB_FIELDS["AF"] = {"vcf_field_class": [
-    "INFO"],          "type": "float", "length": "A"}
+    "INFO"], "type": "float", "length": "A"}
 CONST_TILEDB_FIELDS["AN"] = {"vcf_field_class": [
-    "INFO"],          "type": "int",   "length": 1}
+    "INFO"], "type": "int", "length": 1}
 CONST_TILEDB_FIELDS["AC"] = {"vcf_field_class": [
-    "INFO"],          "type": "int",   "length": "A"}
+    "INFO"], "type": "int", "length": "A"}
 CONST_TILEDB_FIELDS["DP"] = {
     "vcf_field_class": ["INFO", "FORMAT"], "type": "int"}
 CONST_TILEDB_FIELDS["MIN_DP"] = {
-    "vcf_field_class": ["FORMAT"],        "type": "int"}
+    "vcf_field_class": ["FORMAT"], "type": "int"}
 CONST_TILEDB_FIELDS["GQ"] = {
-    "vcf_field_class": ["FORMAT"],        "type": "int"}
+    "vcf_field_class": ["FORMAT"], "type": "int"}
 CONST_TILEDB_FIELDS["SB"] = {"vcf_field_class": [
-    "FORMAT"],        "type": "int",   "length": 4}
+    "FORMAT"], "type": "int", "length": 4}
 CONST_TILEDB_FIELDS["AD"] = {"vcf_field_class": [
-    "FORMAT"],        "type": "int",   "length": "R"}
+    "FORMAT"], "type": "int", "length": "R"}
 CONST_TILEDB_FIELDS["PL"] = {"vcf_field_class": [
-    "FORMAT"],        "type": "int",   "length": "G"}
+    "FORMAT"], "type": "int", "length": "G"}
 CONST_TILEDB_FIELDS["GT"] = {"vcf_field_class": [
-    "FORMAT"],        "type": "int",   "length": "P"}
+    "FORMAT"], "type": "int", "length": "P"}
 CONST_TILEDB_FIELDS["PS"] = {"vcf_field_class": [
-    "FORMAT"],        "type": "int",   "length": 1}
+    "FORMAT"], "type": "int", "length": 1}
 
 
 def getReference(assembly, chromosome, start, end):
@@ -62,8 +62,8 @@ def getReference(assembly, chromosome, start, end):
     if(chromosome == "M"):
         chromosome = "MT"
     server = "http://rest.ensembl.org"
-    request = "/sequence/region/human/" + chromosome + ":" + str(start) + ".." + \
-        str(end) + ":1?coord_system_version=" + assembly
+    request = "/sequence/region/human/" + chromosome + ":" + \
+        str(start) + ".." + str(end) + ":1?coord_system_version=" + assembly
 
     nRetires = NUM_RETRIES
     r = None
@@ -72,10 +72,10 @@ def getReference(assembly, chromosome, start, end):
         try:
             r = requests.get(server + request,
                              headers={"Content-Type": "text/plain"})
-        except Exception, e:
+        except Exception as e:
             bFail = True
 
-        if r == None or not r.ok or bFail:
+        if r is None or not r.ok or bFail:
             nRetires -= 1
             bFail = False
 
@@ -85,7 +85,7 @@ def getReference(assembly, chromosome, start, end):
             continue
         else:
             break
-    if r == None or not r.ok or bFail:
+    if r is None or not r.ok or bFail:
         print server + request
         r.raise_for_status()
 
@@ -96,7 +96,7 @@ def getFileName(inFile, splitStr=None):
     """
     Strips the /'s and gets the file name without extension
     """
-    if(splitStr == None or not inFile.endswith(splitStr)):
+    if(splitStr is None or not inFile.endswith(splitStr)):
         splitStr = "."
     fileName = os.path.basename(inFile).split(splitStr)[0]
     return fileName
@@ -118,18 +118,20 @@ def writeJSON2File(input_json, output_file):
         json.dump(input_json, outFP, indent=2, separators=(',', ': '))
 
 
-def writeVIDMappingFile(DB_URI, reference_set_id, output_file, fields_dict=CONST_TILEDB_FIELDS):
+def writeVIDMappingFile(DB_URI, reference_set_id,
+                        output_file, fields_dict=CONST_TILEDB_FIELDS):
     with DBQuery(DB_URI).getSession() as metadb:
-        references = metadb.session.query(models.Reference)\
-                           .filter(models.Reference.reference_set_id == reference_set_id)\
-                           .all()
+        references = metadb.session.query(models.Reference) .filter(
+            models.Reference.reference_set_id == reference_set_id) .all()
         vid_mapping = OrderedDict()
         vid_mapping["fields"] = fields_dict
         vid_mapping["contigs"] = OrderedDict()
         contigs = vid_mapping["contigs"]
         for reference in references:
-            contigs[reference.name] = {"length": reference.length,
-                                       "tiledb_column_offset": reference.tiledb_column_offset}
+            contigs[
+                reference.name] = {
+                "length": reference.length,
+                "tiledb_column_offset": reference.tiledb_column_offset}
         writeJSON2File(vid_mapping, output_file)
 
 
@@ -160,15 +162,23 @@ def registerWithMetadb(config, references=None):
             str(uuid.uuid4()), assembly, references=references)
 
         dba = metadb.registerDBArray(
-            guid=str(uuid.uuid4()), name=array, reference_set_id=rs.id, workspace_id=ws.id)
+            guid=str(
+                uuid.uuid4()),
+            name=array,
+            reference_set_id=rs.id,
+            workspace_id=ws.id)
         # arbitrary variant set assignment
-        vs = metadb.registerVariantSet(guid=str(
-            uuid.uuid4()), reference_set_id=rs.id, dataset_id=os.path.basename(workspace))
+        vs = metadb.registerVariantSet(
+            guid=str(
+                uuid.uuid4()),
+            reference_set_id=rs.id,
+            dataset_id=os.path.basename(workspace))
 
     return dba, vs, rs
 
 
-def createMappingFiles(outputDir, callset_mapping, rs_id, DB_URI, combinedOutputFile=None):
+def createMappingFiles(outputDir, callset_mapping, rs_id,
+                       DB_URI, combinedOutputFile=None):
     baseFileName = ''
     if combinedOutputFile:
         baseFileName = "." + getFileName(combinedOutputFile)

@@ -38,10 +38,10 @@ class Loader:
         if self.NUM_PROCESSES > 1:
             processArgs.extend([self.MPIRUN, "-np", str(self.NUM_PROCESSES),
                                 self.HOSTFLAG, self.HOSTS])
-            if self.IF_INCLUDE != None:
+            if self.IF_INCLUDE is not None:
                 processArgs.extend(
                     ["--mca", "btl_tcp_if_include", self.IF_INCLUDE])
-            if self.ENV != None:
+            if self.ENV is not None:
                 for env in self.ENV.split(","):
                     processArgs.extend(["-x", env])
 
@@ -53,11 +53,13 @@ class Loader:
         output, error = pipe.communicate()
 
         if pipe.returncode != 0:
-            raise Exception("subprocess run: {0}\nFailed with stdout: \n-- \n{1} \n--\nstderr: \n--\n{2} \n--".format(
-                " ".join(processArgs), output, error))
+            raise Exception(
+                "subprocess run: {0}\nFailed with stdout: \n-- \n{1} \n--\nstderr: \n--\n{2} \n--".format(
+                    " ".join(processArgs), output, error))
 
 
-def load2Tile(loader_config_file, callset_mapping_file, vid_mapping_file, workspace, array):
+def load2Tile(loader_config_file, callset_mapping_file,
+              vid_mapping_file, workspace, array):
     loader = Loader(loader_config_file)
 
     with open(loader.TILE_LOADER_JSON, 'r') as loaderFP:
@@ -86,8 +88,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Load to tile db")
 
-    parser.add_argument("-c", "--config", required=True, type=str,
-                        help="input configuration file for invoking the tile loader")
+    parser.add_argument(
+        "-c",
+        "--config",
+        required=True,
+        type=str,
+        help="input configuration file for invoking the tile loader")
     parser.add_argument("-d", "--debug", action="store_true", required=False,
                         help="debug mode flag")
     args = parser.parse_args()

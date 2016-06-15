@@ -13,12 +13,31 @@ class TestQuery:
                    "15", "16", "17", "18", "19", "20", "21",
                    "22", "X", "Y", "M"]
     chromosome_lengths = {
-        "1": 249250621, "2": 243199373, "3": 198022430, "4": 191154276, "5": 180915260,
-        "6": 171115067, "7": 159138663, "8": 146364022, "9": 141213431, "10": 135534747,
-        "11": 135006516, "12": 133851895, "13": 115169878, "14": 107349540, "15": 102531392,
-        "16": 90354753, "17": 81195210, "18": 78077248, "19": 59128983, "20": 63025520,
-        "21": 48129895, "22": 51304566, "X": 155270560, "Y": 59373566, "M": 16571
-    }
+        "1": 249250621,
+        "2": 243199373,
+        "3": 198022430,
+        "4": 191154276,
+        "5": 180915260,
+        "6": 171115067,
+        "7": 159138663,
+        "8": 146364022,
+        "9": 141213431,
+        "10": 135534747,
+        "11": 135006516,
+        "12": 133851895,
+        "13": 115169878,
+        "14": 107349540,
+        "15": 102531392,
+        "16": 90354753,
+        "17": 81195210,
+        "18": 78077248,
+        "19": 59128983,
+        "20": 63025520,
+        "21": 48129895,
+        "22": 51304566,
+        "X": 155270560,
+        "Y": 59373566,
+        "M": 16571}
     dataset_id = "TileDB"
 
     def typeCheck(self, result, objectType, objectValueType, length):
@@ -39,7 +58,7 @@ class TestQuery:
             idx = range(1, self.numRows + 2)
             result = session.individualId2Name(idx)
             self.typeCheck(result, list, unicode, len(idx))
-            assert result[-1] == None
+            assert result[-1] is None
 
     def test_individualName2Id_single_idx(self):
         with query.DBQuery(self.DBURI).getSession() as session:
@@ -58,7 +77,7 @@ class TestQuery:
             result = session.individualName2Id(name)
             self.typeCheck(result, list, long, len(name))
             assert result[0] == idx[0]
-            assert result[-1] == None
+            assert result[-1] is None
 
     def test_arrayId2TileNames(self):
         with query.DBQuery(self.DBURI).getSession() as session:
@@ -312,25 +331,19 @@ class TestQuery:
                 callset_id[tile_row_id] = result[0]
                 callset_guid[tile_row_id] = result[1]
 
-            tile_rows_for_callset_id = session.callSetIds2TileRowId(callset_id,
-                                                                    self.workspace,
-                                                                    self.arrayName,
-                                                                    isGUID=False)
+            tile_rows_for_callset_id = session.callSetIds2TileRowId(
+                callset_id, self.workspace, self.arrayName, isGUID=False)
             self.typeCheck(tile_rows_for_callset_id, list, str, self.numRows)
 
-            tile_rows_for_callset_guid = session.callSetIds2TileRowId(callset_guid,
-                                                                      self.workspace + '/',
-                                                                      self.arrayName,
-                                                                      isGUID=True)
+            tile_rows_for_callset_guid = session.callSetIds2TileRowId(
+                callset_guid, self.workspace + '/', self.arrayName, isGUID=True)
             self.typeCheck(tile_rows_for_callset_guid, list, str, self.numRows)
 
             assert tile_rows_for_callset_id == tile_rows_for_callset_guid
 
             callset_id.append(-1)
-            neg_tile_rows_for_callset_id = session.callSetIds2TileRowId(callset_id,
-                                                                        self.workspace,
-                                                                        self.arrayName,
-                                                                        isGUID=False)
+            neg_tile_rows_for_callset_id = session.callSetIds2TileRowId(
+                callset_id, self.workspace, self.arrayName, isGUID=False)
             self.typeCheck(neg_tile_rows_for_callset_id,
                            list, str, self.numRows)
 
