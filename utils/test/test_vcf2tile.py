@@ -20,9 +20,18 @@ normal_tag = '##SAMPLE=<ID=NORMAL,Description="Wild type",Platform=ILLUMINA,Prot
 tumor_tag = '##SAMPLE=<ID=TUMOUR,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=sampleT>'
 extra_tag = '##SAMPLE=<ID=EXTRA,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=extra>'
 
-test_data = ["1", "10177", "rs367896724", "A", "AC", "100", "PASS",
-             "AC=1;AF=0.425319;AN=6;NS=2504;DP=103152;EAS_AF=0.3363;AMR_AF=0.3602;AFR_AF=0.4909;EUR_AF=0.4056;SAS_AF=0.4949;AA=|||unknown(NO_COVERAGE);VT=INDEL",
-             "GT", "1|0", "0|0"]
+test_data = [
+    "1",
+    "10177",
+    "rs367896724",
+    "A",
+    "AC",
+    "100",
+    "PASS",
+    "AC=1;AF=0.425319;AN=6;NS=2504;DP=103152;EAS_AF=0.3363;AMR_AF=0.3602;AFR_AF=0.4909;EUR_AF=0.4056;SAS_AF=0.4949;AA=|||unknown(NO_COVERAGE);VT=INDEL",
+    "GT",
+    "1|0",
+    "0|0"]
 
 
 class TestVCFImporter(TestCase):
@@ -78,9 +87,8 @@ class TestVCFImporter(TestCase):
 
         # check proper import into metadb
         with dbquery.DBQuery(self.DBURI).getSession() as session:
-            result = session.session.query(models.CallSet.name)\
-                            .filter(models.CallSet.name.in_([sampleN, sampleT]))\
-                            .all()
+            result = session.session.query(models.CallSet.name) .filter(
+                models.CallSet.name.in_([sampleN, sampleT])) .all()
             assert len(result) == 2
 
         # check callset_map reflects callsets imported
@@ -136,9 +144,8 @@ class TestVCFImporter(TestCase):
         vcimp.multiprocess_import.poolImportVCF((str(conf), str(vcfile)))
         # check proper import
         with dbquery.DBQuery(self.DBURI).getSession() as session:
-            result = session.session.query(models.CallSet.name)\
-                            .filter(models.CallSet.name.in_([sampleN, sampleT]))\
-                            .all()
+            result = session.session.query(models.CallSet.name) .filter(
+                models.CallSet.name.in_([sampleN, sampleT])) .all()
             assert len(result) == 2
 
     def test_poolImportVCF_neg(self):

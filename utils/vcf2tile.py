@@ -12,8 +12,12 @@ if __name__ == "__main__":
 
     parser.add_argument("-c", "--config", required=True, type=str,
                         help="input configuration file for VCF import")
-    parser.add_argument("-d", "--outputdir", required=True, type=str,
-                        help="Output directory where the outputs need to be stored")
+    parser.add_argument(
+        "-d",
+        "--outputdir",
+        required=True,
+        type=str,
+        help="Output directory where the outputs need to be stored")
     parser.add_argument("-i", "--inputs", nargs='+', type=str,
                         required=True, help="VCF files to be imported.")
     parser.add_argument('-l', "--loader", required=False, type=str,

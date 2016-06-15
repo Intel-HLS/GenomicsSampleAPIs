@@ -94,8 +94,9 @@ class File2Tile(object):
         self.dbquery = DBQuery(self.config.DB_URI)
         # Save array_idx since it is used multiple times
         with self.dbquery.getSession() as query:
-            self.array_idx = query.tileNames2ArrayIdx(self.config.TileDBSchema['workspace'],
-                                                      self.config.TileDBSchema['array'])
+            self.array_idx = query.tileNames2ArrayIdx(
+                self.config.TileDBSchema['workspace'],
+                self.config.TileDBSchema['array'])
 
     def generateCSV(self, inputFile, outFile):
         """
@@ -134,18 +135,23 @@ class File2Tile(object):
                              " is not a valid field in input file's header")
 
         if(self.CallSetIdMap[IDX.FLAG] and self.CallSetIdMap[IDX.VALUE] not in self.header):
-            raise ValueError(self.CallSetIdMap[
-                             IDX.VALUE] + " is not a valid field in input file's header")
+            raise ValueError(
+                self.CallSetIdMap[
+                    IDX.VALUE] +
+                " is not a valid field in input file's header")
 
         for key in self.PositionMap.keys():
             if(key == "assembly" and self.PositionMap[key][IDX.FLAG] and
                     self.PositionMap[key][IDX.VALUE] not in self.header):
-                raise ValueError(self.PositionMap[key][
-                                 IDX.VALUE] + " is not a valid field in input file's header")
+                raise ValueError(
+                    self.PositionMap[key][
+                        IDX.VALUE] +
+                    " is not a valid field in input file's header")
 
             if(key != "assembly" and self.PositionMap[key] not in self.header):
-                raise ValueError(self.PositionMap[
-                                 key] + " is not a valid field in input file's header")
+                raise ValueError(
+                    self.PositionMap[key] +
+                    " is not a valid field in input file's header")
 
         for value in self.TileDBMap.values():
             if(value not in self.header):

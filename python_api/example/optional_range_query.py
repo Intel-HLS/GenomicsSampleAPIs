@@ -59,8 +59,13 @@ if __name__ == '__main__':
                         type=long, help="start position")
     parser.add_argument("-e", "--end", required=False,
                         type=long, help="end position")
-    parser.add_argument("-a", "--attributes", nargs='+', required=True, type=str,
-                        help="List of attributes to fetch")
+    parser.add_argument(
+        "-a",
+        "--attributes",
+        nargs='+',
+        required=True,
+        type=str,
+        help="List of attributes to fetch")
 
     args = parser.parse_args()
 

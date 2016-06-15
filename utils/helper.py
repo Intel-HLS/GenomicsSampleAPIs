@@ -62,8 +62,8 @@ def getReference(assembly, chromosome, start, end):
     if(chromosome == "M"):
         chromosome = "MT"
     server = "http://rest.ensembl.org"
-    request = "/sequence/region/human/" + chromosome + ":" + str(start) + ".." + \
-        str(end) + ":1?coord_system_version=" + assembly
+    request = "/sequence/region/human/" + chromosome + ":" + \
+        str(start) + ".." + str(end) + ":1?coord_system_version=" + assembly
 
     nRetires = NUM_RETRIES
     r = None
@@ -121,16 +121,17 @@ def writeJSON2File(input_json, output_file):
 def writeVIDMappingFile(DB_URI, reference_set_id,
                         output_file, fields_dict=CONST_TILEDB_FIELDS):
     with DBQuery(DB_URI).getSession() as metadb:
-        references = metadb.session.query(models.Reference)\
-                           .filter(models.Reference.reference_set_id == reference_set_id)\
-                           .all()
+        references = metadb.session.query(models.Reference) .filter(
+            models.Reference.reference_set_id == reference_set_id) .all()
         vid_mapping = OrderedDict()
         vid_mapping["fields"] = fields_dict
         vid_mapping["contigs"] = OrderedDict()
         contigs = vid_mapping["contigs"]
         for reference in references:
-            contigs[reference.name] = {"length": reference.length,
-                                       "tiledb_column_offset": reference.tiledb_column_offset}
+            contigs[
+                reference.name] = {
+                "length": reference.length,
+                "tiledb_column_offset": reference.tiledb_column_offset}
         writeJSON2File(vid_mapping, output_file)
 
 
@@ -161,10 +162,17 @@ def registerWithMetadb(config, references=None):
             str(uuid.uuid4()), assembly, references=references)
 
         dba = metadb.registerDBArray(
-            guid=str(uuid.uuid4()), name=array, reference_set_id=rs.id, workspace_id=ws.id)
+            guid=str(
+                uuid.uuid4()),
+            name=array,
+            reference_set_id=rs.id,
+            workspace_id=ws.id)
         # arbitrary variant set assignment
-        vs = metadb.registerVariantSet(guid=str(
-            uuid.uuid4()), reference_set_id=rs.id, dataset_id=os.path.basename(workspace))
+        vs = metadb.registerVariantSet(
+            guid=str(
+                uuid.uuid4()),
+            reference_set_id=rs.id,
+            dataset_id=os.path.basename(workspace))
 
     return dba, vs, rs
 

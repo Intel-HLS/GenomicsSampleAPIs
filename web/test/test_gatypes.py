@@ -5,8 +5,11 @@ from json import loads
 class TestGAtypes:
 
     def test_GACall(self):
-        gac = GACall.GACall(callSetId="callId", callSetName="cname", genotype=[
-                            0, 1, 2], phaseset="phase", genotypeLikelihood=[1, 2, 3], info={'Test': 'True', 'Number': 5})
+        gac = GACall.GACall(
+            callSetId="callId", callSetName="cname", genotype=[
+                0, 1, 2], phaseset="phase", genotypeLikelihood=[
+                1, 2, 3], info={
+                'Test': 'True', 'Number': 5})
         res = gac.gacall_info
         loads(gac.getJSON())
 
@@ -41,8 +44,10 @@ class TestGAtypes:
         assert res['updated'] is None
         assert res['info'] == {}
 
-        gacs = GACallSet.GACallSet(id='csid', name='myName', sampleId='12', variantSetIds=[
-                                   0, 1, 2], created=1234, updated=2345, info={'Test': 'True', 'Number': 5})
+        gacs = GACallSet.GACallSet(
+            id='csid', name='myName', sampleId='12', variantSetIds=[
+                0, 1, 2], created=1234, updated=2345, info={
+                'Test': 'True', 'Number': 5})
         res = gacs.gacallset_info
         loads(gacs.getJSON())
 
@@ -56,7 +61,11 @@ class TestGAtypes:
 
     def test_GAVariant(self):
         min_gav = GAVariant.GAVariant(
-            id='myid', variantSetId='myvsid', start=1, end=4, referenceBases='myref')
+            id='myid',
+            variantSetId='myvsid',
+            start=1,
+            end=4,
+            referenceBases='myref')
         res = min_gav.gavariant_info
         loads(min_gav.getJSON())
 
@@ -72,8 +81,24 @@ class TestGAtypes:
         assert res['alternateBases'] == []
         assert res['info'] == {}
 
-        gav = GAVariant.GAVariant(id='myid', variantSetId='myvsid', start=1, end=4, referenceBases='myref', names=[
-                                  'a', 'b'], created=12, updated=16, referenceName='myrefname', alternateBases=['G', 'T'], info={'Test': 'True', 'Number': 5})
+        gav = GAVariant.GAVariant(
+            id='myid',
+            variantSetId='myvsid',
+            start=1,
+            end=4,
+            referenceBases='myref',
+            names=[
+                'a',
+                'b'],
+            created=12,
+            updated=16,
+            referenceName='myrefname',
+            alternateBases=[
+                'G',
+                'T'],
+            info={
+                'Test': 'True',
+                'Number': 5})
         res = gav.gavariant_info
         loads(gav.getJSON())
 
@@ -101,7 +126,15 @@ class TestGAtypes:
         assert res['metadata'] == []
 
         gavs = GAVariantSet.GAVariantSet(
-            id='myid', name='myname', referenceSetId='myrefsetid', datasetId='mydsit', metadata=[1, 2, 3, 4])
+            id='myid',
+            name='myname',
+            referenceSetId='myrefsetid',
+            datasetId='mydsit',
+            metadata=[
+                1,
+                2,
+                3,
+                4])
         res = gavs.gavariantset_info
         loads(gavs.getJSON())
         assert res['id'] == 'myid'
@@ -112,9 +145,29 @@ class TestGAtypes:
 
     def test_GASVResponse(self):
         min_gav = GAVariant.GAVariant(
-            id='myid', variantSetId='myvsid', start=1, end=4, referenceBases='myref')
-        gav = GAVariant.GAVariant(id='myid', variantSetId='myvsid', start=1, end=4, referenceBases='myref', names=[
-                                  'a', 'b'], created=12, updated=16, referenceName='myrefname', alternateBases=['G', 'T'], info={'Test': 'True', 'Number': 5})
+            id='myid',
+            variantSetId='myvsid',
+            start=1,
+            end=4,
+            referenceBases='myref')
+        gav = GAVariant.GAVariant(
+            id='myid',
+            variantSetId='myvsid',
+            start=1,
+            end=4,
+            referenceBases='myref',
+            names=[
+                'a',
+                'b'],
+            created=12,
+            updated=16,
+            referenceName='myrefname',
+            alternateBases=[
+                'G',
+                'T'],
+            info={
+                'Test': 'True',
+                'Number': 5})
 
         min_gasvr = GASVResponse.GASVResponse()
         res = min_gasvr.gavresponse_info
@@ -155,8 +208,10 @@ class TestGAtypes:
         assert second_var['info'] == {'Test': 'True', 'Number': 5}
 
     def test_GACSResponse(self):
-        gacs = GACallSet.GACallSet(id='csid', name='myName', sampleId='12', variantSetIds=[
-                                   0, 1, 2], created=1234, updated=2345, info={'Test': 'True', 'Number': 5})
+        gacs = GACallSet.GACallSet(
+            id='csid', name='myName', sampleId='12', variantSetIds=[
+                0, 1, 2], created=1234, updated=2345, info={
+                'Test': 'True', 'Number': 5})
         min_gacs = GACallSet.GACallSet()
 
         min_gacsr = GACSResponse.GACSResponse()
@@ -192,7 +247,15 @@ class TestGAtypes:
     def test_GASVSetResponse(self):
         min_gavs = GAVariantSet.GAVariantSet()
         gavs = GAVariantSet.GAVariantSet(
-            id='myid', name='myname', referenceSetId='myrefsetid', datasetId='mydsit', metadata=[1, 2, 3, 4])
+            id='myid',
+            name='myname',
+            referenceSetId='myrefsetid',
+            datasetId='mydsit',
+            metadata=[
+                1,
+                2,
+                3,
+                4])
         min_gasvsr = GASVSetResponse.GASVSetResponse()
         res = min_gasvsr.gavsetresponse_info
 
@@ -222,7 +285,15 @@ class TestGAtypes:
     def test_GAVariantSetMetadata(self):
         min_gavsmd = GAVariantSetMetadata.GAVariantSetMetadata()
         gavsmd = GAVariantSetMetadata.GAVariantSetMetadata(
-            key='mykey', value='myval', id='myid', type='mytype', number='mynum', description='mydesc', info={'Test': 'True', 'Number': 5})
+            key='mykey',
+            value='myval',
+            id='myid',
+            type='mytype',
+            number='mynum',
+            description='mydesc',
+            info={
+                'Test': 'True',
+                'Number': 5})
         res = min_gavsmd.gavariantsetmetadata_info
         loads(min_gavsmd.getJSON())
 

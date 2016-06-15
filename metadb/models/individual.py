@@ -20,5 +20,12 @@ class Individual(_Base):
     samples = relationship('Sample', backref='individual')
 
 # Handle auto-increment
-autoinc_handler(Individual.__table__, '%(table)s', id_column_name='id', id_seq_name='individual_id_seq',
-                insert_dict={'id': -1, 'name': None, 'guid': None})
+autoinc_handler(
+    Individual.__table__,
+    '%(table)s',
+    id_column_name='id',
+    id_seq_name='individual_id_seq',
+    insert_dict={
+        'id': -1,
+        'name': None,
+        'guid': None})

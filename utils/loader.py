@@ -53,8 +53,9 @@ class Loader:
         output, error = pipe.communicate()
 
         if pipe.returncode != 0:
-            raise Exception("subprocess run: {0}\nFailed with stdout: \n-- \n{1} \n--\nstderr: \n--\n{2} \n--".format(
-                " ".join(processArgs), output, error))
+            raise Exception(
+                "subprocess run: {0}\nFailed with stdout: \n-- \n{1} \n--\nstderr: \n--\n{2} \n--".format(
+                    " ".join(processArgs), output, error))
 
 
 def load2Tile(loader_config_file, callset_mapping_file,
@@ -87,8 +88,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Load to tile db")
 
-    parser.add_argument("-c", "--config", required=True, type=str,
-                        help="input configuration file for invoking the tile loader")
+    parser.add_argument(
+        "-c",
+        "--config",
+        required=True,
+        type=str,
+        help="input configuration file for invoking the tile loader")
     parser.add_argument("-d", "--debug", action="store_true", required=False,
                         help="debug mode flag")
     args = parser.parse_args()

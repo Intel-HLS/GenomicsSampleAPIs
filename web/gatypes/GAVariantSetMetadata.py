@@ -25,8 +25,14 @@ class GAVariantSetMetadata(object):
         if description:
             description = str(description)
 
-        self.gavariantsetmetadata_info = {'key': key, 'value': value, 'id': id,
-                                          'type': type, 'number': number, 'description': description, 'info': info}
+        self.gavariantsetmetadata_info = {
+            'key': key,
+            'value': value,
+            'id': id,
+            'type': type,
+            'number': number,
+            'description': description,
+            'info': info}
 
     def getJSON(self):
         return json.dumps(self.gavariantsetmetadata_info)

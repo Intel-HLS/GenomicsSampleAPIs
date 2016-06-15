@@ -19,8 +19,14 @@ class GACallSet(object):
         if updated:
             updated = long(updated)
 
-        self.gacallset_info = {'id': id, 'name': name, 'sampleId': sampleId,
-                               'variantSetIds': variantSetIds, 'created': created, 'updated': updated, 'info': info}
+        self.gacallset_info = {
+            'id': id,
+            'name': name,
+            'sampleId': sampleId,
+            'variantSetIds': variantSetIds,
+            'created': created,
+            'updated': updated,
+            'info': info}
 
     def getJSON(self):
         return json.dumps(self.gacallset_info)

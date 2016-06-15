@@ -119,8 +119,8 @@ class MAF(File2Tile):
             # append new data for fields whose type is an array
             # Picking ALT value at 0 since we know that MAF always has only one ALT per line.
             # If that is not the case, then this code needs to be updated
-            if 'ALT' in self.TileDBValues.keys() \
-                    and self.TileDBValues['ALT'][0] not in self.prev_TileDBValues['ALT']:
+            if 'ALT' in self.TileDBValues.keys() and self.TileDBValues['ALT'][
+                    0] not in self.prev_TileDBValues['ALT']:
                 for key in self.TileDBValues.keys():
                     if(key in CSVLine.arrayFields):
                         for value in self.TileDBValues[key]:
@@ -147,10 +147,20 @@ class MAF(File2Tile):
 
                 self.curr_Individual = metadb.registerIndividual(
                     guid=str(uuid.uuid4()), name=self.prev_IndividualId)
-                self.curr_SourceSample = metadb.registerSample(guid=str(uuid.uuid4(
-                )), individual_guid=self.curr_Individual.guid, name=self.SourceSampleId, info={'type': 'source'})
-                self.curr_TargetSample = metadb.registerSample(guid=str(uuid.uuid4(
-                )), individual_guid=self.curr_Individual.guid, name=self.TargetSampleId, info={'type': 'target'})
+                self.curr_SourceSample = metadb.registerSample(
+                    guid=str(
+                        uuid.uuid4()),
+                    individual_guid=self.curr_Individual.guid,
+                    name=self.SourceSampleId,
+                    info={
+                        'type': 'source'})
+                self.curr_TargetSample = metadb.registerSample(
+                    guid=str(
+                        uuid.uuid4()),
+                    individual_guid=self.curr_Individual.guid,
+                    name=self.TargetSampleId,
+                    info={
+                        'type': 'target'})
 
                 # "CallSet_"+self.prev_TargetSampleId+"_"+self.prev_SourceSampleId
                 self.prev_CallSetName = self.CallSetName
@@ -178,9 +188,10 @@ class MAF(File2Tile):
                                                       self.SourceSampleId,
                                                       self.TargetSampleId,
                                                       self.curr_CallSet.id)
-            self.callset_mapping[my_sample_name] = {"row_idx": long(row_id),
-                                                    "idx_in_file": long(row_id),
-                                                    "filename": self.output_file}
+            self.callset_mapping[my_sample_name] = {
+                "row_idx": long(row_id),
+                "idx_in_file": long(row_id),
+                "filename": self.output_file}
 
         self.prev_ChromosomePosition = self.ChromosomePosition
         self.prev_TileDBPosition = self.TileDBPosition
@@ -394,8 +405,10 @@ def poolGenerateCSV(file_params):
     try:
         maf = MAF(config_file)
         maf.setupCallSetMapping(outFile)
-        maf.generateCSV(helper.getFilePointer(inputFile, bGzipped, 'r'),
-                        helper.getFilePointer(outFile, False, 'w'), bVerbose=False)
+        maf.generateCSV(
+            helper.getFilePointer(
+                inputFile, bGzipped, 'r'), helper.getFilePointer(
+                outFile, False, 'w'), bVerbose=False)
         maf.checkCSV(outFile)
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -443,5 +456,9 @@ def parallelGen(config_file, inputFileList, outputDir,
             print "\t{0}".format(f)
         raise Exception("Execution failed on {0}".format(failed))
 
-    helper.createMappingFiles(outputDir, callset_mapping, rs.id,
-                              config.DB_URI, combinedOutputFile=combinedOutputFile)
+    helper.createMappingFiles(
+        outputDir,
+        callset_mapping,
+        rs.id,
+        config.DB_URI,
+        combinedOutputFile=combinedOutputFile)

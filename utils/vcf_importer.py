@@ -120,14 +120,22 @@ class VCF:
                     str(uuid.uuid4()), indv.guid, name=target, info={'type': 'target'})
 
                 # register callset
-                cs = metadb.registerCallSet(str(uuid.uuid4()), src.guid, trg.guid, self.workspace, self.array.name, [
-                                            self.variantset.id], name=callset)
+                cs = metadb.registerCallSet(str(uuid.uuid4()),
+                                            src.guid,
+                                            trg.guid,
+                                            self.workspace,
+                                            self.array.name,
+                                            [self.variantset.id],
+                                            name=callset)
                 tr = metadb.session.query(CallSetToDBArrayAssociation).filter(
                     CallSetToDBArrayAssociation.callset_id == cs.id).first()
 
                 # temp fill in for capturing genomics db import information
-                self.callset_mapping[cs.guid] = {
-                    'row_idx': tr.tile_row_id, 'idx_in_file': file_idx, 'filename': self.filename}
+                self.callset_mapping[
+                    cs.guid] = {
+                    'row_idx': tr.tile_row_id,
+                    'idx_in_file': file_idx,
+                    'filename': self.filename}
 
 
 def sortAndIndex(inFile, outdir):

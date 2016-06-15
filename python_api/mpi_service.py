@@ -78,8 +78,9 @@ class Aggregator():
                 return self.getMultiPosition(
                     chromosome, position, None, attribute_list, "Positions-JSON")
             else:
-                raise ValueError("len(chromosome) ({0}) != len(position) ({1}) ".format(
-                    len(chromosome), len(position)))
+                raise ValueError(
+                    "len(chromosome) ({0}) != len(position) ({1}) ".format(
+                        len(chromosome), len(position)))
         else:
             return self.getMultiPosition(
                 [chromosome], [position], None, attribute_list, "Cotton-JSON")
@@ -92,7 +93,10 @@ class Aggregator():
             attribute_list.remove('POSITION')
 
         jsonFile = self.createJson(
-            chromosome=chromosome, start=position, end=end, attributes=attribute_list)
+            chromosome=chromosome,
+            start=position,
+            end=end,
+            attributes=attribute_list)
         if util.DEBUG:
             util.log("JSON File: {0}".format(jsonFile))
 
@@ -112,8 +116,9 @@ class Aggregator():
                 return self.getMultiPosition(
                     chromosome, position, end, attribute_list, "Positions-JSON")
             else:
-                raise ValueError("len(chromosome) ({0}), len(position) ({1}), len(end) ({2}) MUST be equal".format(
-                    len(chromosome), len(position), len(end)))
+                raise ValueError(
+                    "len(chromosome) ({0}), len(position) ({1}), len(end) ({2}) MUST be equal".format(
+                        len(chromosome), len(position), len(end)))
         else:
             return self.getMultiPosition([chromosome], [position], [
                                          end], attribute_list, "Cotton-JSON")
@@ -121,16 +126,24 @@ class Aggregator():
     def runMPI(self, jsonFile, output_format):
         if util.DEBUG:
             util.log("[Run MPI] Starting mpirun subprocess")
-        processArgs = [self.mpiConfig.MPIRUN, "-np", str(self.mpiConfig.NUM_PROCESSES),
-                       self.mpiConfig.HOSTFLAG, self.mpiConfig.HOSTS]
+        processArgs = [self.mpiConfig.MPIRUN,
+                       "-np",
+                       str(self.mpiConfig.NUM_PROCESSES),
+                       self.mpiConfig.HOSTFLAG,
+                       self.mpiConfig.HOSTS]
         if self.mpiConfig.IF_INCLUDE is not None:
             processArgs.extend(
                 ["--mca", "btl_tcp_if_include", self.mpiConfig.IF_INCLUDE])
         if self.mpiConfig.ENV is not None:
             processArgs.extend(["-x", self.mpiConfig.ENV])
 
-        processArgs.extend([self.mpiConfig.EXEC, "-j", jsonFile,
-                            "-O", output_format, "-l", self.mpiConfig.ID_MAPPING])
+        processArgs.extend([self.mpiConfig.EXEC,
+                            "-j",
+                            jsonFile,
+                            "-O",
+                            output_format,
+                            "-l",
+                            self.mpiConfig.ID_MAPPING])
         if util.DEBUG:
             util.log("MPI Args: {0} ".format(processArgs))
         pipe = subprocess.Popen(
@@ -162,8 +175,14 @@ class Aggregator():
         jsonObj["query_column_ranges"] = [query_positions]
 
         datetime = util.now()
-        outFile = "_".join(str(v) for v in [
-                           datetime.second, datetime.microsecond, random.randint(0, 100000000), ".json"])
+        outFile = "_".join(
+            str(v) for v in [
+                datetime.second,
+                datetime.microsecond,
+                random.randint(
+                    0,
+                    100000000),
+                ".json"])
         outFile = os.path.join(self.mpiConfig.TEMP_DIR, outFile)
 
         with open(outFile, 'w') as outFP:

@@ -11,14 +11,42 @@ from utils.csvline import CSVLine
 from metadb.api.query import DBQuery
 from utils.configuration import ConfigReader
 
-test_header = ["icgc_mutation_id", "project_code", "icgc_donor_id",
-               "icgc_sample_id", "matched_icgc_sample_id", "variation_calling_algorithm",
-               "assembly_version", "chromosome", "chromosome_start",
-               "chromosome_end", "reference_genome_allele", "mutated_to_allele",
-               "quality_score", "probability", "total_read_count",
-               "mutant_allele_read_count", "chromosome_strand"]
-test_data = ["pytest", "ALL-US", "test_person", "target_id", "source_id", "caller",
-             "GRCh37", "1", "100", "101", "T", "A", "0.35", "0.9", "100", "90", "0"]
+test_header = [
+    "icgc_mutation_id",
+    "project_code",
+    "icgc_donor_id",
+    "icgc_sample_id",
+    "matched_icgc_sample_id",
+    "variation_calling_algorithm",
+    "assembly_version",
+    "chromosome",
+    "chromosome_start",
+    "chromosome_end",
+    "reference_genome_allele",
+    "mutated_to_allele",
+    "quality_score",
+    "probability",
+    "total_read_count",
+    "mutant_allele_read_count",
+    "chromosome_strand"]
+test_data = [
+    "pytest",
+    "ALL-US",
+    "test_person",
+    "target_id",
+    "source_id",
+    "caller",
+    "GRCh37",
+    "1",
+    "100",
+    "101",
+    "T",
+    "A",
+    "0.35",
+    "0.9",
+    "100",
+    "90",
+    "0"]
 
 
 class TestMAF(unittest.TestCase):
@@ -206,7 +234,7 @@ class TestMAF(unittest.TestCase):
                             found = True
                             verified_csv_lines += 1
                             break
-                    assert found == True, [line, index, csvlines[index]]
+                    assert found, [line, index, csvlines[index]]
             assert total_csv_lines == verified_csv_lines
 
     def test_poolGenerateCSV_neg(self):
@@ -288,7 +316,8 @@ class TestMAF(unittest.TestCase):
         test_output_dir = self.tmpdir.mkdir("output")
 
         imp.multiprocess_import.parallelGen(
-            str(test_config), [str(input_file)], str(test_output_dir), "out.txt", True)
+            str(test_config), [
+                str(input_file)], str(test_output_dir), "out.txt", True)
 
         output_file = test_output_dir.join("out.txt")
         with open(str(output_file), 'r') as outputFP:

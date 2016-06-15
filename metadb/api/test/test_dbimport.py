@@ -12,9 +12,18 @@ sampleN = 'sampleN'
 sampleT = 'sampleT'
 test_header = ["#CHROM", "POS", "ID", "REF",
                "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]
-test_data = ["1", "10177", "rs367896724", "A", "AC", "100", "PASS",
-             "AC=1;AF=0.425319;AN=6;NS=2504;DP=103152;EAS_AF=0.3363;AMR_AF=0.3602;AFR_AF=0.4909;EUR_AF=0.4056;SAS_AF=0.4949;AA=|||unknown(NO_COVERAGE);VT=INDEL",
-             "GT", "1|0", "0|0"]
+test_data = [
+    "1",
+    "10177",
+    "rs367896724",
+    "A",
+    "AC",
+    "100",
+    "PASS",
+    "AC=1;AF=0.425319;AN=6;NS=2504;DP=103152;EAS_AF=0.3363;AMR_AF=0.3602;AFR_AF=0.4909;EUR_AF=0.4056;SAS_AF=0.4949;AA=|||unknown(NO_COVERAGE);VT=INDEL",
+    "GT",
+    "1|0",
+    "0|0"]
 
 
 class TestDBImportLevel0(TestCase):
@@ -204,13 +213,18 @@ class TestDBImportLevel1(TestCase):
 
                 # regsiter with references
             result = session.registerReferenceSet(
-                self.referenceset.guid, self.referenceset.assembly_id, references=self.references)
+                self.referenceset.guid,
+                self.referenceset.assembly_id,
+                references=self.references)
             assert result.assembly_id == self.referenceset.assembly_id
             assert result.guid == self.referenceset.guid
 
             # validate all references were registered
-            refs = session.session.query(models.Reference).filter(
-                models.Reference.reference_set_id == result.id, models.Reference.name.in_(self.references.keys())).all()
+            refs = session.session.query(
+                models.Reference).filter(
+                models.Reference.reference_set_id == result.id,
+                models.Reference.name.in_(
+                    self.references.keys())).all()
             assert len(refs) == len(self.references)
 
             # register a single reference
@@ -400,20 +414,39 @@ class TestDBImportLevel2(TestCase):
             # no variant set
             with pytest.raises(ValueError) as exec_info:
                 result = session.registerCallSet(
-                    cguid, self.source.guid, self.target.guid, self.workspace.name, self.array.name, name="CallSet1")
+                    cguid,
+                    self.source.guid,
+                    self.target.guid,
+                    self.workspace.name,
+                    self.array.name,
+                    name="CallSet1")
             assert "requires association" in str(exec_info)
 
             # register new, validate addition of that variant set
-            result = session.registerCallSet(cguid, self.source.guid, self.target.guid, self.workspace.name,
-                                             self.array.name, name="CallSet1", variant_set_ids=[self.variantset.id])
+            result = session.registerCallSet(
+                cguid,
+                self.source.guid,
+                self.target.guid,
+                self.workspace.name,
+                self.array.name,
+                name="CallSet1",
+                variant_set_ids=[
+                    self.variantset.id])
             assert result.variant_sets[0].id == self.variantset.id
             assert result.guid == cguid
             assert result.name == "CallSet1"
 
             # add a variant set to callset, validation of no duplication of
             # variant set addition
-            result_vs = session.registerCallSet(cguid, self.source.guid, self.target.guid, self.workspace.name,
-                                                self.array.name, name="CallSet1", variant_set_ids=[self.variantset.id])
+            result_vs = session.registerCallSet(
+                cguid,
+                self.source.guid,
+                self.target.guid,
+                self.workspace.name,
+                self.array.name,
+                name="CallSet1",
+                variant_set_ids=[
+                    self.variantset.id])
             assert result_vs.variant_sets[0].id == self.variantset.id
             assert len(result_vs.variant_sets) == 1
             assert result_vs.guid == cguid
@@ -422,51 +455,88 @@ class TestDBImportLevel2(TestCase):
             # variant set addition
             with pytest.raises(ValueError) as exec_info:
                 result_vs3 = session.registerCallSet(
-                    cguid, self.source.guid, self.target.guid, self.workspace.name, self.array.name, name="CallSet1", variant_set_ids=[5])
+                    cguid,
+                    self.source.guid,
+                    self.target.guid,
+                    self.workspace.name,
+                    self.array.name,
+                    name="CallSet1",
+                    variant_set_ids=[5])
             assert "VariantSet must be registered" in str(exec_info.value)
 
             # already registered, return based on (name, source sample, target
             # sample)
             reg_result = session.registerCallSet(
-                c2guid, self.source.guid, self.target.guid, self.workspace.name, self.array.name, name="CallSet1")
+                c2guid,
+                self.source.guid,
+                self.target.guid,
+                self.workspace.name,
+                self.array.name,
+                name="CallSet1")
             assert reg_result.guid == cguid
             assert reg_result.name == "CallSet1"
 
             # already registered, return based on guid
             reg2_result = session.registerCallSet(
-                cguid, self.source.guid, self.target.guid, self.workspace.name, self.array.name, name="CallSetRegistered")
+                cguid,
+                self.source.guid,
+                self.target.guid,
+                self.workspace.name,
+                self.array.name,
+                name="CallSetRegistered")
             assert reg2_result.guid == cguid
             assert reg2_result.name == "CallSet1"
 
             # validate workspace remove ending "/"
             reg_ws_result = session.registerCallSet(
-                cguid, self.source.guid, self.target.guid, self.workspace.name + "/", self.array.name, name="CallSet1")
+                cguid,
+                self.source.guid,
+                self.target.guid,
+                self.workspace.name + "/",
+                self.array.name,
+                name="CallSet1")
             assert reg_ws_result.guid == cguid
             assert reg_ws_result.name == "CallSet1"
 
             # check db array reg error
             with pytest.raises(ValueError) as exec_info:
                 reg_a_result = session.registerCallSet(
-                    cguid, self.source.guid, self.target.guid, self.workspace.name, "notregistered", name="CallSet1")
+                    cguid,
+                    self.source.guid,
+                    self.target.guid,
+                    self.workspace.name,
+                    "notregistered",
+                    name="CallSet1")
             assert "DBArray needs to exist" in str(exec_info.value)
 
             # register callset to a new array
             reg_a2_result = session.registerCallSet(
-                cguid, self.source.guid, self.target.guid, self.workspace.name, self.array2.name, name="CallSet1")
+                cguid,
+                self.source.guid,
+                self.target.guid,
+                self.workspace.name,
+                self.array2.name,
+                name="CallSet1")
             assert reg_a2_result.guid == cguid
             assert reg_a2_result.name == "CallSet1"
 
             # validate callset registration to that array
-            ca = session.session.query(models.CallSetToDBArrayAssociation)\
-                                .filter(models.CallSetToDBArrayAssociation.db_array_id == self.array2.id)\
-                                .all()
+            ca = session.session.query(models.CallSetToDBArrayAssociation) .filter(
+                models.CallSetToDBArrayAssociation.db_array_id == self.array2.id) .all()
             assert len(ca) == 1
             assert ca[0].callset_id == reg_a2_result.id
 
             # negative callset registration
             with pytest.raises(ValueError) as exec_info:
-                neg_result = session.registerCallSet(fguid, self.source.guid, self.target.guid, self.workspace.name,
-                                                     self.array.name, name="negative", variant_set_ids=[self.variantset.id])
+                neg_result = session.registerCallSet(
+                    fguid,
+                    self.source.guid,
+                    self.target.guid,
+                    self.workspace.name,
+                    self.array.name,
+                    name="negative",
+                    variant_set_ids=[
+                        self.variantset.id])
             assert "DataError" in str(exec_info.value)
 
             # negative callset registration - invalid sample_guid
@@ -482,8 +552,16 @@ class TestDBImportLevel2(TestCase):
                 self.variantset.id, self.variantset2.id, self.variantset3.id]
 
             # test update variant sets through registerCallSet
-            c_result = session.registerCallSet(cguid, self.source.guid, self.target.guid, self.workspace.name,
-                                               self.array.name, name="CallSet1", variant_set_ids=[self.variantset3.id, self.variantset4.id])
+            c_result = session.registerCallSet(
+                cguid,
+                self.source.guid,
+                self.target.guid,
+                self.workspace.name,
+                self.array.name,
+                name="CallSet1",
+                variant_set_ids=[
+                    self.variantset3.id,
+                    self.variantset4.id])
             assert self.variantset4.id == c_result.variant_sets[-1].id
 
     @classmethod

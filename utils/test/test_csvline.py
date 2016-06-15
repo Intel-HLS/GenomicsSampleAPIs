@@ -230,7 +230,7 @@ class TestCSVLine:
         test_csvobj.set('ALT', ['A'])
         result = test_csvobj.runChecks()
         assert "Failed" not in result[1]
-        assert result[0] == True
+        assert result[0]
 
     def test_getCSVLine(self):
         test_csvobj = csvline.CSVLine()
@@ -317,7 +317,7 @@ class TestCSVLine:
     def test_invalidate(self):
         errorString = "Test invalidate"
         test_csvobj = csvline.CSVLine()
-        assert test_csvobj.isValid == True
+        assert test_csvobj.isValid
         test_csvobj.invalidate(errorString)
         assert test_csvobj.isValid == False
         assert test_csvobj.error == errorString

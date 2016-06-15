@@ -137,8 +137,9 @@ class MAF_Spark:
         dataLines = textFiles.filter(lambda l: not l.startswith(
             HeaderStartsWith)).filter(lambda l: not l.startswith('#'))
         # Get the header line so that we can map fields
-        self.header = textFiles.filter(lambda l: l.startswith(HeaderStartsWith))\
-            .take(1)[0].strip().split(self.config.SeperatorMap['line'])
+        self.header = textFiles.filter(
+            lambda l: l.startswith(HeaderStartsWith)) .take(1)[0].strip().split(
+            self.config.SeperatorMap['line'])
         # Generate the indices for attributes where the data will be on the list,
         # so that we can get the attribute value for future processing
         self.genIndices()
@@ -302,8 +303,10 @@ def updateIds(keys, callset_mapping, output_file):
                                                    "idx_in_file": long(row_id),
                                                    "filename": output_file}
 
-            rowIdMap["{0}:{1}:{2}"
-                     .format(SourceSample.name, k[keysList.index('CallSetName')], 'VariantName')] = row_id
+            rowIdMap[
+                "{0}:{1}:{2}" .format(
+                    SourceSample.name, k[
+                        keysList.index('CallSetName')], 'VariantName')] = row_id
 
 
 def kvPairsByLocation(keys_tuple):
@@ -530,10 +533,18 @@ if __name__ == "__main__":
 
     parser.add_argument("-c", "--config", required=True, type=str,
                         help="input configuration file for MAF conversion")
-    parser.add_argument("-o", "--output", required=True, type=str,
-                        help="output Tile DB CSV file (without the path) which will be stored in the output directory")
-    parser.add_argument("-d", "--outputdir", required=True, type=str,
-                        help="Output directory where the outputs need to be stored")
+    parser.add_argument(
+        "-o",
+        "--output",
+        required=True,
+        type=str,
+        help="output Tile DB CSV file (without the path) which will be stored in the output directory")
+    parser.add_argument(
+        "-d",
+        "--outputdir",
+        required=True,
+        type=str,
+        help="Output directory where the outputs need to be stored")
     parser.add_argument("-i", "--inputs", nargs='+', type=str, required=True,
                         help="List of input MAF files to convert")
     args = parser.parse_args()

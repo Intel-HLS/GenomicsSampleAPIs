@@ -19,7 +19,9 @@ class Reference(_Base):
     tiledb_column_offset = sa.Column(sa.BigInteger)
 
     source_accessions = relationship(
-        'SourceAccession', secondary='reference_source_accession', backref=backref('reference'))
+        'SourceAccession',
+        secondary='reference_source_accession',
+        backref=backref('reference'))
     # Unique constraint on (reference_set_id, name)
     __table_args__ = (
         sa.UniqueConstraint('reference_set_id', 'name',
@@ -43,8 +45,11 @@ increment_next_column_in_reference_set_sqlite = sa.DDL('''\
         WHERE id = NEW.reference_set_id;
         UPDATE reference SET tiledb_column_offset=(select next_tiledb_column_offset from reference_set where id=NEW.reference_set_id)-%s where id=NEW.id AND NEW.tiledb_column_offset IS NULL;
     END;''' % (padded_length, padded_length, padded_length, padded_length))
-sa.event.listen(Reference.__table__, 'after_create',
-                increment_next_column_in_reference_set_sqlite.execute_if(dialect='sqlite'))
+sa.event.listen(
+    Reference.__table__,
+    'after_create',
+    increment_next_column_in_reference_set_sqlite.execute_if(
+        dialect='sqlite'))
 
 increment_next_column_in_reference_set_pgsql = sa.DDL('''\
     CREATE OR REPLACE FUNCTION increment_next_column_in_reference_set_pgsql()
@@ -70,5 +75,8 @@ increment_next_column_in_reference_set_pgsql = sa.DDL('''\
     CREATE TRIGGER increment_next_column_in_reference_set BEFORE INSERT ON reference
     FOR EACH ROW EXECUTE PROCEDURE increment_next_column_in_reference_set_pgsql();
     ''' % (padded_length))
-sa.event.listen(Reference.__table__, 'after_create',
-                increment_next_column_in_reference_set_pgsql.execute_if(dialect='postgresql'))
+sa.event.listen(
+    Reference.__table__,
+    'after_create',
+    increment_next_column_in_reference_set_pgsql.execute_if(
+        dialect='postgresql'))

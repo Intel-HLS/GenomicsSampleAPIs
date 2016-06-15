@@ -39,8 +39,11 @@ increment_num_rows_in_db_array_sqlite = sa.DDL('''\
       WHERE id=NEW.db_array_id;
       UPDATE callset_to_db_array_association SET tile_row_id=(select num_rows from db_array where id=NEW.db_array_id)-1 where NEW.tile_row_id IS NULL and db_array_id=NEW.db_array_id and callset_id=NEW.callset_id;
     END;''')
-sa.event.listen(CallSetToDBArrayAssociation.__table__, 'after_create',
-                increment_num_rows_in_db_array_sqlite.execute_if(dialect='sqlite'))
+sa.event.listen(
+    CallSetToDBArrayAssociation.__table__,
+    'after_create',
+    increment_num_rows_in_db_array_sqlite.execute_if(
+        dialect='sqlite'))
 
 increment_num_rows_in_db_array_pgsql = sa.DDL('''\
     CREATE OR REPLACE FUNCTION increment_num_rows_in_db_array_pgsql()
@@ -64,5 +67,8 @@ increment_num_rows_in_db_array_pgsql = sa.DDL('''\
     CREATE TRIGGER increment_num_rows_in_db_array BEFORE INSERT ON callset_to_db_array_association
     FOR EACH ROW EXECUTE PROCEDURE increment_num_rows_in_db_array_pgsql();
     ''')
-sa.event.listen(CallSetToDBArrayAssociation.__table__, 'after_create',
-                increment_num_rows_in_db_array_pgsql.execute_if(dialect='postgresql'))
+sa.event.listen(
+    CallSetToDBArrayAssociation.__table__,
+    'after_create',
+    increment_num_rows_in_db_array_pgsql.execute_if(
+        dialect='postgresql'))

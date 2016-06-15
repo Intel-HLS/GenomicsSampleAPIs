@@ -13,7 +13,11 @@ class GAVariantSet(object):
         str(referenceSetId)
 
         self.gavariantset_info = {
-            'id': id, 'name': name, 'referenceSetId': referenceSetId, 'datasetId': datasetId, 'metadata': metadata}
+            'id': id,
+            'name': name,
+            'referenceSetId': referenceSetId,
+            'datasetId': datasetId,
+            'metadata': metadata}
 
     def getJSON(self):
         return json.dumps(self.gavariantset_info)

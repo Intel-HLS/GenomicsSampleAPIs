@@ -13,8 +13,13 @@ class GACall(object):
         if phaseset:
             phaseset = str(phaseset)
 
-        self.gacall_info = {'callSetId': str(callSetId), 'callSetName': callSetName, 'genotype': genotype,
-                            'phaseset': phaseset, 'genotypeLikelihood': genotypeLikelihood, 'info': info}
+        self.gacall_info = {
+            'callSetId': str(callSetId),
+            'callSetName': callSetName,
+            'genotype': genotype,
+            'phaseset': phaseset,
+            'genotypeLikelihood': genotypeLikelihood,
+            'info': info}
 
     def getJSON(self):
         return json.dumps(self.gacall_info)
