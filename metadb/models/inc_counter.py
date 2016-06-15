@@ -7,7 +7,8 @@ BigInteger = sa.BigInteger()
 BigInteger = sa.BigInteger().with_variant(sa.Integer, 'sqlite')
 
 
-def autoinc_handler(sa_table, sa_table_name, id_column_name, id_seq_name, insert_dict):
+def autoinc_handler(sa_table, sa_table_name,
+                    id_column_name, id_seq_name, insert_dict):
     # Specify that all insert operations (whether through SQLAlchemy or
     # externally launched) must use the sequence for DBs that support
     # sequences

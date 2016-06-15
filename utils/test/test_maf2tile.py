@@ -327,19 +327,19 @@ class TestMAF(unittest.TestCase):
                    Location=None, End=None, REF=None, ALT=None, GT=None):
         csv = CSVLine()
         csv.set("SampleId", SampleId)
-        if Location == None:
+        if Location is None:
             csv.set("Location", str(long(input_list[8]) - 1))
         else:
             csv.set("Location", Location)
-        if End == None:
+        if End is None:
             csv.set("End", str(long(input_list[9]) - 1))
         else:
             csv.set("End", End)
-        if REF == None:
+        if REF is None:
             csv.set("REF", input_list[10])
         else:
             csv.set("REF", REF)
-        if ALT == None:
+        if ALT is None:
             csv.set("ALT", [input_list[11]])
             csv.set("AF", [input_list[13]])
             csv.set("AC", [input_list[15]])
@@ -355,7 +355,7 @@ class TestMAF(unittest.TestCase):
         csv.set("QUAL", input_list[12])
         csv.set("AN", input_list[14])
         csv.set("PLOIDY", 2)
-        if GT == None:
+        if GT is None:
             csv.set("GT", [input_list[16], "0"])
         else:
             csv.set("GT", GT)

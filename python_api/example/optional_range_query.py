@@ -21,7 +21,7 @@ def process(chromosome, start, end, attributes):
 
         util.log("Results from {0}".format(name))
 
-        if end != None:
+        if end is not None:
             data = api.getValidPositions(chromosome, start, end)
             data = json.loads(data)
             print "Valid indices : {0}".format(data['indices'])

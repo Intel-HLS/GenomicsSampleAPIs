@@ -156,7 +156,7 @@ class File2Tile(object):
         """
         reads next line from the file and populates the values, and other fields
         """
-        if(self.header == None):
+        if(self.header is None):
             self.getHeader()
 
         self.values = self.inFile.readline().strip().split(
@@ -167,7 +167,7 @@ class File2Tile(object):
 
         self.SourceSampleId = self.getValue(self.SourceSampleIdMap)
         self.TargetSampleId = self.getValue(self.TargetSampleIdMap)
-        if self.IndividualIdMap == None:
+        if self.IndividualIdMap is None:
             # work around incase indiviudal is not defined
             # assumes one normal sample per individual
             self.IndividualId = 'Individual_' + self.SourceSampleId
@@ -221,7 +221,7 @@ class File2Tile(object):
         if(self.CallSetIdMap[IDX.FLAG]):
             self.CallSetName = self.getValue(self.CallSetIdMap[IDX.VALUE])
         else:
-            if(self.CallSetName != None):
+            if(self.CallSetName is not None):
                 return
             else:
                 self.CallSetName = self.CallSetIdMap[IDX.VALUE]
@@ -243,7 +243,7 @@ class File2Tile(object):
                 self.VariantSetName = self.getValue(
                     self.VariantNameMap[IDX.VALUE])
         else:
-            if(self.VariantSetName != None):
+            if(self.VariantSetName is not None):
                 return
             else:
                 self.VariantSetName = self.VariantNameMap[IDX.VALUE]

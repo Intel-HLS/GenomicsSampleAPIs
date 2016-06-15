@@ -48,7 +48,8 @@ class Import():
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
 
-    def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=None):
+    def registerReferenceSet(
+            self, guid, assembly_id, source_accessions=None, description=None, references=None):
         """
         ReferenceSet registration occurs from a assembly config file. See hg19.json for example.
         Requires assembly ids and guids to be unique.
@@ -157,7 +158,8 @@ class Import():
 
         return thisDBArray
 
-    def registerVariantSet(self, guid, reference_set_id, dataset_id=None, metadata=None):
+    def registerVariantSet(self, guid, reference_set_id,
+                           dataset_id=None, metadata=None):
         """
         Register variant set.
         """
@@ -229,7 +231,8 @@ class Import():
             self.session.add(thisCallSetToDBArrayAssociation)
             self.session.commit()
 
-    def registerCallSet(self, guid, source_sample_guid, target_sample_guid, workspace, array_name, variant_set_ids=None, info=None, name=None):
+    def registerCallSet(self, guid, source_sample_guid, target_sample_guid,
+                        workspace, array_name, variant_set_ids=None, info=None, name=None):
         """
         Register a callset.
         Associate a new or already existing callset to a variant set.
@@ -380,8 +383,11 @@ def sortReferences(references):
     if references.__class__ != OrderedDict().__class__:
         vcflike_refs = {str(key): Contig(id=str(key), length=value)
                         for (key, value) in references.items()}
-        references = OrderedDict(sorted(vcflike_refs.items(), key=lambda (
-            key, value): int(key) if key.isdigit() else key))
+        references = OrderedDict(
+            sorted(
+                vcflike_refs.items(),
+                key=lambda key_value: int(
+                    key_value[0]) if key_value[0].isdigit() else key_value[0]))
 
     if 'MT' in references:
         references['M'] = references.pop('MT')

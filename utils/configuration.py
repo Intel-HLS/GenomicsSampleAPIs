@@ -87,6 +87,6 @@ def getDictValue(inDictionary, inString):
     Else, the object is returned
     """
     returnObject = inDictionary.get(inString, None)
-    if(returnObject == None):
+    if(returnObject is None):
         raise ValueError(inString + " is a required field")
     return returnObject

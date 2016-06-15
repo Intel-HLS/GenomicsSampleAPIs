@@ -5,7 +5,8 @@ import json
 class GAVariant(object):
     """GAVariant representation for ga4gh responses"""
 
-    def __init__(self, id, variantSetId, start, end, referenceBases, names=[], created=None, updated=None, referenceName='', alternateBases=[], info={}, calls=[]):
+    def __init__(self, id, variantSetId, start, end, referenceBases, names=[
+    ], created=None, updated=None, referenceName='', alternateBases=[], info={}, calls=[]):
 
         start = long(start)
         end = long(end)

@@ -17,7 +17,7 @@ class TestCSVLine:
                 test_csvobj.set(attribute, "any")
             assert "{0} is not a valid attribute".format(
                 attribute) in str(exec_info.value)
-            assert test_csvobj.get(attribute) == None
+            assert test_csvobj.get(attribute) is None
 
     def test_set_GT_PLOIDY(self):
         test_csvobj = csvline.CSVLine()

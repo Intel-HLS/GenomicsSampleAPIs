@@ -21,7 +21,7 @@ payload = {"end": 75908600, "pageToken": None, "start": 1,
 content_payload = {"end": 249250621, "pageToken": None, "start": 1,
                    "callSetIds": None, "referenceName": "1", "variantSetIds": ["testing"]}
 content_res = {'nextPageToken': None, 'variants': [{'alternateBases': ['A'], 'calls': [{'callSetId': 'f4e59886-325f-4427-91ff-9e9be6635e20', 'callSetName': 'SNVMix2', 'genotype': [1, 0], 'genotypeLikelihood': [], 'info': {
-}, 'phaseset': None}], 'created': None, 'end': 115060271L, 'id': 1L, 'info': {}, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271L, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
+}, 'phaseset': None}], 'created': None, 'end': 115060271, 'id': 1, 'info': {}, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
 
 empty_vs = {"nextPageToken": None, "variants": []}
 

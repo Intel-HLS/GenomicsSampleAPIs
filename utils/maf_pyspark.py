@@ -71,7 +71,7 @@ class MAF_Spark:
             self.header.index(self.config.TargetSampleIdMap), position]
 
         position += 1
-        if self.config.IndividualIdMap == None:
+        if self.config.IndividualIdMap is None:
             self.config.IndividualIdMap = self.config.SourceSampleIdMap
 
         self.indices['IndividualName'] = [
@@ -250,7 +250,8 @@ def updateIds(keys, callset_mapping, output_file):
         for k in keys:
 
             individual_name = k[keysList.index('IndividualName')]
-            if k[keysList.index('IndividualName')] == k[keysList.index('SourceSampleName')]:
+            if k[keysList.index('IndividualName')] == k[
+                    keysList.index('SourceSampleName')]:
                 individual_name = 'Individual_' + \
                     k[keysList.index('SourceSampleName')]
 
@@ -305,8 +306,9 @@ def updateIds(keys, callset_mapping, output_file):
                      .format(SourceSample.name, k[keysList.index('CallSetName')], 'VariantName')] = row_id
 
 
-def kvPairsByLocation((k, inTuple)):
+def kvPairsByLocation(keys_tuple):
 
+    (k, inTuple) = keys_tuple
     global indices, keysList, keysEndPosition
     global level2KeysList, level2KeysEndPosition, otherAttributes, rowIdMap
 
@@ -479,7 +481,7 @@ def updateRefAltPos(iter):
                             continue
                     value = combinedSnapshot[i]
                     m_csv_line.set(attribute, value)
-            except Exception, e:
+            except Exception as e:
                 global rowIdMap
                 SampleInfo = None
                 for k, v in rowIdMap.items():

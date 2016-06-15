@@ -124,7 +124,8 @@ def gtDecode(count, gtarray):
     return all_elems
 
 
-def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, variantSetIds, callSetIds=None, attrList=['GT', 'REF', 'ALT', 'PL', 'AF', 'AN', 'AC'], pageSize=-1, pageToken=None):
+def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, variantSetIds,
+                   callSetIds=None, attrList=['GT', 'REF', 'ALT', 'PL', 'AF', 'AN', 'AC'], pageSize=-1, pageToken=None):
     gavlist = list()
     attrs = join(attrList, ',')
     if not pageSize:
@@ -138,7 +139,7 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
     with dbqWrapper.dbquery.getSession() as metadb:
 
         # set row query restriction
-        if ((callSetIds != None) and callSetIds):
+        if ((callSetIds is not None) and callSetIds):
             rowIds = metadb.callSetIds2TileRowId(
                 callSetIds, workspace, arrayName)
             rowIds = ",".join(rowIds)
@@ -266,17 +267,20 @@ def searchVariants(workspace, arrayName, referenceName, start, end, searchLib, v
                                                     end=endp, referenceBases=reflist, alternateBases=altlist, calls=gaclist)).gavariant_info)
 
     searchLib.cleanup(token)
-    return (GASVResponse.GASVResponse(variants=gavlist, nextPageToken=nextPageToken))
+    return (GASVResponse.GASVResponse(
+        variants=gavlist, nextPageToken=nextPageToken))
 
 
-def searchCallSets(workspace, arrayName, searchLib, variantSetIds=[], name=None, pageSize=None, pageToken=None):
+def searchCallSets(workspace, arrayName, searchLib, variantSetIds=[
+], name=None, pageSize=None, pageToken=None):
 
     cslist = list()
     callSet = GACallSet.GACallSet().gacallset_info
     nextPageToken = None
     cslist.append(callSet)
 
-    return (GACSResponse.GACSResponse(callSets=cslist, nextPageToken=nextPageToken))
+    return (GACSResponse.GACSResponse(
+        callSets=cslist, nextPageToken=nextPageToken))
 
 
 def searchVariantSets(datasetId="", pageSize=None, pageToken=None):
@@ -296,4 +300,5 @@ def searchVariantSets(datasetId="", pageSize=None, pageToken=None):
                 .gavariantset_info
             vslist.append(variantSet)
 
-    return (GASVSetResponse.GASVSetResponse(variantSets=vslist, nextPageToken=nextPageToken))
+    return (GASVSetResponse.GASVSetResponse(
+        variantSets=vslist, nextPageToken=nextPageToken))

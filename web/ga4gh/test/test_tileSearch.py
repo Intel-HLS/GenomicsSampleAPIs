@@ -26,13 +26,13 @@ test_search = ts.connectSearchLib(current_app.config['SEARCHLIB'])
 
 def test_searchVariants():
     gold_res = {'nextPageToken': None, 'variants': [{'alternateBases': ['A'], 'calls': [{'callSetId': 'f4e59886-325f-4427-91ff-9e9be6635e20', 'callSetName': 'SNVMix2', 'genotype': [1, 0], 'genotypeLikelihood': [], 'info': {
-    }, 'phaseset': None}], 'created': None, 'end': 115060271L, 'id': 1L, 'info': {}, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271L, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
-    nocall_res = {'nextPageToken': None, 'variants': [{'alternateBases': ['A'], 'calls': [], 'created': None, 'end': 115060271L, 'id': 1L, 'info': {}, 'names': [
-    ], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271L, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
+    }, 'phaseset': None}], 'created': None, 'end': 115060271, 'id': 1, 'info': {}, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
+    nocall_res = {'nextPageToken': None, 'variants': [{'alternateBases': ['A'], 'calls': [], 'created': None, 'end': 115060271, 'id': 1, 'info': {}, 'names': [
+    ], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
     page_res = {'nextPageToken': 'test_1_115060270_1', 'variants': [{'alternateBases': ['A'], 'calls': [{'callSetId': 'f4e59886-325f-4427-91ff-9e9be6635e20', 'callSetName': 'SNVMix2', 'genotype': [1, 0], 'genotypeLikelihood': [], 'info': {
-    }, 'phaseset': None}], 'created': None, 'end': 115060271L, 'id': 1L, 'info': {}, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271L, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
-    empty_cs_res = {'nextPageToken': None, 'variants': [{'alternateBases': ['A'], 'calls': [], 'created': None, 'end': 115060271L, 'id': 1L, 'info': {
-    }, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271L, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
+    }, 'phaseset': None}], 'created': None, 'end': 115060271, 'id': 1, 'info': {}, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
+    empty_cs_res = {'nextPageToken': None, 'variants': [{'alternateBases': ['A'], 'calls': [], 'created': None, 'end': 115060271, 'id': 1, 'info': {
+    }, 'names': [], 'referenceBases': 'C', 'referenceName': '1', 'start': 115060271, 'updated': None, 'variantSetId': u'0b8a597e-90ae-40d3-b834-8d4ff108e28e'}]}
     empty_res = {'nextPageToken': None, 'variants': []}
 
     res = ts.searchVariants(workspace=current_app.config['WORKSPACE'], arrayName=current_app.config[

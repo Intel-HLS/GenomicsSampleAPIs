@@ -22,9 +22,9 @@ class TestGAtypes:
         loads(min_gac.getJSON())
 
         assert res['callSetId'] == "justcallId"
-        assert res['callSetName'] == None
+        assert res['callSetName'] is None
         assert res['genotype'] == []
-        assert res['phaseset'] == None
+        assert res['phaseset'] is None
         assert res['genotypeLikelihood'] == []
         assert res['info'] == {}
 
@@ -34,11 +34,11 @@ class TestGAtypes:
         loads(min_gacs.getJSON())
 
         assert res['id'] == ""
-        assert res['name'] == None
+        assert res['name'] is None
         assert res['sampleId'] == ""
         assert res['variantSetIds'] == []
-        assert res['created'] == None
-        assert res['updated'] == None
+        assert res['created'] is None
+        assert res['updated'] is None
         assert res['info'] == {}
 
         gacs = GACallSet.GACallSet(id='csid', name='myName', sampleId='12', variantSetIds=[
@@ -66,8 +66,8 @@ class TestGAtypes:
         assert res['end'] == 4
         assert res['referenceBases'] == 'myref'
         assert res['names'] == []
-        assert res['created'] == None
-        assert res['updated'] == None
+        assert res['created'] is None
+        assert res['updated'] is None
         assert res['referenceName'] == ''
         assert res['alternateBases'] == []
         assert res['info'] == {}
@@ -120,7 +120,7 @@ class TestGAtypes:
         res = min_gasvr.gavresponse_info
 
         assert res['variants'] == []
-        assert res['nextPageToken'] == None
+        assert res['nextPageToken'] is None
 
         gasvr = GASVResponse.GASVResponse(
             variants=[min_gav, gav], nextPageToken='testToken')
@@ -136,8 +136,8 @@ class TestGAtypes:
         assert first_var['end'] == 4
         assert first_var['referenceBases'] == 'myref'
         assert first_var['names'] == []
-        assert first_var['created'] == None
-        assert first_var['updated'] == None
+        assert first_var['created'] is None
+        assert first_var['updated'] is None
         assert first_var['referenceName'] == ''
         assert first_var['alternateBases'] == []
         assert first_var['info'] == {}
@@ -163,7 +163,7 @@ class TestGAtypes:
         res = min_gacsr.gacsresponse_info
 
         assert res['callSets'] == []
-        assert res['nextPageToken'] == None
+        assert res['nextPageToken'] is None
 
         gacsr = GACSResponse.GACSResponse(
             callSets=[min_gacs, gacs], nextPageToken='testToken')
@@ -174,11 +174,11 @@ class TestGAtypes:
         assert res['nextPageToken'] == 'testToken'
 
         assert first_cs['id'] == ""
-        assert first_cs['name'] == None
+        assert first_cs['name'] is None
         assert first_cs['sampleId'] == ""
         assert first_cs['variantSetIds'] == []
-        assert first_cs['created'] == None
-        assert first_cs['updated'] == None
+        assert first_cs['created'] is None
+        assert first_cs['updated'] is None
         assert first_cs['info'] == {}
 
         assert second_cs['id'] == "csid"
@@ -197,7 +197,7 @@ class TestGAtypes:
         res = min_gasvsr.gavsetresponse_info
 
         assert res['variantSets'] == []
-        assert res['nextPageToken'] == None
+        assert res['nextPageToken'] is None
 
         gasvsr = GASVSetResponse.GASVSetResponse(
             variantSets=[min_gavs, gavs], nextPageToken='testToken')

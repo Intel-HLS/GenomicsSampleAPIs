@@ -4,7 +4,8 @@ import json
 class GAVariantSet(object):
     """Variant Set"""
 
-    def __init__(self, id="", name="", referenceSetId="", datasetId="", metadata=[]):
+    def __init__(self, id="", name="", referenceSetId="",
+                 datasetId="", metadata=[]):
 
         id = str(id)
         datasetId = str(datasetId)

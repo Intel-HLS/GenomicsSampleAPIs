@@ -155,15 +155,16 @@ def sortAndIndex(inFile, outdir):
     return sorted_file
 
 
-def poolImportVCF((config_file, inputFile)):
+def poolImportVCF(file_info):
     """
     This function is used by multiprocess.Pool to read vcf, populate metadb, and load into tiledb
     """
+    (config_file, inputFile) = file_info
     with VCF(inputFile, config_file) as vc:
         try:
             # vcf initialization sets up/validates globals (like rs)
             vc.setCallSets()
-        except Exception, e:
+        except Exception as e:
             traceback.print_exc(file=sys.stdout)
             print "Error processing {0}".format(inputFile)
             print str(e)

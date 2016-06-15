@@ -4,7 +4,8 @@ import json
 class GAVariantSetMetadata(object):
     """GAVariantSet Metadata representation for ga4gh responses"""
 
-    def __init__(self, key='', value='', id='', type='', number='', description='', info={}):
+    def __init__(self, key='', value='', id='', type='',
+                 number='', description='', info={}):
 
         if key:
             key = str(key)

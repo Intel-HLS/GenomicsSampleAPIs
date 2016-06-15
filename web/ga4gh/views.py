@@ -30,7 +30,8 @@ def bad_method(e):
 def variants_search():
     tileSearch.LoadConfig(current_app.config)
     if not request.json:
-        return makeGAException(message='Bad Content Type, please send application/json', ecode=-1, rcode=415)
+        return makeGAException(
+            message='Bad Content Type, please send application/json', ecode=-1, rcode=415)
 
     try:
         # making empty variantSetId valid - consistent with old, but documented version of the ga4gh api
@@ -41,9 +42,11 @@ def variants_search():
         endWindow = request.json['end']
 
     except:
-        return makeGAException(message='Required field missing: variantSetIds, referenceName, start, and end are required', ecode=-1, rcode=400)
+        return makeGAException(
+            message='Required field missing: variantSetIds, referenceName, start, and end are required', ecode=-1, rcode=400)
     if not (referenceName and startWindow and endWindow):
-        return makeGAException(message='Required field missing: variantSetIds, referenceName, start, and end are required', ecode=-1, rcode=400)
+        return makeGAException(
+            message='Required field missing: variantSetIds, referenceName, start, and end are required', ecode=-1, rcode=400)
 
     callSetIds = request.json.get('callSetIds', None)
     pageSize = request.json.get('pageSize', None)
@@ -67,7 +70,8 @@ def variants_search():
 @ga4gh.route('/callsets/search', methods=['POST'])
 def callset_search():
     if not request.json:
-        return makeGAException(message='Bad Content Type, please send application/json', ecode=-1, rcode=415)
+        return makeGAException(
+            message='Bad Content Type, please send application/json', ecode=-1, rcode=415)
 
     request.json.get('variantSetIds', [])
     name = request.json.get('name', None)
@@ -81,7 +85,8 @@ def callset_search():
                                            'WORKSPACE'], arrayName=current_app.config['ARRAYNAME'], name=name, searchLib=search_lib)
 
     except:
-        return makeGAException(message='search command exited abnormally', ecode=500, rcode=500)
+        return makeGAException(
+            message='search command exited abnormally', ecode=500, rcode=500)
 
     return jsonify(garesp.gacsresponse_info)
 
@@ -89,7 +94,8 @@ def callset_search():
 @ga4gh.route('/variantsets/search', methods=['POST'])
 def variantset_search():
     if not request.json:
-        return makeGAException(message='Bad Content Type, please send application/json', ecode=-1, rcode=415)
+        return makeGAException(
+            message='Bad Content Type, please send application/json', ecode=-1, rcode=415)
     print request.json
     datasetId = request.json.get('datasetId', "")
     pageSize = request.json.get('pageSize', None)
@@ -100,6 +106,7 @@ def variantset_search():
             datasetId=datasetId, pageSize=pageSize, pageToken=pageToken)
 
     except:
-        return makeGAException(message='search command exited abnormally', ecode=500, rcode=500)
+        return makeGAException(
+            message='search command exited abnormally', ecode=500, rcode=500)
 
     return jsonify(garesp.gavsetresponse_info)

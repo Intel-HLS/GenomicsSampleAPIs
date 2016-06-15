@@ -69,7 +69,7 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(config_path)
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
 
             assert isinstance(f2t.header, list)
@@ -100,7 +100,7 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(config_path)
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             with pytest.raises(ValueError) as exec_info:
                 f2t.getHeader()
             assert "{0} is not a valid field in input file's header".format(
@@ -120,7 +120,7 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(config_path)
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
             f2t.parseNextLine()
 
@@ -152,7 +152,7 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(config_path)
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.parseNextLine()
 
             assert f2t.IndividualId == test_data[2]
@@ -188,7 +188,7 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(str(test_config))
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
             f2t.parseNextLine()
 
@@ -226,9 +226,9 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(str(test_config))
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
-            assert f2t.VariantSetName == None
+            assert f2t.VariantSetName is None
             f2t.parseNextLine()
             f2t.parseNextLine()
 
@@ -265,7 +265,7 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(str(test_config))
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
             f2t.parseNextLine()
 
@@ -303,9 +303,9 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(str(test_config))
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
-            assert f2t.VariantSetName == None
+            assert f2t.VariantSetName is None
             f2t.parseNextLine()
             f2t.parseNextLine()
 
@@ -343,9 +343,9 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(str(test_config))
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
-            assert f2t.VariantSetName == None
+            assert f2t.VariantSetName is None
             f2t.parseNextLine()
             f2t.parseNextLine()
 
@@ -383,9 +383,9 @@ class TestFile2Tile(unittest.TestCase):
         with open(str(input_file), 'r') as inFP, open(str(output_file), 'w') as outFP:
             f2t = file2tile.File2Tile(str(test_config))
             f2t.initFilePointers(inFP, outFP)
-            assert f2t.header == None
+            assert f2t.header is None
             f2t.getHeader()
-            assert f2t.VariantSetName == None
+            assert f2t.VariantSetName is None
             f2t.parseNextLine()
             f2t.parseNextLine()
 

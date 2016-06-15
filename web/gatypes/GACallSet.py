@@ -4,7 +4,8 @@ import json
 class GACallSet(object):
     """Base GACallSet representation for ga4gh responses"""
 
-    def __init__(self, id="", name=None, sampleId="", variantSetIds=[], created=None, updated=None, info={}):
+    def __init__(self, id="", name=None, sampleId="",
+                 variantSetIds=[], created=None, updated=None, info={}):
 
         id = str(id)
         sampleId = str(sampleId)

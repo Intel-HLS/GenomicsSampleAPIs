@@ -178,7 +178,8 @@ class Query():
 
         for i in xrange(0, count):
             # Check if we can optimize the translation without going to the DB
-            if self.offset != None and positionList[i] >= self.offset and (positionList[i] - self.offset) <= self.length:
+            if self.offset is not None and positionList[i] >= self.offset and (
+                    positionList[i] - self.offset) <= self.length:
                 # Since the all positions in the input list is greater than or equal to offset and
                 # less than or equal to the lenth of the contig, use the current result from the DB to
                 # translate all the positions
@@ -195,7 +196,7 @@ class Query():
                                  .filter(models.Reference.tiledb_column_offset <= positionList[i])\
                                  .order_by(models.Reference.tiledb_column_offset.desc())\
                                  .first()
-            if result == None or len(result) != 3:
+            if result is None or len(result) != 3:
                 raise ValueError("Invalid Position {0} for array id {1}".format(
                     positionList[i], array_idx))
             # Update cache
@@ -291,7 +292,8 @@ class Query():
             raise ValueError("Invalid call set Id: {0}".format(callSetId))
         return result[0]
 
-    def callSetIds2TileRowId(self, callSetIds, workspace, arrayName, isGUID=True):
+    def callSetIds2TileRowId(
+            self, callSetIds, workspace, arrayName, isGUID=True):
         """
         Given a list of call set ids (guids), workspace, and arrayName
         returns the tile row ids that are valid
@@ -375,7 +377,7 @@ def fillResults(sourceList, mapper):
     for v in sourceList:
         try:
             result[index] = mapper[v]
-        except Exception, e:
+        except Exception as e:
             # If we have an exception then value v is invalid.
             # Leave value as None, and continue
             pass

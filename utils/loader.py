@@ -38,10 +38,10 @@ class Loader:
         if self.NUM_PROCESSES > 1:
             processArgs.extend([self.MPIRUN, "-np", str(self.NUM_PROCESSES),
                                 self.HOSTFLAG, self.HOSTS])
-            if self.IF_INCLUDE != None:
+            if self.IF_INCLUDE is not None:
                 processArgs.extend(
                     ["--mca", "btl_tcp_if_include", self.IF_INCLUDE])
-            if self.ENV != None:
+            if self.ENV is not None:
                 for env in self.ENV.split(","):
                     processArgs.extend(["-x", env])
 
@@ -57,7 +57,8 @@ class Loader:
                 " ".join(processArgs), output, error))
 
 
-def load2Tile(loader_config_file, callset_mapping_file, vid_mapping_file, workspace, array):
+def load2Tile(loader_config_file, callset_mapping_file,
+              vid_mapping_file, workspace, array):
     loader = Loader(loader_config_file)
 
     with open(loader.TILE_LOADER_JSON, 'r') as loaderFP:

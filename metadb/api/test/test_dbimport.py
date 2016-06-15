@@ -187,8 +187,8 @@ class TestDBImportLevel1(TestCase):
 
         result1 = dbimport.sortReferences(
             {"1": 249250621, "2": 243199373, "3": 198022430, "MT": 1000})
-        assert result1.get('MT', None) == None
-        assert result1.get('M', None) != None
+        assert result1.get('MT', None) is None
+        assert result1.get('M', None) is not None
 
         result2 = dbimport.sortReferences(self.contigs)
         assert result2 == self.contigs

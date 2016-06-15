@@ -71,7 +71,7 @@ class MAF(File2Tile):
 
         self.initFilePointers(inputFile, outFile)
 
-        nLine = 0L
+        nLine = 0
         try:
             while(self.parseNextLine()):
                 self.checkSample()
@@ -100,7 +100,7 @@ class MAF(File2Tile):
         - If a new sample is identified, write the existing data, and copy current
         - If it is the same sample, then compare with previous and append if new
         """
-        if(self.prev_SourceSampleId == None or self.prev_TargetSampleId == None):
+        if(self.prev_SourceSampleId is None or self.prev_TargetSampleId is None):
             # first sample copy data
             self.saveCurrentData()
         elif(self.prev_SourceSampleId != self.SourceSampleId or
@@ -190,7 +190,7 @@ class MAF(File2Tile):
         """
         Creates the CSV object from the data set we have and writes it to disk
         """
-        if(self.prev_SourceSampleId == None or self.prev_TargetSampleId == None or self.prev_IndividualId == None):
+        if(self.prev_SourceSampleId is None or self.prev_TargetSampleId is None or self.prev_IndividualId is None):
             return
         """
         Since MAF represents insertions and deletions with a '-' it needs to
@@ -377,7 +377,7 @@ class MAF(File2Tile):
 
             for (attr, val) in updateList:
                 aggCSV.set(attr, val)
-        except Exception, e:
+        except Exception as e:
             print attribute, zip(aggCSV.fields, aggCSV.values), zip(newCSV.fields, newCSV.values)
             raise e
 
@@ -386,17 +386,18 @@ class MAF(File2Tile):
         self.output_file = outFile
 
 
-def poolGenerateCSV((config_file, inputFile, outFile, bGzipped)):
+def poolGenerateCSV(file_params):
     """
     This function is used by multiprocess.Pool to generate CSV for each input file
     """
+    (config_file, inputFile, outFile, bGzipped) = file_params
     try:
         maf = MAF(config_file)
         maf.setupCallSetMapping(outFile)
         maf.generateCSV(helper.getFilePointer(inputFile, bGzipped, 'r'),
                         helper.getFilePointer(outFile, False, 'w'), bVerbose=False)
         maf.checkCSV(outFile)
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc(file=sys.stdout)
         print "Error processing {0}".format(inputFile)
         print str(e)
@@ -404,7 +405,8 @@ def poolGenerateCSV((config_file, inputFile, outFile, bGzipped)):
     return (0, outFile, maf.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzipped):
+def parallelGen(config_file, inputFileList, outputDir,
+                combinedOutputFile, bGzipped):
     """
     Function that spawns the Pool of MAF objects to work on each of the input files
     Once the BookKeeping support moves to a real DB, move from threads to multiprocessing.Pool

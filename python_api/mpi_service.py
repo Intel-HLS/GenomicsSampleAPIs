@@ -75,14 +75,17 @@ class Aggregator():
     def getPosition(self, chromosome, position, attribute_list):
         if isinstance(chromosome, list):
             if len(chromosome) == len(position):
-                return self.getMultiPosition(chromosome, position, None, attribute_list, "Positions-JSON")
+                return self.getMultiPosition(
+                    chromosome, position, None, attribute_list, "Positions-JSON")
             else:
                 raise ValueError("len(chromosome) ({0}) != len(position) ({1}) ".format(
                     len(chromosome), len(position)))
         else:
-            return self.getMultiPosition([chromosome], [position], None, attribute_list, "Cotton-JSON")
+            return self.getMultiPosition(
+                [chromosome], [position], None, attribute_list, "Cotton-JSON")
 
-    def getMultiPosition(self, chromosome, position, end, attribute_list, output_format):
+    def getMultiPosition(self, chromosome, position, end,
+                         attribute_list, output_format):
         if 'END' in attribute_list:
             attribute_list.remove('END')
         if 'POSITION' in attribute_list:
@@ -104,23 +107,26 @@ class Aggregator():
 
     def getPositionRange(self, chromosome, position, end, attribute_list):
         if isinstance(chromosome, list):
-            if len(chromosome) == len(position) and len(chromosome) == len(end):
-                return self.getMultiPosition(chromosome, position, end, attribute_list, "Positions-JSON")
+            if len(chromosome) == len(position) and len(
+                    chromosome) == len(end):
+                return self.getMultiPosition(
+                    chromosome, position, end, attribute_list, "Positions-JSON")
             else:
                 raise ValueError("len(chromosome) ({0}), len(position) ({1}), len(end) ({2}) MUST be equal".format(
                     len(chromosome), len(position), len(end)))
         else:
-            return self.getMultiPosition([chromosome], [position], [end], attribute_list, "Cotton-JSON")
+            return self.getMultiPosition([chromosome], [position], [
+                                         end], attribute_list, "Cotton-JSON")
 
     def runMPI(self, jsonFile, output_format):
         if util.DEBUG:
             util.log("[Run MPI] Starting mpirun subprocess")
         processArgs = [self.mpiConfig.MPIRUN, "-np", str(self.mpiConfig.NUM_PROCESSES),
                        self.mpiConfig.HOSTFLAG, self.mpiConfig.HOSTS]
-        if self.mpiConfig.IF_INCLUDE != None:
+        if self.mpiConfig.IF_INCLUDE is not None:
             processArgs.extend(
                 ["--mca", "btl_tcp_if_include", self.mpiConfig.IF_INCLUDE])
-        if self.mpiConfig.ENV != None:
+        if self.mpiConfig.ENV is not None:
             processArgs.extend(["-x", self.mpiConfig.ENV])
 
         processArgs.extend([self.mpiConfig.EXEC, "-j", jsonFile,
@@ -147,7 +153,7 @@ class Aggregator():
         jsonObj["query_attributes"] = attributes
 
         query_positions = [None] * len(chromosome)
-        if end == None or len(end) == 0 or start == end:
+        if end is None or len(end) == 0 or start == end:
             for i in xrange(0, len(chromosome)):
                 query_positions[i] = dict({chromosome[i]: start[i]})
         else:

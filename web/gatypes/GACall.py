@@ -4,7 +4,8 @@ import json
 class GACall(object):
     """Base GACall representation for ga4gh responses"""
 
-    def __init__(self, callSetId="", callSetName=None, genotype=[], phaseset=None, genotypeLikelihood=[], info={}):
+    def __init__(self, callSetId="", callSetName=None, genotype=[],
+                 phaseset=None, genotypeLikelihood=[], info={}):
 
         if callSetName:
             callSetName = str(callSetName)

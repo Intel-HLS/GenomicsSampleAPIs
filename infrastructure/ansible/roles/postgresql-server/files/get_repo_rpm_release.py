@@ -17,7 +17,7 @@ url, dist = sys.argv[1:]
 
 try:
     repo = urllib2.urlopen(url)
-except urllib2.HTTPError, e:
+except urllib2.HTTPError as e:
     print >>sys.stderr, "Failed to fetch directory list from %s" % url
     raise
 

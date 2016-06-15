@@ -39,7 +39,7 @@ class TestQuery:
             idx = range(1, self.numRows + 2)
             result = session.individualId2Name(idx)
             self.typeCheck(result, list, unicode, len(idx))
-            assert result[-1] == None
+            assert result[-1] is None
 
     def test_individualName2Id_single_idx(self):
         with query.DBQuery(self.DBURI).getSession() as session:
@@ -58,7 +58,7 @@ class TestQuery:
             result = session.individualName2Id(name)
             self.typeCheck(result, list, long, len(name))
             assert result[0] == idx[0]
-            assert result[-1] == None
+            assert result[-1] is None
 
     def test_arrayId2TileNames(self):
         with query.DBQuery(self.DBURI).getSession() as session:
