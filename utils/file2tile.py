@@ -102,7 +102,6 @@ class File2Tile(object):
         Takes the input data and generates a CSV File
         Should be implemented by the SubClass
         """
-        pass
 
     def initFilePointers(self, inputFile, outFile):
         """

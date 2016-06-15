@@ -5,7 +5,8 @@ import json
 import unittest
 
 from flask import current_app
-from flask.ext.cors import CORS, cross_origin
+from flask.ext.cors import CORS
+from flask.ext.cors import cross_origin
 
 ga4ghPath = "./web/"
 sys.path.append("./web/")

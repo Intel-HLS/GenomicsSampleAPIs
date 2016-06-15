@@ -9,7 +9,7 @@ class GAVariantSet(object):
         id = str(id)
         datasetId = str(datasetId)
         name = str(name)
-        refereneceSetId = str(referenceSetId)
+        str(referenceSetId)
 
         self.gavariantset_info = {
             'id': id, 'name': name, 'referenceSetId': referenceSetId, 'datasetId': datasetId, 'metadata': metadata}

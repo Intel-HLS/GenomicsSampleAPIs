@@ -3,7 +3,6 @@
 import sys
 import os
 import uuid
-import json
 import traceback
 from multiprocessing import Pool
 
@@ -313,7 +312,7 @@ class MAF(File2Tile):
                              ",", inFile], stdout=tmpFP)
 
         p = subprocess.Popen(["wc", "-l", inFile], stdout=subprocess.PIPE)
-        line_count = p.communicate()[0].split(' ')[0]
+        p.communicate()[0].split(' ')[0]
         count = 0
 
         with open(tmpFile, 'r') as inFP, open(inFile, 'w') as outFP:

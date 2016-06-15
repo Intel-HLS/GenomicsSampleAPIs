@@ -209,7 +209,7 @@ class CSVLine:
         bSkipFilterId = (numFilter == EMPTYCHAR or int(numFilter) == 0)
         FilterIdIndex = self.fields.index("FilterId")
 
-        GTIndex = self.fields.index('GT')
+        self.fields.index('GT')
 
         outCSVLine = ""
         for index in range(0, len(self.fields)):

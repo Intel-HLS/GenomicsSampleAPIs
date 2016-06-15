@@ -71,7 +71,7 @@ class TestQuery:
         with query.DBQuery(self.DBURI).getSession() as session:
             idx = 10
             with pytest.raises(ValueError) as exec_info:
-                result = session.arrayId2TileNames(idx)
+                session.arrayId2TileNames(idx)
             # assert result[0] == "/home/variantdb/DB"
             assert "Invalid Array Id" in str(exec_info.value)
 
@@ -88,7 +88,7 @@ class TestQuery:
         with query.DBQuery(self.DBURI).getSession() as session:
             workspace = "Invalid"
             with pytest.raises(ValueError) as exec_info:
-                result = session.tileNames2ArrayIdx(workspace, self.arrayName)
+                session.tileNames2ArrayIdx(workspace, self.arrayName)
             # assert result[0] == "/home/variantdb/DB"
             assert "Invalid workspace" in str(exec_info.value)
 
@@ -96,7 +96,7 @@ class TestQuery:
         with query.DBQuery(self.DBURI).getSession() as session:
             arrayName = "Invalid"
             with pytest.raises(ValueError) as exec_info:
-                result = session.tileNames2ArrayIdx(self.workspace, arrayName)
+                session.tileNames2ArrayIdx(self.workspace, arrayName)
             # assert result[0] == "/home/variantdb/DB"
             assert "Invalid workspace" in str(exec_info.value)
 

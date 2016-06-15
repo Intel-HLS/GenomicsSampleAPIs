@@ -1,12 +1,11 @@
 import pytest
 import uuid
-import time
-from sqlalchemy import create_engine, and_
+from sqlalchemy import and_
+from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, drop_database, database_exists
 import metadb.api.dbimport as dbimport
 import metadb.models as models
 from unittest import TestCase
-from collections import OrderedDict
 import vcf
 
 sampleN = 'sampleN'
@@ -31,7 +30,7 @@ class TestDBImportLevel0(TestCase):
         if database_exists(self.DBURI):
             drop_database(self.DBURI)
 
-        db = create_database(self.DBURI)
+        create_database(self.DBURI)
 
         engine = create_engine(self.DBURI)
         models.bind_engine(engine)
@@ -57,7 +56,7 @@ class TestDBImportLevel0(TestCase):
             assert reg_result.guid == rguid
 
             # registering an already registered referenceset, by guid
-            reg2_result = session.registerReferenceSet(rguid, 'hg19')
+            session.registerReferenceSet(rguid, 'hg19')
             assert reg_result.assembly_id == self.assembly
             assert reg_result.guid == rguid
 
@@ -67,7 +66,7 @@ class TestDBImportLevel0(TestCase):
 
             # negative test
             with pytest.raises(ValueError) as exec_info:
-                neg_result = session.registerReferenceSet(fguid, "negAssembly")
+                session.registerReferenceSet(fguid, "negAssembly")
             assert "DataError" in str(exec_info.value)
 
     def test_registerWorkspace(self):
@@ -148,7 +147,7 @@ class TestDBImportLevel1(TestCase):
         if database_exists(self.DBURI):
             drop_database(self.DBURI)
 
-        db = create_database(self.DBURI)
+        create_database(self.DBURI)
 
         engine = create_engine(self.DBURI)
         models.bind_engine(engine)
@@ -357,7 +356,7 @@ class TestDBImportLevel2(TestCase):
         if database_exists(self.DBURI):
             drop_database(self.DBURI)
 
-        db = create_database(self.DBURI)
+        create_database(self.DBURI)
 
         engine = create_engine(self.DBURI)
         models.bind_engine(engine)
