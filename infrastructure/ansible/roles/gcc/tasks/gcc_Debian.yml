@@ -7,12 +7,12 @@
 - name: install apt package for gcc
   apt: 
     update_cache: yes
-    name: gcc-4.9
+    name: gcc-{{ gcc_exec_version }}
 
 - name: install apt package for g++
   apt: 
     update_cache: yes
-    name: g++-4.9
+    name: g++-{{ gcc_exec_version }}
 
 - name: install apt package for gfortran
   apt: 

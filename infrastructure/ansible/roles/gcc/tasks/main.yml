@@ -6,6 +6,10 @@
   set_fact: gcc_version={{ gcc_default_version }}
   when: gcc_version is not defined
 
+- name: set variable gcc_bin_prefix
+  set_fact: gcc_exec_version={{ gcc_devault_exec_version }}
+  when: gcc_exec_version is not defined
+
 - include_vars: gcc.yml
 
 - name: set variable gcc_bin_prefix
