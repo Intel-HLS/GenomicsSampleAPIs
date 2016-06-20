@@ -17,7 +17,7 @@
 - name: install apt package for gfortran
   apt: 
     update_cache: yes
-    name: gfortran-4.9
+    name: gfortran-{{ gcc_exec_version }}
 
 - name: update alts gcc
   command: "update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20"
