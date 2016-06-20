@@ -1,27 +1,33 @@
 # vi: set ft=yaml.jinja :
 
 ---
-- rpm_key:
-    state: present
-    key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
-    validate_certs: no
-  tags:
-    - install
-  when: ansible_os_family == "RedHat" and
-      ( ansible_distribution_major_version == "5" or
-        ansible_distribution_major_version == "6" or
-        ansible_distribution_major_version == "7" )
 
-- name:   /etc/yum.repos.d/epel-release.repo
-  template:
-    src:   etc/yum.repos.d/epel-release.repo.j2
-    dest: /etc/yum.repos.d/epel-release.repo
-    owner: root
-    group: root
-    mode: "0644"
+- name: Remove EPEL release rpm if previously installed by the Ansible Galaxy EPEL role
+  yum:
+    name: epel-release
+    state: absent
+  when: ansible_os_family == "RedHat"
+  notify: yum update cache
+
+- name: Remove EPEL repo file installed by older version of this role or the Ansible Galaxy EPEL role
+  file:
+    path: /etc/yum.repos.d/epel-release.repo
+    state: absent
+  when: ansible_os_family == "RedHat"
+  notify: yum update cache
+
+- name: Install EPEL RPM
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    disable_gpg_check: yes
+    state: present
   tags:
     - install
   when: ansible_os_family == "RedHat" and
       ( ansible_distribution_major_version == "5" or
         ansible_distribution_major_version == "6" or
         ansible_distribution_major_version == "7" )
+  notify: yum update cache
+
+- name: Force flush handlers (may be invoked as dependency)
+  meta: flush_handlers
