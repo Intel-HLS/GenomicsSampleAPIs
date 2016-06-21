@@ -1,8 +1,5 @@
 ---
 - hosts: default
   name: site
-  vars:
-   - env: {}
-   - environment: 'development'
   roles:
     - postgresql-server
