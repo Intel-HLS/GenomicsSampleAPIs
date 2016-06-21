@@ -153,8 +153,7 @@ def sortAndIndex(inFile, outdir):
     else:
         raise ValueError("File extension must be vcf or vcf.gz")
 
-    with open(inFile, 'rw') as mert:
-        sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
+    sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
 
     bcftools.norm("-m", "+any", "-O", "z", "-o",
                   sorted_file, inFile, catch_stdout=False)
