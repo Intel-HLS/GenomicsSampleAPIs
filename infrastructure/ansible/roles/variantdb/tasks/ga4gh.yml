@@ -9,7 +9,7 @@
 
 - name     : Set variable env_path
   set_fact : 
-    env_path: "{{GenomicsDB_bin_dir}}:{{mpi_path}}/bin:$PATH"
+    env_path: "{{GenomicsDB_bin_dir}}:{{mpi_path}}/bin:{{gcc_prefix}}/bin:$PATH"
   when     : env_path is not defined
 
 - name     : Set variable env_ld_library_path
