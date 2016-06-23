@@ -114,7 +114,7 @@ def writeVIDMappingFile(DB_URI, reference_set_id, output_file, fields_dict=Const
         references = metadb.session.query(models.Reference)\
             .filter(models.Reference.reference_set_id == reference_set_id)\
             .all()
-            
+
         vid_mapping = OrderedDict()
         vid_mapping["fields"] = fields_dict
         vid_mapping["contigs"] = OrderedDict()
@@ -129,7 +129,9 @@ def writeVIDMappingFile(DB_URI, reference_set_id, output_file, fields_dict=Const
 
 
 def registerWithMetadb(config, references=None):
-    # this can be cleaned up once the import processes become more generalized
+    """
+    Registers parent object of a callset in metadb for both MAF and VCF importing.
+    """
     if references is None:
         # set MAF specific vars
         with open(config.TileDBAssembly) as config_file:
@@ -150,22 +152,18 @@ def registerWithMetadb(config, references=None):
         dbimport = DBImport(config['dburi'])
 
     with dbimport.getSession() as metadb:
-
+        # register workspace, referenceset, array, and variantset
         ws = metadb.registerWorkspace(
             str(uuid.uuid4()), workspace)
-
         rs = metadb.registerReferenceSet(
             str(uuid.uuid4()), 
             assembly, 
             references=references)
-
         dba = metadb.registerDBArray(
             guid=str(uuid.uuid4()),
             name=array,
             reference_set_id=rs.id,
             workspace_id=ws.id)
-
-        # arbitrary variant set assignment
         vs = metadb.registerVariantSet(
             guid=str(uuid.uuid4()),
             reference_set_id=rs.id,
@@ -175,6 +173,9 @@ def registerWithMetadb(config, references=None):
 
 
 def createMappingFiles(outputDir, callset_mapping, rs_id, DB_URI, combinedOutputFile=None):
+    """
+    Creates Callset mapping and VID mapping file required for GenomicsDB loading.
+    """
     
     baseFileName = ''
     if combinedOutputFile:
