@@ -1,7 +1,7 @@
 ---
 # GCC Defaults
 gcc_version : 4.9.3
-gcc_prefix  : /opt/gcc-{{gcc_version}}
+gcc_prefix  : /opt/rh/devtoolset-3/root/
 
 # Meta DB Defaults
 default_meta_db_name   : metadb
