@@ -61,6 +61,7 @@ class TestVCFImporter(TestCase):
             self.config = json.load(readFP)
             self.config["dburi"] = self.DBURI
 
+
     @pytest.fixture(autouse=True)
     def set_tmpdir(self, tmpdir):
         self.tmpdir = tmpdir
@@ -176,7 +177,8 @@ class TestVCFImporter(TestCase):
         i) TN vcf, ii) callset_loc in config set, iii) TN vcf with sample tag
         """
         conf = self.tmpdir.join("vcf5_import.config")
-        self.config['callset_loc'] = None
+        # this_conf = dict(self.config)
+        # this_conf['callset_loc'] = None
         conf.write(json.dumps(self.config))
 
         vcfile = self.tmpdir.join("test5.vcf")
@@ -212,8 +214,9 @@ class TestVCFImporter(TestCase):
         assert "Set callset_loc" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf7_import.config")
-        self.config['callset_loc'] = 'SampleName'
-        conf.write(json.dumps(self.config))
+        this_conf = dict(self.config)
+        this_conf['callset_loc'] = 'SampleName'
+        conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test7.vcf")
         test3_header = list(test_header)
@@ -232,9 +235,11 @@ class TestVCFImporter(TestCase):
         assert "only single TN" in str(exec_info.value)
 
     def test_createCallSetDict(self):
+
         conf = self.tmpdir.join("vcf8_import.config")
-        self.config['callset_loc'] = 'SampleName'
-        conf.write(json.dumps(self.config))
+        this_conf = dict(self.config)
+        this_conf['callset_loc'] = 'SampleName'
+        conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test8.vcf")
         test1_header = list(test_header)
