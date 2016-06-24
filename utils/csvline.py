@@ -1,6 +1,6 @@
 """
-Contains the key methods and type checks that are required to generate a csv
-file that tiledb can load.
+Contains the key methods and type checks required 
+to generate a csv file that tiledb can load.
 """
 
 EMPTYCHAR = '*'
@@ -18,33 +18,12 @@ class CSVLine:
     # Fields in Tile DB CSV
     # It is a 2D array, and each element is an array represents the fields of
     # a version
-    fieldNames = [["SampleId",
-                   "Location",
-                   "End",
-                   "REF",
-                   "ALT",
-                   "QUAL",
-                   "numFilter",
-                   "FilterId",
-                   "BaseQRankSum",
-                   "ClippingRankSum",
-                   "MQRankSum",
-                   "ReadPosRankSum",
-                   "MQ",
-                   "MQ0",
-                   "AF",
-                   "AN",
-                   "AC",
-                   "DP",
-                   "DP_FMT",
-                   "MIN_DP",
-                   "GQ",
-                   "SB",
-                   "AD",
-                   "PL",
-                   "PLOIDY",
-                   "GT",
-                   "PS"]]
+    fieldNames = [["SampleId", "Location", "End", "REF", "ALT",
+                   "QUAL", "numFilter", "FilterId", "BaseQRankSum",
+                   "ClippingRankSum", "MQRankSum", "ReadPosRankSum",
+                   "MQ", "MQ0", "AF", "AN", "AC", "DP", "DP_FMT", "MIN_DP",
+                   "GQ", "SB", "AD", "PL", "PLOIDY", "GT", "PS"]]
+
     arrayFields = ["ALT", "FilterId", "SB", "AD", "PL", "GT", "AF", "AC"]
 
     def __init__(self, version=1):
