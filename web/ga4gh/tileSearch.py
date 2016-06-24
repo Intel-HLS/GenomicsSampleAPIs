@@ -194,8 +194,9 @@ def searchVariants(
             endp = vArray[i].contents.end
             chromosome, [startp, endp] = metadb.tile2Contig(
                 array_idx, [startp, endp])
-            # Since the query was to a chromosome, the results will not be outside the
-            # chromosome. So just pick chromosome at index 0 for reference name
+            # Since the query was to a chromosome,
+            # the results will not be outside the chromosome.
+            # So just pick chromosome at index 0 for reference name
             referenceName = chromosome[0]
             gaclist = list()
 

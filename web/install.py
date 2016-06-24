@@ -26,14 +26,21 @@ def installPaths(ga4ghPath):
 def main():
     # Get the installation path for the APIs repo
     apar = argparse.ArgumentParser()
-    apar.add_argument("-p", "--port", type=int, default=8008,
-                      help="port for web server")
+
+    apar.add_argument(
+        "-p",
+        "--port",
+        type=int,
+        default=8008,
+        help="port for web server")
+
     apar.add_argument(
         "-s",
         "--socket",
         type=str,
         default="unix:/var/uwsgi/ga4gh.sock",
-        help="string with socket information fo uwsgi")
+        help="string with socket information for uwsgi")
+
     args = apar.parse_args()
     listenPort = args.port
     socket = args.socket
@@ -45,7 +52,7 @@ def main():
     updateConfigs(basePath, ga4ghPath)
     getHttpdConf(sockpath=socket, port=listenPort)
     getuwsgiConf(basePath)
-    print "DONE"
+    print "Installation Complete"
 
 
 def updateConfigs(basePath, ga4ghPath):
