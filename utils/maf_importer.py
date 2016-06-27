@@ -7,9 +7,11 @@ import traceback
 from multiprocessing import Pool
 
 import utils.csvline as csvline
-from utils.file2tile import File2Tile, IDX
+from utils.file2tile import File2Tile
+from utils.file2tile import IDX
 import utils.helper as helper
-from metadb.api import DBImport, DBQuery
+from metadb.api import DBImport
+from metadb.api import DBQuery
 from utils.configuration import ConfigReader
 from metadb.api import DBImport
 from metadb.models import CallSetToDBArrayAssociation
@@ -313,17 +315,18 @@ class MAF(File2Tile):
         and merges them
         """
         # print "Checking CSV File for global merging"
-        import subprocess
-        tmpFile = inFile + '.sorted'
-        # Sort the file by column 2 which is the position
-        with open(inFile + ".original", 'w') as tmpFP:
-            subprocess.call(["cat", inFile], stdout=tmpFP)
-        with open(tmpFile, 'w') as tmpFP:
-            subprocess.call(["sort", "-k", "2", "-n", "-t",
-                             ",", inFile], stdout=tmpFP)
+        from shutil import copyfile
+        import csv
+        # sort csv file into a new file
+        copyfile(inFile, inFile+".original")
+        tmpFile = inFile+".sorted"
+        with open(inFile) as f:
+            csv_reader = csv.reader(f, delimiter=",")
+            csv_sorted = sorted(csv_reader, key=lambda row: int(row[1]), reverse=False)
+        with open(tmpFile, 'wb') as ft:
+            csv_writer = csv.writer(ft, delimiter=",")
+            csv_writer.writerows(csv_sorted)
 
-        p = subprocess.Popen(["wc", "-l", inFile], stdout=subprocess.PIPE)
-        p.communicate()[0].split(' ')[0]
         count = 0
 
         with open(tmpFile, 'r') as inFP, open(inFile, 'w') as outFP:
