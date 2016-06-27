@@ -7,12 +7,19 @@ import utils.helper as helper
 
 
 class Loader:
+    """
+    Class that handles loading of GenomicsDB, Optional MPI
+    Requires callset mapping file and vid mapping file
+    """
 
     def __init__(self, config_file, debug=False):
         self.debug = debug
         self.readConfig(config_file)
 
     def readConfig(self, config_file):
+        """
+        Reads config for loading parameters
+        """
         parser = ConfigParser.RawConfigParser()
         parser.read(config_file)
         self.NUM_PROCESSES = parser.getint('loader', 'NUM_PROCESSES')
@@ -32,6 +39,9 @@ class Loader:
             self.ENV = parser.get('mpi', 'INCLUDE_ENV')
 
     def run(self, tile_loader_config_file):
+        """
+        Executes the GenomicsDB loader
+        """
         if self.debug:
             helper.log("[Loader:Run] Starting mpirun subprocess")
         processArgs = list()
@@ -58,8 +68,11 @@ class Loader:
                     " ".join(processArgs), output, error))
 
 
-def load2Tile(loader_config_file, callset_mapping_file,
-              vid_mapping_file, workspace, array):
+def load2Tile(loader_config_file, callset_mapping_file, vid_mapping_file, workspace, array):
+    """
+    Sets proper loader json attribtues for vcf2tiledb, 
+    and performs the loading process
+    """
     loader = Loader(loader_config_file)
 
     with open(loader.TILE_LOADER_JSON, 'r') as loaderFP:
@@ -85,7 +98,9 @@ def load2Tile(loader_config_file, callset_mapping_file,
     print "Tile DB loading complete"
 
 if __name__ == "__main__":
+
     import argparse
+    
     parser = argparse.ArgumentParser(description="Load to tile db")
 
     parser.add_argument(
@@ -94,8 +109,14 @@ if __name__ == "__main__":
         required=True,
         type=str,
         help="input configuration file for invoking the tile loader")
-    parser.add_argument("-d", "--debug", action="store_true", required=False,
-                        help="debug mode flag")
+
+    parser.add_argument(
+        "-d", 
+        "--debug", 
+        action="store_true", 
+        required=False,
+        help="debug mode flag")
+
     args = parser.parse_args()
 
     loader = Loader(args.config, args.debug)
