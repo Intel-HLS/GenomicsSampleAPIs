@@ -2,6 +2,7 @@
 Contains the key methods and type checks required 
 to generate a csv file that tiledb can load.
 """
+from ast import literal_eval
 
 EMPTYCHAR = '*'
 NUM_SB = 4
@@ -297,8 +298,8 @@ class CSVLine:
         self.isValid = False
         self.error = errorString
 
-    def loadCSV(self, inString):
-        values = inString.strip().split(',')
+    # def loadCSV(self, inString):
+    def loadCSV(self, values):
         index = 0
         numFilter = 0
         index_history = list()

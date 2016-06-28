@@ -317,23 +317,19 @@ class MAF(File2Tile):
         # print "Checking CSV File for global merging"
         from shutil import copyfile
         import csv
-        # sort csv file into a new file
         copyfile(inFile, inFile+".original")
-        tmpFile = inFile+".sorted"
         with open(inFile) as f:
             csv_reader = csv.reader(f, delimiter=",")
             csv_sorted = sorted(csv_reader, key=lambda row: int(row[1]), reverse=False)
-        with open(tmpFile, 'wb') as ft:
-            csv_writer = csv.writer(ft, delimiter=",")
-            csv_writer.writerows(csv_sorted)
+            print csv_sorted[0]
 
         count = 0
 
-        with open(tmpFile, 'r') as inFP, open(inFile, 'w') as outFP:
+        with open(inFile, 'w') as outFP:
             prev_Location = None
             csvMap = dict()
 
-            for line in inFP:
+            for line in csv_sorted:
                 csv = csvline.CSVLine()
                 csv.loadCSV(line)
                 SId = csv.get('SampleId')
