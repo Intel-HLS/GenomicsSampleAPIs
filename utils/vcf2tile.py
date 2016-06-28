@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import json
 import utils.vcf_importer as multiprocess_import
 import utils.helper as helper
 import utils.loader as loader
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     multiprocess_import.parallelGen(args.config, args.inputs, args.outputdir)
 
     if args.loader:
-
+        import json
         with open(args.config) as conf:
             conf_json = json.load(conf)
             workspace = conf_json['workspace']

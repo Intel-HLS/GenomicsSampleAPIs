@@ -87,7 +87,7 @@ if __name__ == "__main__":
             args.gzipped)
 
     if args.loader:
-
+        import json
         with open(args.config) as conf:
             conf_json = json.load(conf)
             workspace = conf_json['TileDBSchema']['workspace']
