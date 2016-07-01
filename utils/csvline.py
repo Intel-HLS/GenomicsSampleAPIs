@@ -299,6 +299,9 @@ class CSVLine:
         self.error = errorString
 
     def loadCSV(self, values):
+        """
+        Loads a csvline object, from a row in a csv reader.
+        """
         index = 0
         numFilter = 0
         index_history = list()
