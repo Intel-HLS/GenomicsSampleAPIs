@@ -298,7 +298,6 @@ class CSVLine:
         self.isValid = False
         self.error = errorString
 
-    # def loadCSV(self, inString):
     def loadCSV(self, values):
         index = 0
         numFilter = 0

@@ -5,6 +5,8 @@ import os
 import uuid
 import traceback
 from multiprocessing import Pool
+from shutil import copyfile
+import csv
 
 import utils.csvline as csvline
 from utils.file2tile import File2Tile
@@ -313,24 +315,21 @@ class MAF(File2Tile):
         and merges them
         """
         # check csv file for global merging
-        from shutil import copyfile
-        import csv
+
         copyfile(inFile, inFile+".original")
         with open(inFile) as f:
             csv_reader = csv.reader(f, delimiter=",")
             csv_sorted = sorted(csv_reader, key=lambda row: int(row[1]), reverse=False)
-
-        count = 0
 
         with open(inFile, 'w') as outFP:
             prev_Location = None
             csvMap = dict()
 
             for line in csv_sorted:
-                csv = csvline.CSVLine()
-                csv.loadCSV(line)
-                SId = csv.get('SampleId')
-                Location = csv.get('Location')
+                csv_line = csvline.CSVLine()
+                csv_line.loadCSV(line)
+                SId = csv_line.get('SampleId')
+                Location = csv_line.get('Location')
 
                 if Location != prev_Location:
                     for l in csvMap.values():
@@ -339,13 +338,12 @@ class MAF(File2Tile):
                     prev_Location = Location
                     del csvMap
                     csvMap = dict()
-                    csvMap[SId] = csv
+                    csvMap[SId] = csv_line
                 else:
                     if SId in csvMap.keys():
-                        self.combineCSVs(csvMap[SId], csv)
+                        self.combineCSVs(csvMap[SId], csv_line)
                     else:
-                        csvMap[SId] = csv
-                count += 1
+                        csvMap[SId] = csv_line
             for l in csvMap.values():
                 outFP.write(l.getCSVLine())
                 outFP.write('\n')
