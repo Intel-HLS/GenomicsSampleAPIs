@@ -9,17 +9,17 @@
 
 - name     : Set variable env_path
   set_fact : 
-    env_path: "{{GenomicsDB_bin_dir}}:{{mpi_path}}/bin:{{gcc_prefix}}/bin:$PATH"
+    env_path: "{{GenomicsDB_bin_dir}}:{{gcc_prefix}}/bin:{{mpi_path}}/bin:$PATH"
   when     : env_path is not defined
 
 - name     : Set variable env_ld_library_path
   set_fact : 
-    env_ld_library_path: "{{mpi_path}}/lib:{{gcc_prefix}}/lib:{{gcc_prefix}}/lib64:{{htslib_dir}}:$LD_LIBRARY_PATH"
+    env_ld_library_path: "{{gcc_prefix}}/lib:{{gcc_prefix}}/lib64:{{htslib_dir}}:{{mpi_path}}/lib:$LD_LIBRARY_PATH"
   when     : env_ld_library_path is not defined and libcsv_path is not defined
 
 - name     : Set variable env_ld_library_path
   set_fact : 
-    env_ld_library_path: "{{mpi_path}}/lib:{{gcc_prefix}}/lib:{{gcc_prefix}}/lib64:{{htslib_dir}}:{{libcsv_path}}/.libs:$LD_LIBRARY_PATH"
+    env_ld_library_path: "{{gcc_prefix}}/lib:{{gcc_prefix}}/lib64:{{htslib_dir}}:{{libcsv_path}}/.libs:{{mpi_path}}/lib:$LD_LIBRARY_PATH"
   when     : env_ld_library_path is not defined and libcsv_path is defined
 
 - name     : Set variable env_pythonpath
@@ -85,12 +85,12 @@
     owner : "{{owner_user_name}}"
     mode  : "{{permissions}}"
 
-- name  : Run alembic upgrade to head
-  shell : ". {{ga4gh_virtualenv}}/bin/activate && alembic upgrade head"
-  args  : 
-    chdir : "{{store_dir}}/metadb"
-  become      : yes
-  become_user : "{{owner_user_name}}"
+#- name  : Run alembic upgrade to head
+#  shell : ". {{ga4gh_virtualenv}}/bin/activate && alembic upgrade head"
+#  args  : 
+#    chdir : "{{store_dir}}/metadb"
+#  become      : yes
+#  become_user : "{{owner_user_name}}"
 
 # Priviledges have to be granted on the tables after it is created by alembic.
 - name : Grant SELECT-only priviledges to the client on the DB
