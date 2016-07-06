@@ -85,12 +85,12 @@
     owner : "{{owner_user_name}}"
     mode  : "{{permissions}}"
 
-#- name  : Run alembic upgrade to head
-#  shell : ". {{ga4gh_virtualenv}}/bin/activate && alembic upgrade head"
-#  args  : 
-#    chdir : "{{store_dir}}/metadb"
-#  become      : yes
-#  become_user : "{{owner_user_name}}"
+- name  : Run alembic upgrade to head
+  shell : ". {{ga4gh_virtualenv}}/bin/activate && alembic upgrade head"
+  args  : 
+    chdir : "{{store_dir}}/metadb"
+  become      : yes
+  become_user : "{{owner_user_name}}"
 
 # Priviledges have to be granted on the tables after it is created by alembic.
 - name : Grant SELECT-only priviledges to the client on the DB
