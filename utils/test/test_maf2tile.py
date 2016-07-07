@@ -354,41 +354,41 @@ class TestMAF(unittest.TestCase):
 
     def getCSVLine(self, input_list, SampleId,
                    Location=None, End=None, REF=None, ALT=None, GT=None):
-        csv = CSVLine()
-        csv.set("SampleId", SampleId)
+        csv_line = CSVLine()
+        csv_line.set("SampleId", SampleId)
         if Location is None:
-            csv.set("Location", str(long(input_list[8]) - 1))
+            csv_line.set("Location", str(long(input_list[8]) - 1))
         else:
-            csv.set("Location", Location)
+            csv_line.set("Location", Location)
         if End is None:
-            csv.set("End", str(long(input_list[9]) - 1))
+            csv_line.set("End", str(long(input_list[9]) - 1))
         else:
-            csv.set("End", End)
+            csv_line.set("End", End)
         if REF is None:
-            csv.set("REF", input_list[10])
+            csv_line.set("REF", input_list[10])
         else:
-            csv.set("REF", REF)
+            csv_line.set("REF", REF)
         if ALT is None:
-            csv.set("ALT", [input_list[11]])
-            csv.set("AF", [input_list[13]])
-            csv.set("AC", [input_list[15]])
+            csv_line.set("ALT", [input_list[11]])
+            csv_line.set("AF", [input_list[13]])
+            csv_line.set("AC", [input_list[15]])
         else:
-            csv.set("ALT", ALT)
+            csv_line.set("ALT", ALT)
             AF = [input_list[13]]
             AC = [input_list[15]]
             for x in xrange(1, len(ALT)):
                 AF.append(input_list[13])
                 AC.append(input_list[15])
-            csv.set("AF", AF)
-            csv.set("AC", AC)
-        csv.set("QUAL", input_list[12])
-        csv.set("AN", input_list[14])
-        csv.set("PLOIDY", 2)
+            csv_line.set("AF", AF)
+            csv_line.set("AC", AC)
+        csv_line.set("QUAL", input_list[12])
+        csv_line.set("AN", input_list[14])
+        csv_line.set("PLOIDY", 2)
         if GT is None:
-            csv.set("GT", [input_list[16], "0"])
+            csv_line.set("GT", [input_list[16], "0"])
         else:
-            csv.set("GT", GT)
-        return csv.getCSVLine()
+            csv_line.set("GT", GT)
+        return csv_line.getCSVLine()
 
     def setAndGet(self, input_list, header_field, newValue):
         new_data = input_list[:]

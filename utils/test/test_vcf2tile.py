@@ -61,6 +61,7 @@ class TestVCFImporter(TestCase):
             self.config = json.load(readFP)
             self.config["dburi"] = self.DBURI
 
+
     @pytest.fixture(autouse=True)
     def set_tmpdir(self, tmpdir):
         self.tmpdir = tmpdir
@@ -171,12 +172,13 @@ class TestVCFImporter(TestCase):
         assert result[0] == -1
         # assert result[1] == str(vcfile)
 
-    def test_toCallSetDict_neg(self):
+    def test_createCallSetDict_neg(self):
         """
         i) TN vcf, ii) callset_loc in config set, iii) TN vcf with sample tag
         """
         conf = self.tmpdir.join("vcf5_import.config")
-        self.config['callset_loc'] = None
+        # this_conf = dict(self.config)
+        # this_conf['callset_loc'] = None
         conf.write(json.dumps(self.config))
 
         vcfile = self.tmpdir.join("test5.vcf")
@@ -191,7 +193,7 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
-            vc.toCallSetDict()
+            vc.createCallSetDict()
         assert "only single TN" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf6_import.config")
@@ -208,12 +210,13 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
-            vc.toCallSetDict()
+            vc.createCallSetDict()
         assert "Set callset_loc" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf7_import.config")
-        self.config['callset_loc'] = 'SampleName'
-        conf.write(json.dumps(self.config))
+        this_conf = dict(self.config)
+        this_conf['callset_loc'] = 'SampleName'
+        conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test7.vcf")
         test3_header = list(test_header)
@@ -228,13 +231,15 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
-            vc.toCallSetDict()
+            vc.createCallSetDict()
         assert "only single TN" in str(exec_info.value)
 
-    def test_toCallSetDict(self):
+    def test_createCallSetDict(self):
+
         conf = self.tmpdir.join("vcf8_import.config")
-        self.config['callset_loc'] = 'SampleName'
-        conf.write(json.dumps(self.config))
+        this_conf = dict(self.config)
+        this_conf['callset_loc'] = 'SampleName'
+        conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test8.vcf")
         test1_header = list(test_header)
@@ -248,7 +253,7 @@ class TestVCFImporter(TestCase):
             inVCF.write("{0}\n".format("\t".join(test_data)))
 
         with VCF(str(vcfile), str(conf)) as vc:
-            results = vc.toCallSetDict()
+            results = vc.createCallSetDict()
         assert results[sampleT] == [sampleT, sampleN]
         assert len(results) == 2
 

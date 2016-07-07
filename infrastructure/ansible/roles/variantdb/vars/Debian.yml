@@ -10,7 +10,6 @@ dependency_libs:
   - python-psycopg2
   - python-pip
   - python-virtualenv
-  - python-pandas
   - rsync
   - libapache2-mod-wsgi
   - openmpi-bin

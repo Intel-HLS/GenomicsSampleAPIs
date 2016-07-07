@@ -2,6 +2,9 @@ import json
 
 
 class ConfigReader:
+    """
+    Specialized config reader for a MAF importing.
+    """
 
     def __init__(self, config_file):
         with open(config_file, "r") as fp:
