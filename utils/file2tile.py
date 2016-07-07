@@ -35,8 +35,7 @@ class File2Tile(object):
         self.TargetSampleId = None
 
         # CallSetId is a list of length 2 where the first element says whether the
-        # CallSetId is a constant for the input file or based on a field in the
-        # input
+        # CallSetId is a constant for the input file or based on a field in the input
         self.CallSetIdMap = None
 
         self.VariantSetName = None
@@ -101,7 +100,7 @@ class File2Tile(object):
     def generateCSV(self, inputFile, outFile):
         """
         Takes the input data and generates a CSV File
-        Should be implemented by the SubClass
+        Should be implemented by the SubClass (MAF)
         """
 
     def initFilePointers(self, inputFile, outFile):

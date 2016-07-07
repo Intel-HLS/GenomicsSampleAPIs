@@ -1,4 +1,6 @@
 import pytest
+import csv as pycsv
+import StringIO
 import utils.csvline as csvline
 
 
@@ -324,7 +326,8 @@ class TestCSVLine:
 
     def test_loadCSV(self):
         test_csvobj = csvline.CSVLine()
-        csv = "1,100,100,*,A,*,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        csv_data = "1,100,100,*,A,*,0,*,*,*,*,*,*,0,*,0,*,*,*,*,*,*,*,*,0,0,*,*"
+        csv = pycsv.reader(StringIO.StringIO(csv_data), delimiter=',').next()
         test_csvobj.loadCSV(csv)
         assert test_csvobj.get('SampleId') == '1'
         assert test_csvobj.get('Location') == '100'
@@ -352,9 +355,10 @@ class TestCSVLine:
         assert test_csvobj.get('PLOIDY') == 0
         assert test_csvobj.get('GT') == []
         assert test_csvobj.get('PS') == '*'
-        assert test_csvobj.getCSVLine(True) == csv
+        assert test_csvobj.getCSVLine(True) == csv_data
 
-        csv = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,0,0,*,*"
+        csv_data = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,0,0,*,*"
+        csv = pycsv.reader(StringIO.StringIO(csv_data), delimiter=',').next()
         test_csvobj.loadCSV(csv)
         assert test_csvobj.get('SampleId') == '1'
         assert test_csvobj.get('Location') == '100'
@@ -382,9 +386,10 @@ class TestCSVLine:
         assert test_csvobj.get('PLOIDY') == 0
         assert test_csvobj.get('GT') == []
         assert test_csvobj.get('PS') == '*'
-        assert test_csvobj.getCSVLine(True) == csv
+        assert test_csvobj.getCSVLine(True) == csv_data
 
-        csv = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,*,*"
+        csv_data = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,*,*"
+        csv = pycsv.reader(StringIO.StringIO(csv_data), delimiter=',').next()
         test_csvobj.loadCSV(csv)
         assert test_csvobj.get('SampleId') == '1'
         assert test_csvobj.get('Location') == '100'
@@ -412,9 +417,10 @@ class TestCSVLine:
         assert test_csvobj.get('PLOIDY') == 0
         assert test_csvobj.get('GT') == []
         assert test_csvobj.get('PS') == '*'
-        assert test_csvobj.getCSVLine(True) == csv
+        assert test_csvobj.getCSVLine(True) == csv_data
 
-        csv = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,*"
+        csv_data = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,*"
+        csv = pycsv.reader(StringIO.StringIO(csv_data), delimiter=',').next()
         test_csvobj.loadCSV(csv)
         assert test_csvobj.get('SampleId') == '1'
         assert test_csvobj.get('Location') == '100'
@@ -442,9 +448,10 @@ class TestCSVLine:
         assert test_csvobj.get('PLOIDY') == 2
         assert test_csvobj.get('GT') == ['1', '2']
         assert test_csvobj.get('PS') == '*'
-        assert test_csvobj.getCSVLine(True) == csv
+        assert test_csvobj.getCSVLine(True) == csv_data
 
-        csv = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,12345"
+        csv_data = "1,100,100,T,A,5.45,2,1,2,35.7,5.7,15.7,17.7,8.5,9,1,3.14,100,1,90,7,2,1,10,21,22,23,24,2,25,26,3,70,71,72,2,1,2,12345"
+        csv = pycsv.reader(StringIO.StringIO(csv_data), delimiter=',').next()
         test_csvobj.loadCSV(csv)
         assert test_csvobj.get('SampleId') == '1'
         assert test_csvobj.get('Location') == '100'
@@ -472,4 +479,4 @@ class TestCSVLine:
         assert test_csvobj.get('PLOIDY') == 2
         assert test_csvobj.get('GT') == ['1', '2']
         assert test_csvobj.get('PS') == '12345'
-        assert test_csvobj.getCSVLine(True) == csv
+        assert test_csvobj.getCSVLine(True) == csv_data

@@ -5,14 +5,16 @@ import os
 import uuid
 import traceback
 from multiprocessing import Pool
+from shutil import copyfile
+import csv
 
 import utils.csvline as csvline
-from utils.file2tile import File2Tile, IDX
+from utils.file2tile import File2Tile
+from utils.file2tile import IDX
 import utils.helper as helper
-from metadb.api import DBImport, DBQuery
-from utils.configuration import ConfigReader
 from metadb.api import DBImport
-from metadb.models import CallSetToDBArrayAssociation
+from metadb.api import DBQuery
+from utils.configuration import ConfigReader
 
 CSVLine = csvline.CSVLine
 
@@ -146,23 +148,21 @@ class MAF(File2Tile):
                 self.prev_TargetSampleId = self.TargetSampleId
 
                 self.curr_Individual = metadb.registerIndividual(
-                    guid=str(uuid.uuid4()), name=self.prev_IndividualId)
+                    guid=str(uuid.uuid4()), 
+                    name=self.prev_IndividualId)
+
                 self.curr_SourceSample = metadb.registerSample(
-                    guid=str(
-                        uuid.uuid4()),
+                    guid=str(uuid.uuid4()),
                     individual_guid=self.curr_Individual.guid,
                     name=self.SourceSampleId,
-                    info={
-                        'type': 'source'})
+                    info={'type': 'source'})
+
                 self.curr_TargetSample = metadb.registerSample(
-                    guid=str(
-                        uuid.uuid4()),
+                    guid=str(uuid.uuid4()),
                     individual_guid=self.curr_Individual.guid,
                     name=self.TargetSampleId,
-                    info={
-                        'type': 'target'})
+                    info={'type': 'target'})
 
-                # "CallSet_"+self.prev_TargetSampleId+"_"+self.prev_SourceSampleId
                 self.prev_CallSetName = self.CallSetName
 
                 self.curr_CallSet = metadb.registerCallSet(
@@ -177,21 +177,23 @@ class MAF(File2Tile):
 
             row_id = None
             with self.dbquery.getSession() as query:
-                row_id = query.callSetIds2TileRowId([self.curr_CallSet.id],
-                                                    self.config.TileDBSchema[
-                                                        'workspace'],
-                                                    self.config.TileDBSchema[
-                                                        'array'],
-                                                    isGUID=False
-                                                    )[0]
-            my_sample_name = "{0}-{1}-{2}-{3}".format(self.prev_IndividualId,
-                                                      self.SourceSampleId,
-                                                      self.TargetSampleId,
-                                                      self.curr_CallSet.id)
+                row_id = query.callSetIds2TileRowId(
+                    [self.curr_CallSet.id],
+                    self.config.TileDBSchema['workspace'],
+                    self.config.TileDBSchema['array'],
+                    isGUID=False)[0]
+
+            my_sample_name = "{0}-{1}-{2}-{3}".format(
+                self.prev_IndividualId,
+                self.SourceSampleId,
+                self.TargetSampleId,
+                self.curr_CallSet.id)
+
             self.callset_mapping[my_sample_name] = {
                 "row_idx": long(row_id),
                 "idx_in_file": long(row_id),
-                "filename": self.output_file}
+                "filename": self.output_file
+            }
 
         self.prev_ChromosomePosition = self.ChromosomePosition
         self.prev_TileDBPosition = self.TileDBPosition
@@ -225,7 +227,7 @@ class MAF(File2Tile):
             assembly = self.prev_ChromosomePosition[IDX.CHR_ASSEMBLY]
             chromosome = self.prev_ChromosomePosition[IDX.CHR_CHR]
             start = self.prev_ChromosomePosition[IDX.CHR_START] - 1
-            end = start  # self.prev_ChromosomePosition[IDX.CHR_END]
+            end = start 
 
             ref = helper.getReference(assembly, chromosome, start, start)
             self.prev_TileDBValues["REF"] = ref
@@ -249,8 +251,7 @@ class MAF(File2Tile):
                 end = self.prev_ChromosomePosition[IDX.CHR_END]
 
                 ref = helper.getReference(assembly, chromosome, start, start)
-                self.prev_TileDBValues["REF"] = ref + \
-                    self.prev_TileDBValues["REF"]
+                self.prev_TileDBValues["REF"] = ref + self.prev_TileDBValues["REF"]
                 index = 0
                 for value in self.prev_TileDBValues["ALT"]:
                     if(value == "-"):
@@ -261,17 +262,18 @@ class MAF(File2Tile):
 
                 with self.dbquery.getSession() as query:
                     self.prev_TileDBPosition = query.contig2Tile(
-                        self.array_idx, chromosome, [start, end])
+                        self.array_idx, 
+                        chromosome, 
+                        [start, end])
 
         row_id = None
         with self.dbquery.getSession() as query:
-            row_id = query.callSetIds2TileRowId([self.curr_CallSet.id],
-                                                self.config.TileDBSchema[
-                                                    'workspace'],
-                                                self.config.TileDBSchema[
-                                                    'array'],
-                                                isGUID=False
-                                                )[0]
+            row_id = query.callSetIds2TileRowId(
+                [self.curr_CallSet.id],
+                self.config.TileDBSchema['workspace'],
+                self.config.TileDBSchema['array'],
+                isGUID=False)[0]
+
         self.m_csv_line.set("SampleId", row_id)
         self.m_csv_line.set("Location", self.prev_TileDBPosition[IDX.START])
         self.m_csv_line.set("End", self.prev_TileDBPosition[IDX.END])
@@ -312,29 +314,22 @@ class MAF(File2Tile):
         Checks if there are more than 1 entries for a sample at the Location
         and merges them
         """
-        # print "Checking CSV File for global merging"
-        import subprocess
-        tmpFile = inFile + '.sorted'
-        # Sort the file by column 2 which is the position
-        with open(inFile + ".original", 'w') as tmpFP:
-            subprocess.call(["cat", inFile], stdout=tmpFP)
-        with open(tmpFile, 'w') as tmpFP:
-            subprocess.call(["sort", "-k", "2", "-n", "-t",
-                             ",", inFile], stdout=tmpFP)
+        # check csv file for global merging
 
-        p = subprocess.Popen(["wc", "-l", inFile], stdout=subprocess.PIPE)
-        p.communicate()[0].split(' ')[0]
-        count = 0
+        copyfile(inFile, inFile+".original")
+        with open(inFile) as f:
+            csv_reader = csv.reader(f, delimiter=",")
+            csv_sorted = sorted(csv_reader, key=lambda row: int(row[1]), reverse=False)
 
-        with open(tmpFile, 'r') as inFP, open(inFile, 'w') as outFP:
+        with open(inFile, 'w') as outFP:
             prev_Location = None
             csvMap = dict()
 
-            for line in inFP:
-                csv = csvline.CSVLine()
-                csv.loadCSV(line)
-                SId = csv.get('SampleId')
-                Location = csv.get('Location')
+            for line in csv_sorted:
+                csv_line = csvline.CSVLine()
+                csv_line.loadCSV(line)
+                SId = csv_line.get('SampleId')
+                Location = csv_line.get('Location')
 
                 if Location != prev_Location:
                     for l in csvMap.values():
@@ -343,17 +338,15 @@ class MAF(File2Tile):
                     prev_Location = Location
                     del csvMap
                     csvMap = dict()
-                    csvMap[SId] = csv
+                    csvMap[SId] = csv_line
                 else:
                     if SId in csvMap.keys():
-                        self.combineCSVs(csvMap[SId], csv)
+                        self.combineCSVs(csvMap[SId], csv_line)
                     else:
-                        csvMap[SId] = csv
-                count += 1
+                        csvMap[SId] = csv_line
             for l in csvMap.values():
                 outFP.write(l.getCSVLine())
                 outFP.write('\n')
-        # print ""
 
     def combineCSVs(self, aggCSV, newCSV):
         """
@@ -407,9 +400,16 @@ def poolGenerateCSV(file_params):
         maf.setupCallSetMapping(outFile)
         maf.generateCSV(
             helper.getFilePointer(
-                inputFile, bGzipped, 'r'), helper.getFilePointer(
-                outFile, False, 'w'), bVerbose=False)
+                inputFile, 
+                bGzipped, 
+                'r'), 
+            helper.getFilePointer(
+                outFile, 
+                False, 
+                'w'), 
+            bVerbose=False)
         maf.checkCSV(outFile)
+
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         print "Error processing {0}".format(inputFile)
@@ -418,8 +418,7 @@ def poolGenerateCSV(file_params):
     return (0, outFile, maf.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir,
-                combinedOutputFile, bGzipped):
+def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzipped):
     """
     Function that spawns the Pool of MAF objects to work on each of the input files
     Once the BookKeeping support moves to a real DB, move from threads to multiprocessing.Pool
