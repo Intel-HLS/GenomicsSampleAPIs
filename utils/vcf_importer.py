@@ -1,5 +1,3 @@
-# vcf importer
-
 import sys
 import os
 import uuid
@@ -21,33 +19,38 @@ import utils.configuration as utils
 
 
 class VCF:
+    """
+    Class handling metadb registration and
+    GenomicsDB loading configuration for a tumor normal VCF file
+    """
 
     def __init__(self, filename, config):
         """
-        init uses reads in the vcf
+        init reads vcf file name and associated config
         """
         self.filename = filename
         self.configfile = config
 
-        # TileDB loader specific
+        # GenomicsDB loader specific
         self.callset_mapping = dict()
 
     def __enter__(self):
-
+        """
+        VCF opens vcf file as a pyvcf object
+        """
         self.file = open(self.filename, 'rb')
         self.reader = vcf.Reader(self.file)
 
         self.config = open(self.configfile, 'r')
-
         conf = json.load(self.config)
         self.dburi = conf['dburi']
         self.workspace = conf['workspace']
         # default TN columns normal first column, target second column
-        # this can be used for idx in file
+        # capture idx in file for GenomicsDB reference
         self.source_idx = conf.get('source_idx', 0)
         self.target_idx = conf.get('target_idx', 1)
-        # callset map will say how to retrieve the callset names
-        # from the vcf metadata, assuming standard two column TN vcf
+
+        # callset loc specifies callset name reference in sample tag
         self.callset_map = conf.get('callset_loc', None)
         self.array, self.variantset, self.referenceset = helper.registerWithMetadb(
             conf, references=self.reader.contigs)
@@ -55,18 +58,23 @@ class VCF:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Closes file objects used in VCF import
+        """
         self.file.close()
         self.config.close()
 
-    def toCallSetDict(self):
-        # if the callset_map is not specified, we assume the sample headers
-        # are the main identifier for the callset
-        # use ordered dict for future expansion to multisample TN vcf
+    def createCallSetDict(self):
+        """
+        Creates a callset dictionary ordered in terms of callset index in vcf
+        If callset_loc is not specified, the sample headers are the main identifier
+        of the callset. Designed to be later expanded for mulitsample TN vcf, currently
+        assumes single sample TN pair VCFs defaulted to NORMAL TUMOUR column order. 
+        """
+
         callsets = OrderedDict()
 
-        # assumption that import files will be single sample TN pair VCFs
-        # defaulted to NORMAL TUMOUR column order in the VCF, unless otherwise
-        # stated
+        # callset names in column headers
         if self.callset_map is None:
             if len(self.reader.samples) != 2:
                 raise ValueError(
@@ -74,10 +82,8 @@ class VCF:
             elif 'NORMAL' in self.reader.samples:
                 raise ValueError("Set callset_loc in import config.")
             else:
-                callsets[self.reader.samples[
-                    self.source_idx]] = self.reader.samples
-                callsets[self.reader.samples[
-                    self.target_idx]] = self.reader.samples
+                callsets[self.reader.samples[self.source_idx]] = self.reader.samples
+                callsets[self.reader.samples[self.target_idx]] = self.reader.samples
 
         else:
             # if not then, callset names are retrieved from VCF SAMPLE tag
@@ -85,27 +91,25 @@ class VCF:
                 raise ValueError(
                     "Currently only single TN vcf format supported.")
             else:
-                source = self.reader.metadata['SAMPLE'][
-                    self.source_idx]['SampleName']
-                target = self.reader.metadata['SAMPLE'][
-                    self.target_idx]['SampleName']
+                source = self.reader.metadata['SAMPLE'][self.source_idx]['SampleName']
+                target = self.reader.metadata['SAMPLE'][self.target_idx]['SampleName']
                 callsets[source] = [source, target]
                 callsets[target] = [source, target]
 
         return callsets
 
-    def setCallSets(self):
-
-        # get variant set id, register parent models
-        callsets = self.toCallSetDict()
+    def registerCallSets(self):
+        """
+        Registers CallSets with Metadb and 
+        builds callset mapping for GenomicsDB
+        """
+        callsets = self.createCallSetDict()
 
         with DBImport(self.dburi).getSession() as metadb:
             for callset in callsets:
-
                 # source and target names
                 source = callsets[callset][self.source_idx]
                 target = callsets[callset][self.target_idx]
-
                 if callset == source:
                     file_idx = self.source_idx
                 else:
@@ -113,34 +117,47 @@ class VCF:
 
                 # register individual and samples
                 indv = metadb.registerIndividual(
-                    str(uuid.uuid4()), source + "_" + target)
+                    str(uuid.uuid4()), 
+                    source + "_" + target)
+
                 src = metadb.registerSample(
-                    str(uuid.uuid4()), indv.guid, name=source, info={'type': 'source'})
+                    str(uuid.uuid4()),
+                    indv.guid,
+                    name=source,
+                    info={'type': 'source'})
+
                 trg = metadb.registerSample(
-                    str(uuid.uuid4()), indv.guid, name=target, info={'type': 'target'})
+                    str(uuid.uuid4()),
+                    indv.guid,
+                    name=target,
+                    info={'type': 'target'})
 
                 # register callset
                 cs = metadb.registerCallSet(str(uuid.uuid4()),
-                                            src.guid,
-                                            trg.guid,
-                                            self.workspace,
-                                            self.array.name,
-                                            [self.variantset.id],
-                                            name=callset)
-                tr = metadb.session.query(CallSetToDBArrayAssociation).filter(
-                    CallSetToDBArrayAssociation.callset_id == cs.id).first()
+                    src.guid,
+                    trg.guid,
+                    self.workspace,
+                    self.array.name,
+                    [self.variantset.id],
+                    name=callset)
 
-                # temp fill in for capturing genomics db import information
-                self.callset_mapping[
-                    cs.guid] = {
+                # retrieve tile row information for callset
+                tr = metadb.session.query(CallSetToDBArrayAssociation)\
+                    .filter(CallSetToDBArrayAssociation.callset_id == cs.id)\
+                    .first()
+
+                # capture genomics db callset mapping information
+                self.callset_mapping[cs.guid] = {
                     'row_idx': tr.tile_row_id,
                     'idx_in_file': file_idx,
-                    'filename': self.filename}
+                    'filename': self.filename
+                }
 
 
 def sortAndIndex(inFile, outdir):
     """
-    sort and index vcfs to ensure bgzipped, sorted, and indexed
+    Sort and index vcfs to ensure bgzipped, sorted, collapsed and indexed vcfs
+    GenomicsDB import will fail if these four requirements aren't satisfied.
     """
     splitFile = os.path.basename(inFile).split(".")
 
@@ -153,11 +170,12 @@ def sortAndIndex(inFile, outdir):
     else:
         raise ValueError("File extension must be vcf or vcf.gz")
 
-    with open(inFile, 'rw') as mert:
-        sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
+    sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
 
+    #bcftools sort, collapse, and compress
     bcftools.norm("-m", "+any", "-O", "z", "-o",
                   sorted_file, inFile, catch_stdout=False)
+    #bcftools index
     bcftools.index(sorted_file, "-t", "-f", catch_stdout=False)
 
     return sorted_file
@@ -165,13 +183,13 @@ def sortAndIndex(inFile, outdir):
 
 def poolImportVCF(file_info):
     """
-    This function is used by multiprocess.Pool to read vcf, populate metadb, and load into tiledb
+    Used by multiprocess.Pool to read vcf, populate metadb, 
+    and (optionally) load into GenomicsDB
     """
     (config_file, inputFile) = file_info
     with VCF(inputFile, config_file) as vc:
         try:
-            # vcf initialization sets up/validates globals (like rs)
-            vc.setCallSets()
+            vc.registerCallSets()
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
             print "Error processing {0}".format(inputFile)
@@ -182,18 +200,20 @@ def poolImportVCF(file_info):
 
 def parallelGen(config_file, inputFileList, outputDir):
     """
-    Function that spawns the Pool of VCF objects to work on each of the input files
+    Spawns the Pool of VCF objects to work on each input VCF
+    Creates callset mapping and vid mapping files for GenomicsDB import
     """
-    # set config
+
     with open(config_file) as conf:
         config = json.load(conf)
 
-    # register reference set, using first vcf
+    # register callset parent objects with first input vcf
     with open(inputFileList[0], 'rb') as vcf_init:
         reader = vcf.Reader(vcf_init)
-        dba, vs, rs = helper.registerWithMetadb(
-            config, references=reader.contigs)
+        dba, vs, rs = helper.registerWithMetadb(config, references=reader.contigs)
 
+    # sort and index vcfs, and
+    # build arguments for parallel gen
     function_args = [None] * len(inputFileList)
     index = 0
     for inFile in inputFileList:
@@ -201,6 +221,7 @@ def parallelGen(config_file, inputFileList, outputDir):
         function_args[index] = (config_file, sorted_file)
         index += 1
 
+    # set for callset mapping recording
     callset_mapping = dict()
     callset_mapping["callsets"] = dict()
     callsets = callset_mapping["callsets"]
@@ -220,5 +241,5 @@ def parallelGen(config_file, inputFileList, outputDir):
             print "\t{0}".format(f)
         raise Exception("Execution failed on {0}".format(failed))
 
-    helper.createMappingFiles(
-        outputDir, callset_mapping, rs.id, config['dburi'])
+    # create GenomicsDB vid mapping and callset mapping files 
+    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config['dburi'])

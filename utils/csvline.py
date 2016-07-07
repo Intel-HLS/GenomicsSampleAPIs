@@ -1,7 +1,8 @@
 """
-Contains the key methods and type checks that are required to generate a csv
-file that tiledb can load.
+Contains the key methods and type checks required 
+to generate a csv file that tiledb can load.
 """
+from ast import literal_eval
 
 EMPTYCHAR = '*'
 NUM_SB = 4
@@ -18,33 +19,12 @@ class CSVLine:
     # Fields in Tile DB CSV
     # It is a 2D array, and each element is an array represents the fields of
     # a version
-    fieldNames = [["SampleId",
-                   "Location",
-                   "End",
-                   "REF",
-                   "ALT",
-                   "QUAL",
-                   "numFilter",
-                   "FilterId",
-                   "BaseQRankSum",
-                   "ClippingRankSum",
-                   "MQRankSum",
-                   "ReadPosRankSum",
-                   "MQ",
-                   "MQ0",
-                   "AF",
-                   "AN",
-                   "AC",
-                   "DP",
-                   "DP_FMT",
-                   "MIN_DP",
-                   "GQ",
-                   "SB",
-                   "AD",
-                   "PL",
-                   "PLOIDY",
-                   "GT",
-                   "PS"]]
+    fieldNames = [["SampleId", "Location", "End", "REF", "ALT",
+                   "QUAL", "numFilter", "FilterId", "BaseQRankSum",
+                   "ClippingRankSum", "MQRankSum", "ReadPosRankSum",
+                   "MQ", "MQ0", "AF", "AN", "AC", "DP", "DP_FMT", "MIN_DP",
+                   "GQ", "SB", "AD", "PL", "PLOIDY", "GT", "PS"]]
+
     arrayFields = ["ALT", "FilterId", "SB", "AD", "PL", "GT", "AF", "AC"]
 
     def __init__(self, version=1):
@@ -318,8 +298,10 @@ class CSVLine:
         self.isValid = False
         self.error = errorString
 
-    def loadCSV(self, inString):
-        values = inString.strip().split(',')
+    def loadCSV(self, values):
+        """
+        Loads a csvline object, from a row in a csv reader.
+        """
         index = 0
         numFilter = 0
         index_history = list()

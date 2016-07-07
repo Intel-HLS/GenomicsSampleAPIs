@@ -171,8 +171,7 @@ class MAF_Spark:
         # Now make key = (ID, location), and value = (attributes)
         kvValuesByLocation = reduxTuple.flatMapValues(
             lambda x: x).map(kvPairsByLocation)
-        # reduce the data by their keys and combine the attributes along the
-        # way
+        # reduce the data by their keys and combine the attributes along the way
         positionalEntries = kvValuesByLocation.reduceByKey(combineData)
         # Now that we have the combined data, check if ALT or REF is a '-' and replace it
         # with correct allele. Also create the CSVLine object.
@@ -208,8 +207,7 @@ def getFields(fields):
     outFields = ['*'] * len(indices)
     for key, index in indices.items():
         if key in ['CallSetName', 'assembly']:
-            # if key in ['VariantName', 'CallSetName', 'assembly']:
-            if index[CONST.MAP][CONST.FLAG] == False:
+            if not index[CONST.MAP][CONST.FLAG]:
                 # Dynamic naming is off so just pick the name that was provided
                 outFields[index[CONST.POSITION]] = index[
                     CONST.MAP][CONST.INDEX]
@@ -282,31 +280,30 @@ def updateIds(keys, callset_mapping, output_file):
                 target_sample_guid=TargetSample.guid,
                 workspace=config.TileDBSchema['workspace'],
                 array_name=config.TileDBSchema['array'],
-                # 'CallSet_'+k[keysList.index('TargetSampleName')]+'_'+k[keysList.index('SourceSampleName')],
                 name=k[keysList.index('CallSetName')],
                 variant_set_ids=[variantSetId]
             )
 
             with dbquery.getSession() as query:
                 row_id = query.callSetIds2TileRowId([CallSet.id],
-                                                    config.TileDBSchema[
-                                                        'workspace'],
-                                                    config.TileDBSchema[
-                                                        'array'],
-                                                    isGUID=False
-                                                    )[0]
-                my_sample_name = "{0}-{1}-{2}-{3}".format(Individual.name,
-                                                          SourceSample.name,
-                                                          TargetSample.name,
-                                                          CallSet.id)
-                callset_mapping[my_sample_name] = {"row_idx": long(row_id),
-                                                   "idx_in_file": long(row_id),
-                                                   "filename": output_file}
+                    config.TileDBSchema['workspace'],
+                    config.TileDBSchema['array'],
+                    isGUID=False)[0]
 
-            rowIdMap[
-                "{0}:{1}:{2}" .format(
-                    SourceSample.name, k[
-                        keysList.index('CallSetName')], 'VariantName')] = row_id
+                my_sample_name = "{0}-{1}-{2}-{3}".format(
+                    Individual.name,
+                    SourceSample.name,
+                    TargetSample.name,
+                    CallSet.id)
+
+                callset_mapping[my_sample_name] = {
+                    "row_idx": long(row_id),
+                    "idx_in_file": long(row_id),
+                    "filename": output_file
+                }
+
+            rowIdMap["{0}:{1}:{2}" .format(SourceSample.name, 
+                    k[keysList.index('CallSetName')], 'VariantName')] = row_id
 
 
 def kvPairsByLocation(keys_tuple):
@@ -527,26 +524,41 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile):
         outputDir, combinedOutputFile, callset_mapping, rs.id, config.DB_URI)
 
 if __name__ == "__main__":
+
     import argparse
+
     parser = argparse.ArgumentParser(
         description="Convert MAF format to Tile DB CSV")
 
-    parser.add_argument("-c", "--config", required=True, type=str,
-                        help="input configuration file for MAF conversion")
+    parser.add_argument(
+        "-c", 
+        "--config", 
+        required=True, 
+        type=str,
+        help="input configuration file for MAF conversion")
+
     parser.add_argument(
         "-o",
         "--output",
         required=True,
         type=str,
-        help="output Tile DB CSV file (without the path) which will be stored in the output directory")
+        help="Tile DB CSV output file basename to be stored in the output directory")
+
     parser.add_argument(
         "-d",
         "--outputdir",
         required=True,
         type=str,
         help="Output directory where the outputs need to be stored")
-    parser.add_argument("-i", "--inputs", nargs='+', type=str, required=True,
-                        help="List of input MAF files to convert")
+
+    parser.add_argument(
+        "-i", 
+        "--inputs", 
+        nargs='+', 
+        type=str, 
+        required=True,
+        help="List of input MAF files to convert")
+
     args = parser.parse_args()
 
     parallelGen(args.config, args.inputs, args.outputdir, args.output)
