@@ -8,7 +8,7 @@ User = {{ client_user_name }}
 Group = {{ group_name }}
 WorkdingDirectory = {{ store_dir }}
 Environment = PATH={{ ga4gh_virtualenv }}/bin LD_LIBRARY_PATH={{ env_ld_library_path }}
-ExecStart = {{ ga4gh_virtualenv }}/bin/uwsgi --ini {{ store_dir }}/web/ga4gh_{{ array_name }}.ini
+ExecStart = {{ ga4gh_virtualenv }}/bin/uwsgi --ini {{ store_dir }}/web/ga4gh_{{ template_array_name }}.ini
 
 [Install]
 WantedBy=multi-user.target

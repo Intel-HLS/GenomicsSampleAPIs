@@ -1,7 +1,7 @@
 [loader]
 num_processes = 1
 executable = {{GenomicsDB_dir}}/bin/vcf2tiledb
-tile_loader_json = {{import_data_path}}/{{array_name}}_tiledb_loader.json
+tile_loader_json = {{store_dir}}/utils/example_configs/tiledb_loader.json
 
 [mpi]
 mpirun = {{mpi_path}}/bin/{{mpi_runner}}
