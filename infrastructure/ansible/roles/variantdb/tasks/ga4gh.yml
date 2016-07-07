@@ -53,7 +53,6 @@
   pip  : 
     requirements             : "{{store_dir}}/requirements.txt"
     virtualenv               : "{{ga4gh_virtualenv}}"
-    virtualenv_site_packages : yes
   become      : yes
   become_user : "{{owner_user_name}}"
 
