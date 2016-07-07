@@ -1,4 +1,5 @@
 ---
 gcc_default_version: 4.9.3
 gcc_devault_exec_version: "{{ gcc_default_version[0:3] }}"
-gcc_prefix: /opt/gcc-{{ gcc_default_version }}
+# ccc_prefix not used for Debian, as version in /usr works
+gcc_prefix: /opt/rh/devtoolset-3/root/

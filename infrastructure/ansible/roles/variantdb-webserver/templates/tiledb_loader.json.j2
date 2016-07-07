@@ -12,7 +12,7 @@
     }
   ],
   "size_per_column_partition": {{ size_per_column_partition }},
-  "delete_and_create_tiledb_array": {{ delete_and_create_tiledb_array }},
+  "delete_and_create_tiledb_array": {{ delete_and_create_tiledb_array | bool | to_json }},
   "num_parallel_vcf_files": 1,
   "discard_vcf_index": true,
   "offload_vcf_output_processing": true,
