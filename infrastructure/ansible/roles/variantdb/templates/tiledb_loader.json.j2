@@ -1,20 +1,22 @@
 {
   "treat_deletions_as_intervals": true,
+  "callset_mapping_file": "{{import_data_path}}/{{callset_mapping_file}}",
   "compress_tiledb_array": true,
   "produce_tiledb_array": true,
   "produce_combined_vcf": false,
   "row_partitions": [
     {
       "begin": 0,
-      "array": "{{ template_array_name }}",
+      "array": "{{ array_name }}",
       "workspace": "{{ workspace_dir }}"
     }
   ],
-  "size_per_column_partition": 3000,
-  "delete_and_create_tiledb_array": false,
+  "size_per_column_partition": {{ size_per_column_partition }},
+  "delete_and_create_tiledb_array": {{ delete_and_create_tiledb_array | bool | to_json }},
   "num_parallel_vcf_files": 1,
   "discard_vcf_index": true,
   "offload_vcf_output_processing": true,
+  "vid_mapping_file": "{{import_data_path}}/{{vid_mapping_file}}",
   "row_based_partitioning": true,
   "segment_size": 1048576,
   "do_ping_pong_buffering": true,
