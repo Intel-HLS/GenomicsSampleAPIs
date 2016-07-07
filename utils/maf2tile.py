@@ -87,13 +87,7 @@ if __name__ == "__main__":
             args.gzipped)
 
     if args.loader:
-        import json
-        with open(args.config) as conf:
-            conf_json = json.load(conf)
-            workspace = conf_json['TileDBSchema']['workspace']
-            array = conf_json['TileDBSchema']['array']
-
         baseFileName = helper.getFileName(args.output)
         callset_mapping_file = "{0}/{1}.callset_mapping".format(args.outputdir, baseFileName)
         vid_mapping_file = "{0}/{1}.vid_mapping".format(args.outputdir, baseFileName)
-        loader.load2Tile(args.loader, callset_mapping_file, vid_mapping_file, workspace, array)
+        loader.load2Tile(args.loader, callset_mapping_file, vid_mapping_file)
