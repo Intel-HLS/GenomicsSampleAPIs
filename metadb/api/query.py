@@ -264,17 +264,14 @@ class Query():
             models.CallSet.id,
             models.CallSet.guid,
             models.CallSet.name) .join(
-            models.CallSetToDBArrayAssociation) .filter(
+            models.CallSet, models.CallSetToDBArrayAssociation.callset_id == models.CallSet.id) .filter(
             models.CallSetToDBArrayAssociation.tile_row_id.in_(tile_row_id)) .filter(
                 models.CallSetToDBArrayAssociation.db_array_id == array_idx) .all()
 
         if len(result) < 1:
             raise ValueError(
                 "Invalid Array Id: {0} and/or tile row id: {1}".format(array_idx, tile_row_id))
-        resultDict = dict()
-        for r in result:
-            resultDict[r[0]] = r[1:]
-        return fillResults(tile_row_id, resultDict)
+        return result
 
     def datasetId2VariantSets(self, datasetId):
         """
