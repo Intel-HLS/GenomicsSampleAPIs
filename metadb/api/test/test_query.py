@@ -197,9 +197,16 @@ class TestQuery:
         with query.DBQuery(self.DBURI).getSession() as session:
             for tile_row_id in range(0, self.numRows):
                 result = session.tileRow2CallSet(idx, tile_row_id)
-                self.typeCheck(result, tuple, long, 3)
-                assert isinstance(result[1], unicode)
+                self.typeCheck(result, list, long, 1)
+                self.typeCheck(result[0], tuple, long, 4)
                 assert isinstance(result[2], unicode)
+                assert isinstance(result[3], unicode)
+            
+            result = session.tileRow2CallSet(idx, xrange(0, self.numRows))
+            self.typeCheck(result, list, long, self.numRows)
+            self.typeCheck(result[0], tuple, long, 4)
+            assert isinstance(result[2], unicode)
+            assert isinstance(result[3], unicode)
 
     def test_tileRow2CallSet_neg(self):
         idx = 1
