@@ -1,17 +1,16 @@
+from itertools import chain
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from itertools import chain
-
 import metadb.models as models
-
 
 class DBQuery():
     """ keeps the engine and the session maker for the database """
 
     def __init__(self, database):
         self.engine = create_engine(database)
-        self.Session = sessionmaker(bind=self.engine)
+        self.Session = sessionmaker(bind = self.engine)
 
         # Pre-fetch field mapping since the table is usually small and can be
         # looked up in memory quickly
@@ -31,8 +30,6 @@ class DBQuery():
 class Query():
     """
     Manages the session for queries
-    This will be the class that
-
     """
 
     def __init__(self, db):
@@ -226,7 +223,7 @@ class Query():
                         positionList[i], array_idx))
         return resultContigList, resultPositionList
 
-    def getArrayRows(self, array_idx=None, variantSets=[], callSets=[]):
+    def getArrayRows(self, array_idx = None, variantSets = [], callSets = []):
         """
         The method returns a dictionary whose key is the array_idx and the value is a list of tile_row_id.
         Each of the parameter is a filter that is applied, and all parameters are optional.
@@ -257,21 +254,27 @@ class Query():
 
     def tileRow2CallSet(self, array_idx, tile_row_id):
         """
-        Given a array id and tile row, returns a tuple of
-        (call set id, call set guid, call set name)
+        Given a array id and tile rows, returns a list of tuples of the form
+        (tile_row_id, call set id, call set guid, call set name)
         """
+        if( isinstance(tile_row_id, list) != True ):
+            tile_row_id = [tile_row_id]
         result = self.session.query(
+            models.CallSetToDBArrayAssociation.tile_row_id,
             models.CallSet.id,
             models.CallSet.guid,
             models.CallSet.name) .join(
             models.CallSetToDBArrayAssociation) .filter(
-            models.CallSetToDBArrayAssociation.tile_row_id == tile_row_id) .filter(
+            models.CallSetToDBArrayAssociation.tile_row_id.in_(tile_row_id)) .filter(
                 models.CallSetToDBArrayAssociation.db_array_id == array_idx) .all()
 
-        if len(result) != 1:
+        if len(result) < 1:
             raise ValueError(
                 "Invalid Array Id: {0} and/or tile row id: {1}".format(array_idx, tile_row_id))
-        return result[0]
+        resultDict = dict()
+        for r in result:
+            resultDict[r[0]] = r[1:]
+        return fillResults(tile_row_id, resultDict)
 
     def datasetId2VariantSets(self, datasetId):
         """
@@ -313,7 +316,7 @@ class Query():
         return result[0]
 
     def callSetIds2TileRowId(
-            self, callSetIds, workspace, arrayName, isGUID=True):
+            self, callSetIds, workspace, arrayName, isGUID = True):
         """
         Given a list of call set ids (guids), workspace, and arrayName
         returns the tile row ids that are valid
@@ -410,7 +413,7 @@ def fillResults(sourceList, mapper):
     return result
 
 
-def toList(results, pickIndex=0):
+def toList(results, pickIndex = 0):
     """
     converts a list of tuples into a list, where pick index is the index in
     the tuple to use to prepare the list
