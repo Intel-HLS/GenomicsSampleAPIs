@@ -23,7 +23,7 @@ def installPaths(ga4ghPath):
     fp.close()
 
 def updateConfigs(basePath, ga4ghPath):
-    configFile = os.path.join(ga4ghPath, "ga4gh.conf")
+    configFile = os.path.join(ga4ghPath, "ga4gh_test.conf")
     print 'configFile'
     print "Updating Config file @ {0} ".format(configFile)
 
