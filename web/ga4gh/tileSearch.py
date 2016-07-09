@@ -134,7 +134,7 @@ def getRow2CallSet(array_idx, variants, nVariants):
         callcount = variants[i].contents.callcount
         CallArray = variants[i].contents.CallArray
         for j in range(0, callcount):
-            tile_rows.append(CallArray[j].contents.id)
+            tile_rows.append(long(CallArray[j].contents.id))
     
     # Fetch info from meta DBQuery
     results = metadb.tileRow2CallSet(array_idx, tile_rows)
@@ -206,7 +206,7 @@ def searchVariants(
         varcount = qresp.contents.varcount
         vArray = qresp.contents.VariantArray
 
-        row2callset = getRow2CallSet(vArray, nVariants)
+        row2callset = getRow2CallSet(array_idx, vArray, varcount)
 
         for i in range(0, varcount):
             callcount = vArray[i].contents.callcount
