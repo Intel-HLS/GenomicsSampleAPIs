@@ -136,8 +136,9 @@ def getRow2CallSet(array_idx, variants, nVariants, metadb):
         for j in range(0, callcount):
             tile_rows.append(long(CallArray[j].contents.id))
     
+    if len(tile_rows) == 0:
+      return dict()
     # Fetch info from meta DBQuery
-    
     results = metadb.tileRow2CallSet(array_idx, tile_rows)
     
     resultDict = dict()
@@ -236,7 +237,7 @@ def searchVariants(
                 string_count = CallArray[j].contents.string_count
                 # tile row assignment right now is assuming that callsetid =
                 # tilerowid
-                (CallSetIdx, callId, cname) = row2calset[CallArray[j].contents.id] 
+                (CallSetIdx, callId, cname) = row2callset[CallArray[j].contents.id] 
 
                 callData = dict()
 
