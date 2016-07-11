@@ -124,7 +124,7 @@ def gtDecode(count, gtarray):
         all_elems[data_name] = elems
     return all_elems
 
-def getRow2CallSet(array_idx, variants, nVariants):
+def getRow2CallSet(array_idx, variants, nVariants, metadb):
     """
     Returns a dictionary that maps the row ids to the tuple (call set Id, call
     set GUID, call set name)
@@ -137,6 +137,7 @@ def getRow2CallSet(array_idx, variants, nVariants):
             tile_rows.append(long(CallArray[j].contents.id))
     
     # Fetch info from meta DBQuery
+    
     results = metadb.tileRow2CallSet(array_idx, tile_rows)
     
     resultDict = dict()
@@ -206,7 +207,7 @@ def searchVariants(
         varcount = qresp.contents.varcount
         vArray = qresp.contents.VariantArray
 
-        row2callset = getRow2CallSet(array_idx, vArray, varcount)
+        row2callset = getRow2CallSet(array_idx, vArray, varcount, metadb)
 
         for i in range(0, varcount):
             callcount = vArray[i].contents.callcount
