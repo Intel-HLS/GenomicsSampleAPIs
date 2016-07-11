@@ -202,7 +202,7 @@ class TestQuery:
                 assert isinstance(result[0][2], unicode)
                 assert isinstance(result[0][3], unicode)
             
-            result = session.tileRow2CallSet(idx, xrange(0, self.numRows))
+            result = session.tileRow2CallSet(idx, range(0, self.numRows))
             self.typeCheck(result, list, tuple, self.numRows)
             self.typeCheck(result[0], tuple, long, 4)
             assert isinstance(result[0][2], unicode)
@@ -299,9 +299,9 @@ class TestQuery:
         idx = 1
         callset_guid = [None] * self.numRows
         with query.DBQuery(self.DBURI).getSession() as session:
+            result = session.tileRow2CallSet(idx, range(0, self.numRows))
             for tile_row_id in range(0, self.numRows):
-                result = session.tileRow2CallSet(idx, tile_row_id)
-                callset_guid[tile_row_id] = result[0][2]
+                callset_guid[tile_row_id] = result[tile_row_id][2]
 
             result = session.datasetId2VariantSets(self.dataset_id)
             vs = result[0]
