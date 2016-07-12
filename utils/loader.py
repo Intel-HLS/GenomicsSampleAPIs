@@ -68,7 +68,7 @@ class Loader:
                     " ".join(processArgs), output, error))
 
 
-def load2Tile(loader_config_file, callset_mapping_file, vid_mapping_file, workspace, array):
+def load2Tile(loader_config_file, callset_mapping_file, vid_mapping_file):
     """
     Sets proper loader json attribtues for vcf2tiledb, 
     and performs the loading process
@@ -79,18 +79,6 @@ def load2Tile(loader_config_file, callset_mapping_file, vid_mapping_file, worksp
         loader_json_obj = json.load(loaderFP)
     loader_json_obj["callset_mapping_file"] = callset_mapping_file
     loader_json_obj["vid_mapping_file"] = vid_mapping_file
-
-    # get row or column paritions to validate array and workspace
-    # assuming one array for now
-    rc_check = "column_partitions"
-    info = loader_json_obj.get("column_partitions", None)
-    if info is None:
-        rc_check = "row_partitions"
-        info = loader_json_obj.get("row_partitions", None)
-
-    info[0]['array'] = array
-    info[0]['workspace'] = workspace
-    loader_json_obj[rc_check] = info
 
     helper.writeJSON2File(loader_json_obj, loader.TILE_LOADER_JSON)
     print "Updated Tile Loader JSON file : {0}".format(loader.TILE_LOADER_JSON)
