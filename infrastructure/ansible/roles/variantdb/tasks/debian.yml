@@ -15,8 +15,9 @@
 
 - name : GIT pull libcsv repo
   git:
-    repo           : git@github.com:robertpostill/libcsv.git
+    repo           : https://github.com/robertpostill/libcsv.git
     dest           : "{{store_dir}}"
+    version        : master
   become         : yes
   become_user    : "{{owner_user_name}}"
 
