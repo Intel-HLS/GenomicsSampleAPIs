@@ -1,4 +1,11 @@
-from web.gatypes import GACall, GACallSet, GAVariant, GAVariantSet, GASVResponse, GACSResponse, GASVSetResponse, GAVariantSetMetadata
+from web.gatypes import GACall
+from web.gatypes import GACallSet
+from web.gatypes import GAVariant
+from web.gatypes import GAVariantSet
+from web.gatypes import GASVResponse
+from web.gatypes import GACSResponse
+from web.gatypes import GASVSetResponse
+from web.gatypes import GAVariantSetMetadata
 from json import loads
 
 
