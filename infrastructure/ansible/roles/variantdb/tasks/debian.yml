@@ -13,15 +13,16 @@
     mode  : "{{permissions}}"
     state : directory
 
-- name: Get package
-  get_url:
-    dest: "{{dependencies_path}}/libcsv.tar.gz"
-    url : http://downloads.sourceforge.net/project/libcsv/libcsv/libcsv-3.0.3/libcsv-3.0.3.tar.gz
+- name : GIT pull libcsv repo
+  git:
+    repo           : git@github.com:robertpostill/libcsv.git
+    dest           : "{{store_dir}}"
+  become         : yes
+  become_user    : "{{owner_user_name}}"
 
 - name: Prepare libcsv package
   shell: >
-    cd {{dependencies_path}} &&
-    tar xzf libcsv.tar.gz  -C {{libcsv_path}} --strip-components=1 &&
     cd {{libcsv_path}} &&
     ./configure &&
     make
+
