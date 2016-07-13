@@ -36,7 +36,8 @@ def variants_search():
             rcode=415)
 
     try:
-        # making empty variantSetId valid - consistent with old, but documented version of the ga4gh api
+        # making empty variantSetId valid - consistent with old
+        # documented version of the ga4gh api
         # variantSetId = request.json['variantSetId']
         variantSetIds = request.json.get('variantSetIds', None)
         referenceName = request.json.get('referenceName')
@@ -45,12 +46,15 @@ def variants_search():
 
     except:
         return makeGAException(
-            message='Required field missing: variantSetIds, referenceName, start, and end are required',
+            message='Required field missing: '
+                    'variantSetIds, referenceName, start, and end are required',
             ecode=- 1,
             rcode=400)
+
     if not (referenceName and startWindow and endWindow):
         return makeGAException(
-            message='Required field missing: variantSetIds, referenceName, start, and end are required',
+            message='Required field missing: '
+                    'variantSetIds, referenceName, start, and end are required',
             ecode=- 1,
             rcode=400)
 
@@ -82,36 +86,6 @@ def variants_search():
 
     return jsonify(garesp.gavresponse_info)
 
-
-@ga4gh.route('/callsets/search', methods=['POST'])
-def callset_search():
-    if not request.json:
-        return makeGAException(
-            message='Bad Content Type, please send application/json',
-            ecode=-1,
-            rcode=415)
-
-    request.json.get('variantSetIds', [])
-    name = request.json.get('name', None)
-    request.json.get('pageSize', None)
-    request.json.get('pageToken', None)
-
-    try:
-        search_lib = tileSearch.connectSearchLib(
-            current_app.config['SEARCHLIB'])
-        garesp = tileSearch.searchCallSets(
-            workspace=current_app.config['WORKSPACE'],
-            arrayName=current_app.config['ARRAYNAME'],
-            name=name,
-            searchLib=search_lib)
-
-    except:
-        return makeGAException(
-            message='search command exited abnormally', ecode=500, rcode=500)
-
-    return jsonify(garesp.gacsresponse_info)
-
-
 @ga4gh.route('/variantsets/search', methods=['POST'])
 def variantset_search():
     if not request.json:
@@ -119,7 +93,6 @@ def variantset_search():
             message='Bad Content Type, please send application/json',
             ecode=-1,
             rcode=415)
-    print request.json
     datasetId = request.json.get('datasetId', "")
     pageSize = request.json.get('pageSize', None)
     pageToken = request.json.get('pageToken', None)

@@ -71,16 +71,17 @@ class GTString(Structure):
 
 
 class GTCall (Structure):
-    _fields_ = [("id", c_ulonglong), ("int_count", c_ulonglong), ("longlong_count", c_ulonglong),
-                ("unsigned_count", c_ulonglong), ("unsigned_longlong_count", c_ulonglong),
-                ("float_count", c_ulonglong), ("double_count",
-                                               c_ulonglong), ("string_count", c_ulonglong),
-                ("int_arr", POINTER(POINTER(GTInt))
-                 ), ("longlong_arr", POINTER(POINTER(GTLongLong))),
-                ("unsigned", POINTER(POINTER(GTUInt))
-                 ), ("unsigned_longlong", POINTER(POINTER(GTULongLong))),
-                ("float_arr", POINTER(POINTER(GTFloat))
-                 ), ("double_arr", POINTER(POINTER(GTDouble))),
+    _fields_ = [("id", c_ulonglong), ("int_count", c_ulonglong),
+                ("longlong_count", c_ulonglong), ("unsigned_count", c_ulonglong),
+                ("unsigned_longlong_count", c_ulonglong),
+                ("float_count", c_ulonglong),
+                ("double_count", c_ulonglong), ("string_count", c_ulonglong),
+                ("int_arr", POINTER(POINTER(GTInt))),
+                ("longlong_arr", POINTER(POINTER(GTLongLong))),
+                ("unsigned", POINTER(POINTER(GTUInt))),
+                ("unsigned_longlong", POINTER(POINTER(GTULongLong))),
+                ("float_arr", POINTER(POINTER(GTFloat))),
+                ("double_arr", POINTER(POINTER(GTDouble))),
                 ("string_arr", POINTER(POINTER(GTString)))]
 
 
@@ -141,7 +142,7 @@ def searchVariants(
             'AF',
             'AN',
             'AC'],
-    pageSize=-1,
+        pageSize=-1,
         pageToken=None):
     gavlist = list()
     attrs = join(attrList, ',')
@@ -193,63 +194,63 @@ def searchVariants(
             endp = vArray[i].contents.end
             chromosome, [startp, endp] = metadb.tile2Contig(
                 array_idx, [startp, endp])
-            # Since the query was to a chromosome, the results will not be outside the
-            # chromosome. So just pick chromosome at index 0 for reference name
+            # Since the query was to a chromosome,
+            # the results will not be outside the chromosome.
+            # So just pick chromosome at index 0 for reference name
             referenceName = chromosome[0]
             gaclist = list()
 
     # if an empty callSetIds list is sent, do not get calls
     # this will need to be fixed for the new library, so ignoring it for now
             for j in range(0, callcount):
-                int_count = CallArray[j].contents.int_count
-                float_count = CallArray[j].contents.float_count
-                double_count = CallArray[j].contents.double_count
-                longlong_count = CallArray[j].contents.longlong_count
-                unsigned_count = CallArray[j].contents.unsigned_count
-                unsigned_longlong_count = CallArray[
-                    j].contents.unsigned_longlong_count
-                string_count = CallArray[j].contents.string_count
+                call_info = CallArray[j].contents
+                int_count = call_info.int_count
+                float_count = call_info.float_count
+                double_count = call_info.double_count
+                longlong_count = call_info.longlong_count
+                unsigned_count = call_info.unsigned_count
+                unsigned_longlong_count = call_info.unsigned_longlong_count
+                string_count = call_info.string_count
                 # tile row assignment right now is assuming that callsetid =
                 # tilerowid
                 CallSetIdx, callId, cname = metadb.tileRow2CallSet(
-                    array_idx, CallArray[j].contents.id)
+                    array_idx, call_info.id)
 
                 callData = dict()
 
                 if(int_count > 0):
-                    int_arr = CallArray[j].contents.int_arr
+                    int_arr = call_info.int_arr
                     int_elems = gtDecode(int_count, int_arr)
                     callData.update(int_elems)
 
                 if(float_count > 0):
-                    float_arr = CallArray[j].contents.float_arr
+                    float_arr = call_info.float_arr
                     float_elems = gtDecode(float_count, float_arr)
                     callData.update(float_elems)
 
                 if(double_count > 0):
-                    double_arr = CallArray[j].contents.double_arr
+                    double_arr = call_info.double_arr
                     double_elems = gtDecode(double_count, double_arr)
                     callData.update(double_elems)
 
                 if(longlong_count > 0):
-                    longlong_arr = CallArray[j].contents.longlong_arr
+                    longlong_arr = call_info.longlong_arr
                     longlong_elems = gtDecode(longlong_count, longlong_arr)
                     callData.update(longlong_elems)
 
                 if(unsigned_count > 0):
-                    unsigned_arr = CallArray[j].contents.unsigned_arr
+                    unsigned_arr = call_info.unsigned_arr
                     unsigned_elems = gtDecode(unsigned_count, unsigned_arr)
                     callData.update(unsigned_elems)
 
                 if(unsigned_longlong_count > 0):
-                    unsigned_longlong_arr = CallArray[
-                        j].contents.unsigned_longlong_arr
+                    unsigned_longlong_arr = call_info.unsigned_longlong_arr
                     unsigned_longlong_elems = gtDecode(
                         unsigned_longlong_count, unsigned_longlong_arr)
                     callData.update(unsigned_longlong_elems)
 
                 if(string_count > 0):
-                    string_arr = CallArray[j].contents.string_arr
+                    string_arr = call_info.string_arr
                     string_elems = gtDecode(string_count, string_arr)
                     callData.update(string_elems)
 
@@ -305,38 +306,3 @@ def searchVariants(
     return (GASVResponse.GASVResponse(
         variants=gavlist, nextPageToken=nextPageToken))
 
-
-def searchCallSets(workspace, arrayName, searchLib, variantSetIds=[
-], name=None, pageSize=None, pageToken=None):
-
-    cslist = list()
-    callSet = GACallSet.GACallSet().gacallset_info
-    nextPageToken = None
-    cslist.append(callSet)
-
-    return (GACSResponse.GACSResponse(
-        callSets=cslist, nextPageToken=nextPageToken))
-
-
-def searchVariantSets(datasetId="", pageSize=None, pageToken=None):
-
-    with dbqWrapper.dbquery.getSession() as metadb:
-
-        nextPageToken = None
-
-        vslist = list()
-        for vs in metadb.datasetId2VariantSets(datasetId):
-
-            referenceSetId = metadb.referenceSetIdx2ReferenceSetGUID(
-                vs.reference_set_id)
-
-            variantSet = GAVariantSet .GAVariantSet(
-                id=vs.guid,
-                name=vs.name,
-                referenceSetId=referenceSetId,
-                datasetId=vs.dataset_id,
-                metadata=vs.variant_set_metadata) .gavariantset_info
-            vslist.append(variantSet)
-
-    return (GASVSetResponse.GASVSetResponse(
-        variantSets=vslist, nextPageToken=nextPageToken))
