@@ -21,8 +21,9 @@ template<class T> struct return_data_t {
  * Templated helper function that creates an object of the return_data_t
  * with the appropriate type, assigns the pointers and returns the object
  */
-template<class T> 
-return_data_t<T> *create_return_data(const std::string &attribute, const int &count, T *value) {
+template<class T>
+return_data_t<T> *create_return_data(const std::string &attribute,
+        const int &count, T *value) {
     return_data_t<T> *p_return_data = new return_data_t<T>();
 
     p_return_data->attribute = const_cast<char *>(attribute.c_str());
@@ -36,7 +37,7 @@ return_data_t<T> *create_return_data(const std::string &attribute, const int &co
  * Data that is stored per cell in TileDB
  * e.g. Think of this structure as the GACall under GA4GH
  */
-struct cell_t { 
+struct cell_t {
     uint64_t id;
     uint64_t int_count;
     uint64_t int64_t_count;
@@ -85,7 +86,7 @@ extern "C" void clear_token(uint64_t token);
 /** 
  * Setup the attributes of interest for the query before calling query_column
  * attributes_list is a comma separated list of attribute names
- */ 
+ */
 extern "C" bool setup_attributes(char *attributes_list, uint64_t token);
 
 /**
@@ -99,22 +100,15 @@ extern "C" void filter_rows(char *data, uint64_t token);
  * takes the workspace and the array name for the tileDB
  * takes a range of positions of interest and returns a result_array_t
  */
-extern "C" result_array_t *query_column(char *workspace, char * array_name, 
-                                        uint64_t start, uint64_t end, 
-                                        uint64_t token, int64_t page_size=-1,
-                                        char *page_token=NULL);
+extern "C" result_array_t *query_column(char *workspace, char * array_name,
+        uint64_t start, uint64_t end, uint64_t token, int64_t page_size = -1,
+        char *page_token = NULL);
 
-/**
- * get the data as a JSON string instead of ctypes pointer structure
- */
-extern "C" char *get_JSON(char *workspace, char *array_name,
-                            uint64_t start, uint64_t end,
-                            uint64_t token, char *json_type);
 /*
  * Use this function to free the memory after the data from query function 
  * has been processed
  */
-extern "C" void cleanup(uint64_t token); 
+extern "C" void cleanup(uint64_t token);
 
 /**
  * Helper Functions to print the data structure
