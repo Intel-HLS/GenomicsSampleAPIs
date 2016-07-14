@@ -1,0 +1,52 @@
+{
+  "TileDBConfig"   : "/home/variantdb/repos/GenomicsSampleAPIs/utils/example_configs/tiledb_config.json",
+  "TileDBAssembly" : "/home/variantdb/repos/GenomicsSampleAPIs/utils/example_configs/hg19.json",
+  "TileDBSchema"   : {
+    "workspace"   : "/home/variantdb/DB",
+    "array"       : "test",
+    "fields_list" : "END,REF,ALT,QUAL,FILTER,BaseQRankSum,ClippingRankSum,MQRankSum,ReadPosRankSum,DP,MQ,MQ0,DP_FORMAT,MIN_DP,GQ,SB,AD,PL,AF,AN,AC,GT,PS",
+    "ftypes_list" : "int64,char:var,char:var,float,int:var,float,float,float,float,int,float,int,int,int,int,int:4,int:var,int:var,float:var,int,int:var,int:var,int,int64"
+  },
+  "DB_URI"           : "postgresql+psycopg2://@:5432/metadb",
+  "HeaderStartsWith" : "icgc_mutation_id",
+  "VariantSetMap" : {
+    "Dynamic"       : true,
+    "VariantSet"    : "project_code",
+    "VariantLookup" : true,
+    "VariantConfig" : "/home/variantdb/repos/GenomicsSampleAPIs/utils/example_configs/icgc_variants.json",
+    "LookupIdx"     : 2
+  },
+  "IndividualId"   : "icgc_donor_id",
+  "SourceSampleId" : "matched_icgc_sample_id",
+  "TargetSampleId" : "icgc_sample_id",
+  "CallSetId"      : {
+    "Dynamic"     : true,
+    "CallSetName" : "variation_calling_algorithm"
+  },
+  "Position"  : {
+    "assembly"  : {
+      "Dynamic"     : true,
+      "assemblyName": "assembly_version"
+    },
+    "chromosome": "chromosome",
+    "Location"  : "chromosome_start",
+    "End"       : "chromosome_end"
+  },
+  "TileDBMapping"   : {
+    "REF"   : "reference_genome_allele",
+    "ALT"   : "mutated_to_allele",
+    "QUAL"  : "quality_score",
+    "AF"    : "probability",
+    "AN"    : "total_read_count",
+    "AC"    : "mutant_allele_read_count",
+    "GT"    : "chromosome_strand"
+  },
+  "Seperators" : {
+    "line"  : "\t"
+  },
+  "GTMapping" : {
+  },
+  "Constants" : {
+    "PLOIDY" : 2
+  }
+}
