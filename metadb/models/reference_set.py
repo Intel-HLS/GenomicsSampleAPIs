@@ -16,14 +16,15 @@ class ReferenceSet(_Base):
     tiledb_reference_offset_padding_factor = sa.Column(
         sa.Float(53),
         default=tiledb_reference_offset_padding_factor_default,
-        server_default=sa.text(
-            '%.2f' %
-            (tiledb_reference_offset_padding_factor_default)),
+        server_default=sa.text('%.2f' %(tiledb_reference_offset_padding_factor_default)),
         nullable=False)
     # Next tiledb column offset that can be used when adding a new reference
     # contig, also equal to max_columns required by TileDB
     next_tiledb_column_offset = sa.Column(
-        sa.BigInteger, default=0, nullable=False, server_default=sa.text('0'))
+        sa.BigInteger, 
+        default=0, 
+        nullable=False, 
+        server_default=sa.text('0'))
     arrays = relationship('DBArray', backref='reference_set')
     references = relationship('Reference', backref='reference_set')
     source_accessions = relationship(

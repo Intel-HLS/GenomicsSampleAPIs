@@ -8,8 +8,7 @@ class Reference(_Base):
     id = sa.Column(BigInteger, primary_key=True)
     guid = sa.Column(sa.String(36), nullable=False, unique=True)
     length = sa.Column(sa.BigInteger, nullable=False)
-    reference_set_id = sa.Column(BigInteger, sa.ForeignKey(
-        'reference_set.id'), nullable=False)
+    reference_set_id = sa.Column(BigInteger, sa.ForeignKey('reference_set.id'), nullable=False)
     md5_checksum = sa.Column(sa.String(32))
     name = sa.Column(sa.Text, nullable=False)
     source_uri = sa.Column(sa.Text)
@@ -21,11 +20,12 @@ class Reference(_Base):
     source_accessions = relationship(
         'SourceAccession',
         secondary='reference_source_accession',
-        backref=backref('reference'))
+        backref=backref('reference')
+    )
     # Unique constraint on (reference_set_id, name)
     __table_args__ = (
         sa.UniqueConstraint('reference_set_id', 'name',
-                            name='unique_name_per_reference_set_constraint'),
+            name='unique_name_per_reference_set_constraint'),
     )
     # Unique index on (reference_set_id, tiledb_column_offset) if
     # tiledb_column_offset non-NULL
