@@ -3,3 +3,4 @@
 dependencies:
   - { role: epel-release }
   - { role: ansible-role-build-essential }
+  - { role: yum_utils, when: ansible_os_family == "RedHat" }

@@ -22,34 +22,8 @@ def installPaths(ga4ghPath):
     fp.write(ga4ghPath + "\n")
     fp.close()
 
-
-def main():
-    # Get the installation path for the APIs repo
-    apar = argparse.ArgumentParser()
-    apar.add_argument("-p", "--port", type=int, default=8008,
-                      help="port for web server")
-    apar.add_argument(
-        "-s",
-        "--socket",
-        type=str,
-        default="unix:/var/uwsgi/ga4gh.sock",
-        help="string with socket information fo uwsgi")
-    args = apar.parse_args()
-    listenPort = args.port
-    socket = args.socket
-
-    basePath = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
-    ga4ghPath = os.path.join(basePath, "web")
-
-    installPaths(ga4ghPath)
-    updateConfigs(basePath, ga4ghPath)
-    getHttpdConf(sockpath=socket, port=listenPort)
-    getuwsgiConf(basePath)
-    print "DONE"
-
-
 def updateConfigs(basePath, ga4ghPath):
-    configFile = os.path.join(ga4ghPath, "ga4gh.conf")
+    configFile = os.path.join(ga4ghPath, "ga4gh_test.conf")
     print 'configFile'
     print "Updating Config file @ {0} ".format(configFile)
 
@@ -102,7 +76,7 @@ def getuwsgiConf(basePath, sockpath="/var/uwsgi/ga4gh.sock"):
     myuser = os.getenv('USER')
 
     # if virtual_env set in environment, else pull from config
-    configFile = os.path.join(basePath, "web/ga4gh.conf")
+    configFile = os.path.join(basePath, "web/ga4gh_test.conf")
     parser = ConfigParser.RawConfigParser()
     parser.read(configFile)
     if parser.has_section('virtualenv'):
@@ -160,4 +134,33 @@ def getuwsgiConf(basePath, sockpath="/var/uwsgi/ga4gh.sock"):
         parser.write(fp)
 
 if __name__ == "__main__":
-    main()
+    # Get the installation path for the APIs repo
+    apar = argparse.ArgumentParser()
+
+    apar.add_argument(
+        "-p",
+        "--port",
+        type=int,
+        default=8008,
+        help="port for web server")
+
+    apar.add_argument(
+        "-s",
+        "--socket",
+        type=str,
+        default="unix:/var/uwsgi/ga4gh.sock",
+        help="string with socket information for uwsgi")
+
+    args = apar.parse_args()
+    listenPort = args.port
+    socket = args.socket
+
+    basePath = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
+    ga4ghPath = os.path.join(basePath, "web")
+
+    installPaths(ga4ghPath)
+    updateConfigs(basePath, ga4ghPath)
+    getHttpdConf(sockpath=socket, port=listenPort)
+    getuwsgiConf(basePath)
+    print "Installation Complete"
+

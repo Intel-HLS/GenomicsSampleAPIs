@@ -11,5 +11,6 @@ dependency_libs:
   - openssl-devel
   - git-all
   - libcsv-devel
+  - mpich-devel
 
 user_libs: []
