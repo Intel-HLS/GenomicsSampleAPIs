@@ -66,7 +66,7 @@ Check sudo permissions and/or your Linux distribution manual to run equivalents 
 
 ERROR LOG:
 {1}'''.format(self.array_name,
-                        e))
+                                  e))
 
     def setup_uwsgi_ini(self):
         input_file = os.path.join(self.webserver_path, 'templates',
@@ -79,7 +79,7 @@ ERROR LOG:
 
     def setup_webserver_conf(self):
         input_file = os.path.join(self.webserver_path, 'templates',
-                                  'ga4gh.conf.template')
+                                  'ga4gh.cfg.template')
         output_file = os.path.join(self.webserver_path,
                                    'ga4gh_{}.conf'.format(self.array_name))
         writeConfig(input_file, output_file, [('<Array_Name>',
@@ -90,35 +90,38 @@ ERROR LOG:
                                    'uwsgi_{}.log'.format(self.array_name))
         with open(output_file, 'a') as outFP:
             pass
-        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP)
+        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR
+                 | stat.S_IRGRP | stat.S_IWGRP)
         print '[INFO] Updated: {}'.format(output_file)
 
     def setup_ga4gh_service(self):
         input_file = os.path.join(self.webserver_path, 'templates',
-                                  'ga4gh.service.template')
-        temporary_file = os.path.join(self.webserver_path, 'templates','ga4gh_{0}.{1}'.format(self.array_name,
-                                   self.service_extension))
+                                  'ga4gh.{}.template'.format(self.service_extension))
+        temporary_file = os.path.join(self.webserver_path, 'templates',
+                'ga4gh_{0}.{1}'.format(self.array_name,
+                self.service_extension))
         output_file = os.path.join(self.service_directory,
                                    'ga4gh_{0}.{1}'.format(self.array_name,
                                    self.service_extension))
         writeConfig(input_file, temporary_file, [('<Array_Name>',
                     self.array_name)])
-        
+
         run_command(['sudo', 'mv', temporary_file, output_file])
 
     def setup_nginx_conf(self):
         input_file = os.path.join(self.webserver_path, 'templates',
                                   'nginx_ga4gh.conf.template')
-        temporary_file = os.path.join(self.webserver_path, 'templates','nginx_ga4gh_{}.conf'.format(self.array_name))
+        temporary_file = os.path.join(self.webserver_path, 'templates',
+                'nginx_ga4gh_{}.conf'.format(self.array_name))
         output_file = os.path.join(self.nginx_conf_directory,
                                    'nginx_ga4gh_{}.conf'.format(self.array_name))
-        writeConfig(input_file, temporary_file, [('<uwsgi_socket_path>',
-                    self.uwsgi_socket_path), ('<PORT>', self.port)])
+        writeConfig(input_file, temporary_file, [('<uwsgi_socket_path>'
+                    , self.uwsgi_socket_path), ('<PORT>', self.port)])
         run_command(['sudo', 'mv', temporary_file, output_file])
 
 
 def run_command(processArgs):
-    print "[INFO] Executing: {}".format(processArgs)
+    print '[INFO] Executing: {}'.format(processArgs)
     pipe = subprocess.Popen(processArgs, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     (output, error) = pipe.communicate()

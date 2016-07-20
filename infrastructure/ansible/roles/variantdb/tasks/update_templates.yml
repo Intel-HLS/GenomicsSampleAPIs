@@ -22,7 +22,7 @@
 - name     : Setup ga4gh conf template
   template :
     src   : ga4gh.conf.j2 
-    dest  : "{{store_dir}}/web/templates/ga4gh.conf.template"
+    dest  : "{{store_dir}}/web/templates/ga4gh.cfg.template"
     group : "{{group_name}}"
     owner : "{{owner_user_name}}"
     mode  : "{{permissions}}"
