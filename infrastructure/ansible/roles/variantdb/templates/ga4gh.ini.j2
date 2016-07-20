@@ -13,6 +13,6 @@ wsgi_file =  {{ store_dir }}/web/wsgi.py
 module = wsgi
 callable = application
 chmod-socket = 666
-logger = file:/tmp/uwsgi_{{ template_array_name }}.log
+logger = file:/var/log/uwsgi/uwsgi_{{ template_array_name }}.log
 no-default-app = true
 need-app = true
