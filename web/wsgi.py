@@ -22,4 +22,4 @@ if os.getenv('VIRUTAL_ENV') is None:
 
 application = create_app('config.LoadedConfig')
 
-application.register_blueprint(ga4gh)
+application.register_blueprint(views.ga4gh)
