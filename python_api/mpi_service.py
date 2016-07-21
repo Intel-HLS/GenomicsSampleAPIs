@@ -1,18 +1,22 @@
-import python_api.util as util
-
 import json
-import random
 import os
+import random
 import subprocess
 
+import python_api.util as util
 
 class Aggregator():
     """
-    Aggregator has methods that is overloaded from the API class to send the request
-    to multiple end-points using MPI and fetch tile db data
+    Aggregator has methods that the request to multiple end-points using MPI and
+    fetch tile db data
     """
 
     def __init__(self, config):
+        """
+        Initializes the configration to use for MPI run, and some static
+        configuration that will be used for lookups 
+        @param config: Object of the python_api.config.MPIConfig class
+        """
         self.mpiConfig = config.MPIConfig()
         with open(self.mpiConfig.ID_MAPPING, 'r') as fp:
             self.initSamplesInfo(json.load(fp))
@@ -53,6 +57,14 @@ class Aggregator():
         return self.numSamples
 
     def getSampleNames(self, sampleIds):
+        """
+        API gets the sample name corresponding to the sample IDs 
+        
+        @param sampleIds: list of ids whose sample names are requested 
+        
+        @return: list of sample names in the same order as the input list. If
+        the sample Id is invalid a None is returned in its place
+        """
         result = [None] * len(sampleIds)
         index = 0
         for sampleId in sampleIds:
@@ -62,6 +74,15 @@ class Aggregator():
         return result
 
     def getValidPositions(self, chromosome, start, end):
+        """
+        API to get the ranges where valid data is available in Tile DB
+        
+        @param chromosome: string representing the contig
+        @param start: start position for the search
+        @param end: end position for the search
+        
+        @return: JSON formatted dictionary with keys = ['indices', 'POSITION', 'END']
+        """
         attribute = "REF"
         result = self.getPositionRange(chromosome, start, end, [attribute])
         data = json.loads(result)
@@ -73,6 +94,21 @@ class Aggregator():
         return json.dumps(data)
 
     def getPosition(self, chromosome, position, attribute_list):
+        """
+        Given a contig, position(s) and attributes returns the data from Tile DB
+        
+        @param chromosome: string representing the contig
+        @param position: can be a single position or a list of positions in the
+        chromosome to query 
+        @param attribute_list: list of attributes to query for
+        
+        @return: JSON formatted string. When position is not a list, then
+        dictionary with keys = ['indices', 'POSITION', 'END', 'attribute0',
+        ...]. When position is a list, then dictionary with the following format
+        { contig : { POSITION : {'indices' : [results], 'POSITION': [results],
+        'END':[results], 'attribute0': [...], 'attribute1': [...], ...},
+        next_POSITION : {...}}, next_contig: {...} }
+        """
         if isinstance(chromosome, list):
             if len(chromosome) == len(position):
                 return self.getMultiPosition(
@@ -87,6 +123,22 @@ class Aggregator():
 
     def getMultiPosition(self, chromosome, position, end,
                          attribute_list, output_format):
+        """
+        Method that is used by all variants of the get..Position.. to fetch data
+        from the underlying C++ implementation over MPI
+        
+        @param chromosome: string representing the contig 
+        @param position: list of start positions in the chromosome for the query
+        @param end: list of end positions in the chromosome for the query
+        @param attribute_list: list of attributes to query for
+        
+        @return: JSON formatted string. When output_format is "Cotton-JSON",
+        then dictionary with keys = ['indices', 'POSITION', 'END', 'attribute0',
+        ...]. When output_format is "Postions-JSON", then dictionary with the
+        following format { contig : { POSITION : {'indices' : [results],
+        'POSITION': [results], 'END':[results], 'attribute0': [...],
+        'attribute1': [...], ...}, next_POSITION : {...}}, next_contig: {...} }
+        """
         if 'END' in attribute_list:
             attribute_list.remove('END')
         if 'POSITION' in attribute_list:
@@ -110,6 +162,22 @@ class Aggregator():
         return result
 
     def getPositionRange(self, chromosome, position, end, attribute_list):
+        """
+        Similar to the getPosition API except that a range between start and end
+        is queried
+
+        @param chromosome: string representing the contig 
+        @param position: list of start positions in the chromosome for the query
+        @param end: list of end positions in the chromosome for the query
+        @param attribute_list: list of attributes to query for
+
+        @return: JSON formatted string. When position is not a list, then
+        dictionary with keys = ['indices', 'POSITION', 'END', 'attribute0',
+        ...]. When position is a list, then dictionary with the following format
+        { contig : { POSITION : {'indices' : [results], 'POSITION': [results],
+        'END':[results], 'attribute0': [...], 'attribute1': [...], ...},
+        next_POSITION : {...}}, next_contig: {...} }
+        """
         if isinstance(chromosome, list):
             if len(chromosome) == len(position) and len(
                     chromosome) == len(end):
@@ -124,6 +192,15 @@ class Aggregator():
                                          end], attribute_list, "Cotton-JSON")
 
     def runMPI(self, jsonFile, output_format):
+        """
+        Runs the executable using MPI run with the parameters from the
+        configuration
+        
+        @param jsonFile: string representing the path to the JSON input that is
+        generated from the createJSON function
+        @param output_format: string representing the format that is expected
+        from the executable
+        """
         if util.DEBUG:
             util.log("[Run MPI] Starting mpirun subprocess")
         processArgs = [self.mpiConfig.MPIRUN,
@@ -160,6 +237,13 @@ class Aggregator():
         """
         Creates the JSON file which is the input to the MPI process
         and returns the file name
+        
+        @param chromosome: string representing the contig 
+        @param position: list of start positions in the chromosome for the query
+        @param end: list of end positions in the chromosome for the query
+        @param attribute_list: list of attributes to query for
+        
+        @return: string which is the full path to the JSON file that was created
         """
         jsonObj = dict()
 
