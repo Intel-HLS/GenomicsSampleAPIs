@@ -1,5 +1,6 @@
 import ConfigParser
-import util
+
+import python_api.util as util
 
 
 class MPIConfig():
@@ -18,6 +19,9 @@ class MPIConfig():
 
 
 def initMPIConfig(parser):
+    """
+    Initializes the MPIConfi static class from the config file 
+    """
     if not parser.has_section("mpi"):
         return
     MPIConfig.MPIRUN = parser.get('mpi', 'MPIRUN')

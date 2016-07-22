@@ -76,7 +76,7 @@ def getuwsgiConf(basePath, sockpath="/var/uwsgi/ga4gh.sock"):
     myuser = os.getenv('USER')
 
     # if virtual_env set in environment, else pull from config
-    configFile = os.path.join(basePath, "web/ga4gh.conf")
+    configFile = os.path.join(basePath, "web/ga4gh_test.conf")
     parser = ConfigParser.RawConfigParser()
     parser.read(configFile)
     if parser.has_section('virtualenv'):
