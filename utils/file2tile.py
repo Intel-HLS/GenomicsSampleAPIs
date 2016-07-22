@@ -164,11 +164,20 @@ class File2Tile(object):
         if(self.header is None):
             self.getHeader()
 
-        self.values = self.inFile.readline().strip().split(
+        nextLine = self.inFile.readline()
+        cleanLine = nextLine.strip().split(
             self.SeperatorMap["line"])
-        # If we reach the end of file then return False
-        if(len(self.values) == 1):
-            return False
+
+        while((len(nextLine) < 2) or (len(cleanLine) == 0)):
+            # If we reach the end of file then return False
+            if(len(nextLine) == 0):
+                return False
+
+            nextLine = self.inFile.readline()
+            cleanLine = nextLine.strip().split(
+                self.SeperatorMap["line"])
+        
+        self.values = cleanLine
 
         self.SourceSampleId = self.getValue(self.SourceSampleIdMap)
         self.TargetSampleId = self.getValue(self.TargetSampleIdMap)
