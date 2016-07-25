@@ -2,8 +2,6 @@ from ..models import _Base, TextPickleType, BigInteger, autoinc_handler
 import sqlalchemy as sa
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
-from sqlalchemy.schema import CreateSequence
-from sqlalchemy.schema import Sequence
 import json
 
 
@@ -12,8 +10,7 @@ class Sample(_Base):
     sample_id_seq = sa.Sequence('sample_id_seq', minvalue=0, start=0)
     id = sa.Column(BigInteger, sample_id_seq, primary_key=True)
     guid = sa.Column(sa.String(36), nullable=False, unique=True)
-    individual_id = sa.Column(BigInteger, sa.ForeignKey(
-        'individual.id'), nullable=False)
+    individual_id = sa.Column(BigInteger, sa.ForeignKey('individual.id'), nullable=False)
     name = sa.Column(sa.Text, nullable=False)
     info = sa.Column(TextPickleType(pickler=json))
 

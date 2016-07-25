@@ -31,6 +31,7 @@ default_is_clean_compile : true
 default_store_branch     : HEAD
 default_library_build    : release
 
+default_uwsgi_socket_path          : /var/uwsgi
 template_system_services_extension : service
 # Template overrides
 template_array_name     : "<Array_Name>"
