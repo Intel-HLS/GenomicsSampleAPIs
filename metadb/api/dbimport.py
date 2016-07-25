@@ -48,27 +48,23 @@ class Import():
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
 
-    def registerReferenceSet(
-            self,
-            guid,
-            assembly_id,
-            source_accessions=None,
-            description=None,
-            references=None):
+    def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=None):
         """
-        ReferenceSet registration occurs from a assembly config file. See hg19.json for example.
+        ReferenceSet registration for MAF occurs from an assembly config file. See hg19.json for example.
+        ReferenceSet registration for VCF occurs from reading VCF contig tags in header. 
         Requires assembly ids and guids to be unique.
         """
 
-        thisReferenceSet = self.session.query(ReferenceSet).filter(
-            or_(ReferenceSet.assembly_id == assembly_id, ReferenceSet.guid == guid)).first()
+        referenceSet = self.session.query(ReferenceSet).filter(
+            or_(ReferenceSet.assembly_id == assembly_id, ReferenceSet.guid == guid))\
+            .first()
 
-        if thisReferenceSet is None:
+        if referenceSet is None:
 
             try:
-                thisReferenceSet = ReferenceSet(
+                referenceSet = ReferenceSet(
                     guid=guid, assembly_id=assembly_id, description=description)
-                self.session.add(thisReferenceSet)
+                self.session.add(referenceSet)
                 self.session.commit()
 
             except exc.DataError as e:
@@ -81,9 +77,9 @@ class Import():
                 refs = sortReferences(references)
                 for ref in refs:
                     self.registerReference(
-                        str(uuid.uuid4()), thisReferenceSet.id, ref, refs[ref].length)
+                        str(uuid.uuid4()), referenceSet.id, ref, refs[ref].length)
 
-        return thisReferenceSet
+        return referenceSet
 
     def registerReference(self, guid, reference_set_id, name, length):
         """
@@ -95,26 +91,26 @@ class Import():
         if name == 'MT':
             name = 'M'
 
-        thisReference = self.session.query(Reference).filter(
-            and_(
-                Reference.reference_set_id == reference_set_id,
-                Reference.name == name)).first()
+        reference = self.session.query(Reference).filter(
+            and_(Reference.reference_set_id == reference_set_id,Reference.name == name))\
+            .first()
 
-        if thisReference is None:
+        if reference is None:
             try:
-                thisReference = Reference(
-                    name=name,
-                    reference_set_id=reference_set_id,
-                    length=length,
-                    guid=guid)
-                self.session.add(thisReference)
+                reference = Reference(
+                    name=name, 
+                    reference_set_id=reference_set_id, 
+                    length=length, 
+                    guid=guid
+                )
+                self.session.add(reference)
                 self.session.commit()
 
             except exc.DataError as e:
                 self.session.rollback()
                 raise ValueError("{0} : {1} ".format(str(e), guid))
 
-        return thisReference
+        return reference
 
     def registerWorkspace(self, guid, name):
         """
@@ -127,20 +123,24 @@ class Import():
         # since users could have / or not for the workspace.
         name = name.rstrip('/')
 
-        thisWorkspace = self.session.query(Workspace).filter(
-            and_(Workspace.name == name)).first()
+        workspace = self.session.query(Workspace).filter(
+            and_(Workspace.name == name))\
+            .first()
 
-        if thisWorkspace is None:
+        if workspace is None:
             try:
-                thisWorkspace = Workspace(guid=guid, name=name)
-                self.session.add(thisWorkspace)
+                workspace = Workspace(
+                    guid=guid, 
+                    name=name
+                )
+                self.session.add(workspace)
                 self.session.commit()
 
             except exc.DataError as e:
                 self.session.rollback()
                 raise ValueError("{0} : {1} ".format(str(e), guid))
 
-        return thisWorkspace
+        return workspace
 
     def registerDBArray(self, guid, reference_set_id, workspace_id, name):
         """
@@ -150,61 +150,62 @@ class Import():
 
         # array is a unique set of workspace, array, and reference set
         # association
-        thisDBArray = self.session.query(DBArray) .filter(
-            and_(
-                DBArray.reference_set_id == reference_set_id,
-                DBArray.workspace_id == workspace_id,
-                DBArray.name == name)) .first()
+        dbarray = self.session.query(DBArray) .filter(
+            and_(DBArray.reference_set_id == reference_set_id,\
+                DBArray.workspace_id == workspace_id,\
+                DBArray.name == name))\
+            .first()
 
-        if thisDBArray is None:
+        if dbarray is None:
             try:
-                thisDBArray = DBArray(
-                    guid=guid,
-                    reference_set_id=reference_set_id,
-                    workspace_id=workspace_id,
-                    name=name)
-                self.session.add(thisDBArray)
+                dbarray = DBArray(
+                    guid=guid, 
+                    reference_set_id=reference_set_id, 
+                    workspace_id=workspace_id, 
+                    name=name
+                )
+                self.session.add(dbarray)
                 self.session.commit()
 
             except exc.DataError as e:
-
                 self.session.rollback()
                 raise ValueError("{0} : {1} ".format(str(e), guid))
 
-        return thisDBArray
+        return dbarray
 
-    def registerVariantSet(self, guid, reference_set_id,
-                           dataset_id=None, metadata=None):
+    def registerVariantSet(self, guid, reference_set_id, dataset_id=None, metadata=None):
         """
         Register variant set.
         """
 
-        thisReferenceSet = self.session.query(ReferenceSet) .filter(
-            ReferenceSet.id == reference_set_id).first()
+        referenceSet = self.session.query(ReferenceSet).filter(
+            ReferenceSet.id == reference_set_id)\
+            .first()
 
-        if thisReferenceSet is None:
+        if referenceSet is None:
             raise ValueError(
                 "ReferenceSet must be registered before registering this VariantSet : {0} ".format(reference_set_id))
 
-        thisVariantSet = self.session.query(
-            VariantSet).filter(VariantSet.guid == guid).first()
+        variantSet = self.session.query(
+            VariantSet).filter(VariantSet.guid == guid)\
+            .first()
 
-        if thisVariantSet is None:
+        if variantSet is None:
             try:
-                thisVariantSet = VariantSet(
+                variantSet = VariantSet(
                     guid=guid,
                     reference_set_id=reference_set_id,
                     dataset_id=dataset_id,
                     variant_set_metadata=metadata
                 )
-                self.session.add(thisVariantSet)
+                self.session.add(variantSet)
                 self.session.commit()
 
             except exc.DataError as e:
                 self.session.rollback()
                 raise ValueError("{0} : {1} ".format(str(e), guid))
 
-        return thisVariantSet
+        return variantSet
 
     def updateVariantSetList(self, variant_set_ids, callset=None):
         """
@@ -213,18 +214,19 @@ class Import():
         ie. set(callset.variant_sets)
         """
 
-        thisVariantSets = self.session.query(VariantSet).filter(
-            VariantSet.id.in_(variant_set_ids)).all()
+        variantSets = self.session.query(VariantSet).filter(
+            VariantSet.id.in_(variant_set_ids))\
+            .all()
 
-        if len(thisVariantSets) != len(variant_set_ids):
+        if len(variantSets) != len(variant_set_ids):
             raise ValueError(
                 "VariantSet must be registered before being added to CallSet VariantSet list.")
 
         if callset is None:
-            return thisVariantSets
+            return variantSets
 
         callset.variant_sets.extend(
-            x for x in thisVariantSets if x not in callset.variant_sets)
+            x for x in variantSets if x not in callset.variant_sets)
 
         return callset
 
@@ -235,28 +237,22 @@ class Import():
         """
 
         # check if callset is registered to array already
-        thisCallSetToDBArrayAssociation = self.session.query(CallSetToDBArrayAssociation) .filter(
-            and_(
-                CallSetToDBArrayAssociation.db_array_id == db_array_id,
-                CallSetToDBArrayAssociation.callset_id == callset_id)) .first()
+        callSetToDBArrayAssociation = self.session.query(CallSetToDBArrayAssociation) .filter(
+            and_(CallSetToDBArrayAssociation.db_array_id == db_array_id,
+                CallSetToDBArrayAssociation.callset_id == callset_id))\
+            .first()
 
-        if thisCallSetToDBArrayAssociation is None:
+        if callSetToDBArrayAssociation is None:
 
-            thisCallSetToDBArrayAssociation = CallSetToDBArrayAssociation(
-                db_array_id=db_array_id, callset_id=callset_id)
-            self.session.add(thisCallSetToDBArrayAssociation)
+            callSetToDBArrayAssociation = CallSetToDBArrayAssociation(
+                db_array_id=db_array_id, 
+                callset_id=callset_id
+            )
+            self.session.add(callSetToDBArrayAssociation)
             self.session.commit()
 
-    def registerCallSet(
-            self,
-            guid,
-            source_sample_guid,
-            target_sample_guid,
-            workspace,
-            array_name,
-            variant_set_ids=None,
-            info=None,
-            name=None):
+    def registerCallSet(self, guid, source_sample_guid, target_sample_guid, workspace,
+            array_name, variant_set_ids=None, info=None, name=None):
         """
         Register a callset.
         Associate a new or already existing callset to a variant set.
@@ -270,53 +266,55 @@ class Import():
         workspace = workspace.rstrip('/')
 
         # get samples
-        thisSourceSample = self.session.query(Sample.id).filter(
-            Sample.guid == source_sample_guid).first()
-        thisTargetSample = self.session.query(Sample.id).filter(
-            Sample.guid == target_sample_guid).first()
+        sourceSample = self.session.query(Sample.id).filter(
+            Sample.guid == source_sample_guid)\
+            .first()
+        targetSample = self.session.query(Sample.id).filter(
+            Sample.guid == target_sample_guid)\
+            .first()
 
-        if thisSourceSample is None or thisTargetSample is None:
+        if sourceSample is None or targetSample is None:
             raise ValueError(
                 "Issue retrieving Sample info, check: source sample {0}, or target sample {1}".format(
                     source_sample_guid, target_sample_guid))
 
         # get array
-        thisDBArray = self.session.query(DBArray)\
+        dbarray = self.session.query(DBArray)\
             .join(Workspace)\
             .filter(Workspace.name == workspace)\
             .filter(DBArray.name == array_name)\
             .first()
 
-        if thisDBArray is None:
+        if dbarray is None:
             raise ValueError(
                 "DBArray needs to exist for CallSet Registration : {0} ".format(array_name))
 
-        thisCallSet = self.session.query(CallSet) .filter(
-            or_(
-                CallSet.guid == guid,
-                and_(
-                    CallSet.name == name,
-                    CallSet.source_sample_id == thisSourceSample[0],
-                    CallSet.target_sample_id == thisTargetSample[0]))).first()
+        callSet = self.session.query(CallSet).filter(
+            or_(CallSet.guid == guid,
+            and_(CallSet.name == name,
+                CallSet.source_sample_id == sourceSample[0],
+                CallSet.target_sample_id == targetSample[0])))\
+            .first()
 
-        if thisCallSet is None:
+        if callSet is None:
             if variant_set_ids is None:
                 raise ValueError(
                     "Registration of a CallSet requires association to an existing VariantSet.")
 
             try:
-                thisCallSet = CallSet(guid=guid,
-                                      name=name,
-                                      created=int(time.time() * 1000),
-                                      updated=int(time.time() * 1000),
-                                      info=info,
-                                      source_sample_id=thisSourceSample[0],
-                                      target_sample_id=thisTargetSample[0],
-                                      variant_sets=self.updateVariantSetList(
-                                          variant_set_ids)
-                                      )
+                callSet = CallSet(
+                    guid=guid,
+                    name=name,
+                    created=int(time.time() * 1000),
+                    updated=int(time.time() * 1000),
+                    info=info,
+                    source_sample_id=sourceSample[0],
+                    target_sample_id=targetSample[0],
+                    variant_sets=self.updateVariantSetList(
+                        variant_set_ids)
+                    )
 
-                self.session.add(thisCallSet)
+                self.session.add(callSet)
                 self.session.commit()
 
             except exc.DataError as e:
@@ -327,18 +325,20 @@ class Import():
             # avoid calling and registering again if this is a repeat variant
             # set id
             vs = set(variant_set_ids).difference(
-                [x.id for x in thisCallSet.variant_sets])
+                [x.id for x in callSet.variant_sets])
             if len(vs) > 0:
-                self.updateVariantSetList(vs, callset=thisCallSet)
-                self.session.add(thisCallSet)
+                self.updateVariantSetList(vs, callset=callSet)
+                self.session.add(callSet)
                 self.session.commit()
 
         # adding this callset to the dbarray, performs check if already
         # registered to array
         self.addCallSetToDBArrayAssociation(
-            db_array_id=thisDBArray.id, callset_id=thisCallSet.id)
+            db_array_id=dbarray.id, 
+            callset_id=callSet.id
+        )
 
-        return thisCallSet
+        return callSet
 
     def registerSample(self, guid, individual_guid, name=None, info=None):
         """
@@ -347,24 +347,28 @@ class Import():
         ie. an individual cannot have two samples with the same name
         """
 
-        thisIndividual = self.session.query(Individual).filter(
-            Individual.guid == individual_guid).first()
+        individual = self.session.query(Individual).filter(
+            Individual.guid == individual_guid)\
+            .first()
 
-        if thisIndividual is None:
+        if individual is None:
             raise ValueError(
                 "Invalid Individual Id : {0} ".format(individual_guid))
 
-        thisSample = self.session.query(Sample).filter(or_(Sample.guid == guid, and_(
-            Sample.name == name, Sample.individual_id == thisIndividual.id))).first()
+        sample = self.session.query(Sample).filter(
+            or_(Sample.guid == guid, 
+            and_(Sample.name == name, Sample.individual_id == individual.id)))\
+            .first()
 
-        if thisSample is None:
+        if sample is None:
             try:
-                thisSample = Sample(
+                sample = Sample(
                     guid=guid,
-                    individual_id=thisIndividual.id,
+                    individual_id=individual.id,
                     name=name,
-                    info=info)
-                self.session.add(thisSample)
+                    info=info
+                )
+                self.session.add(sample)
                 self.session.commit()
 
             except exc.DataError as e:
@@ -372,15 +376,16 @@ class Import():
                 self.session.rollback()
                 raise ValueError("{0} : {1} ".format(str(e), guid))
 
-        return thisSample
+        return sample
 
     def registerIndividual(self, guid, name, info=None):
         """
         Registration of an individual requires a guid and a name.
         Name can be None to support retrival from registerSample
         """
-        individual = self.session.query(Individual) .filter(
-            or_(Individual.guid == guid, Individual.name == name)).first()
+        individual = self.session.query(Individual).filter(
+            or_(Individual.guid == guid, Individual.name == name))\
+            .first()
 
         if individual is None:
 
@@ -390,7 +395,8 @@ class Import():
                     guid=guid,
                     info=info,
                     record_update_time=strftime("%Y-%m-%d %H:%M:%S%S.%S%S%S"),
-                    record_create_time=strftime("%Y-%m-%d %H:%M:%S%S.%S%S%S"))
+                    record_create_time=strftime("%Y-%m-%d %H:%M:%S%S.%S%S%S")
+                )
                 self.session.add(individual)
                 self.session.commit()
 
@@ -417,7 +423,8 @@ def sortReferences(references):
             sorted(
                 vcflike_refs.items(),
                 key=lambda key_value: int(
-                    key_value[0]) if key_value[0].isdigit() else key_value[0]))
+                    key_value[0]) if key_value[0].isdigit() else key_value[0])
+            )
 
     if 'MT' in references:
         references['M'] = references.pop('MT')

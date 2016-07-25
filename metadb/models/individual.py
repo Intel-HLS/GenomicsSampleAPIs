@@ -28,4 +28,5 @@ autoinc_handler(
     insert_dict={
         'id': -1,
         'name': None,
-        'guid': None})
+        'guid': None
+    })
