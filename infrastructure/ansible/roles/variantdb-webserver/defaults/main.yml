@@ -2,7 +2,6 @@
 default_array_name : test
 
 # Webserver defaults
-default_uwsgi_socket_path         : /var/uwsgi
 default_system_services_path      : /etc/systemd/system
 default_system_services_extension : service
 default_webserver_port            : 8990

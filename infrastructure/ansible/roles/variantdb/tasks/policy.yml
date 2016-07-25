@@ -36,6 +36,29 @@
   user       : name={{item}} group={{group_name}}
   with_items : "{{users_list}}"
 
+# Add owner_user to the sudoers so that the webserver service files can be created
+- name: Ensure /etc/sudoers.d directory is present
+  file: 
+    path: /etc/sudoers.d 
+    state: directory
+
+- name: Ensure /etc/sudoers.d is scanned by sudo
+  lineinfile: 
+    dest: /etc/sudoers 
+    regexp: '#includedir\s+/etc/sudoers.d' 
+    line: '#includedir /etc/sudoers.d'
+
+- name: Add ga4gh_owner user to the sudoers
+  lineinfile: 
+    dest: /etc/sudoers.d/{{group_name}} 
+    create: yes
+    state: present 
+    owner: root
+    group: root
+    mode: 0440
+    regexp: "{{owner_user_name}} .*" 
+    line: "{{owner_user_name}} ALL=(ALL) NOPASSWD: ALL"
+
 # Create directories and set permissions
 - name     : Set fact variantdb_dir
   set_fact : variantdb_dir={{default_variantdb_dir}}
@@ -51,4 +74,23 @@
     group : "{{group_name}}"
     owner : "{{owner_user_name}}"
     mode  : "{{permissions}}"
+    state : directory
+
+# Setup UWSGI realted paths with right permissions
+- name: Verify that the uwsgi log dir is present with right permissions
+  file:
+    path  : /var/log/uwsgi
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "u=rwx,g=rwx,o=r"
+    state : directory
+
+- name     : Set variable uwsgi_socket_path
+  set_fact : uwsgi_socket_path={{default_uwsgi_socket_path}}
+  when     : uwsgi_socket_path is not defined
+
+- name: Verify that the uwsgi_socket_path is present with right permissions
+  file: 
+    path  : "{{uwsgi_socket_path}}"
+    mode  : "u=rwx,g=rwx,o=rwx"
     state : directory

@@ -5,14 +5,6 @@
   when     : array_name is not defined
 
 # Update web server variables
-- name     : Set variable uwsgi_socket_path
-  set_fact : uwsgi_socket_path={{default_uwsgi_socket_path}}
-  when     : uwsgi_socket_path is not defined
-
-- name     : Set variable uwsgi_socket
-  set_fact : uwsgi_socket={{uwsgi_socket_path}}/ga4gh_{{array_name}}.sock
-  when     : uwsgi_socket is not defined
-
 - name     : Set variable system_services_path
   set_fact : system_services_path={{default_system_services_path}}
   when     : system_services_path is not defined
