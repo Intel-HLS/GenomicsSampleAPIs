@@ -86,6 +86,34 @@ def variants_search():
 
     return jsonify(garesp.gavresponse_info)
 
+@ga4gh.route('/callsets/search', methods=['POST'])
+def callset_search():
+    if not request.json:
+        return makeGAException(
+            message='Bad Content Type, please send application/json',
+            ecode=-1,
+            rcode=415)
+
+    vs_ids = request.json.get('variantSetIds', [])
+    name = request.json.get('name', None)
+    request.json.get('pageSize', None)
+    request.json.get('pageToken', None)
+
+    try:
+        search_lib = tileSearch.connectSearchLib(
+            current_app.config['SEARCHLIB'])
+        garesp = tileSearch.searchCallSets(
+            workspace=current_app.config['WORKSPACE'],
+            arrayName=current_app.config['ARRAYNAME'],
+            name=name,
+            searchLib=search_lib)
+
+    except:
+        return makeGAException(
+            message='search command exited abnormally', ecode=500, rcode=500)
+
+    return jsonify(garesp.gacsresponse_info)
+
 @ga4gh.route('/variantsets/search', methods=['POST'])
 def variantset_search():
     if not request.json:

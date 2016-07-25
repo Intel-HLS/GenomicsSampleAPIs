@@ -331,3 +331,38 @@ def searchVariants(
     searchLib.cleanup(token)
     return (GASVResponse.GASVResponse(
         variants = gavlist, nextPageToken = nextPageToken))
+
+def searchCallSets(workspace, arrayName, searchLib, variantSetIds=[],
+                   name=None, pageSize=None, pageToken=None):
+
+    cslist = list()
+    callSet = GACallSet.GACallSet().gacallset_info
+    nextPageToken = None
+    cslist.append(callSet)
+
+    return (GACSResponse.GACSResponse(
+        callSets=cslist, nextPageToken=nextPageToken))
+
+
+def searchVariantSets(datasetId="", pageSize=None, pageToken=None):
+
+    with dbqWrapper.dbquery.getSession() as metadb:
+
+        nextPageToken = None
+
+        vslist = list()
+        for vs in metadb.datasetId2VariantSets(datasetId):
+
+            referenceSetId = metadb.referenceSetIdx2ReferenceSetGUID(
+                vs.reference_set_id)
+
+            variantSet = GAVariantSet .GAVariantSet(
+                id=vs.guid,
+                name=vs.name,
+                referenceSetId=referenceSetId,
+                datasetId=vs.dataset_id,
+                metadata=vs.variant_set_metadata).gavariantset_info
+            vslist.append(variantSet)
+
+    return (GASVSetResponse.GASVSetResponse(
+        variantSets=vslist, nextPageToken=nextPageToken))
