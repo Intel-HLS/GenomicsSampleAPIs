@@ -281,7 +281,7 @@ class Query():
             CallSet.id,
             CallSet.guid,
             CallSet.name).join(
-            CallSet, models.CallSetToDBArrayAssociation.callset_id == models.CallSet.id)\
+            CallSet, CallSetToDBArrayAssociation.callset_id == CallSet.id)\
             .filter(CallSetToDBArrayAssociation.tile_row_id.in_(tile_row_id))\
             .filter(
             CallSetToDBArrayAssociation.db_array_id == array_idx).all()
