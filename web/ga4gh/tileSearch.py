@@ -1,3 +1,10 @@
+from ctypes import *
+from string import join
+
+from flask import json
+from flask import jsonify
+from sqlalchemy import and_
+
 from gatypes import GACSResponse
 from gatypes import GACall
 from gatypes import GACallSet
@@ -6,15 +13,9 @@ from gatypes import GASVSetResponse
 from gatypes import GAVariant
 from gatypes import GAVariantSet
 from gatypes import GAVariantSetMetadata
-from flask import json
-from flask import jsonify
-from ctypes import *
-from string import join
-
-
 from metadb.api import DBQuery
 from metadb.models import VariantSet
-from sqlalchemy import and_
+from __builtin__ import list
 
 
 class dbqWrapper():
@@ -124,6 +125,29 @@ def gtDecode(count, gtarray):
         all_elems[data_name] = elems
     return all_elems
 
+def getRow2CallSet(array_idx, variants, nVariants, metadb):
+    """
+    Returns a dictionary that maps the row ids to the tuple (call set Id, call
+    set GUID, call set name)
+    """
+    tile_rows = list()
+    for i in range(0, nVariants):
+        callcount = variants[i].contents.callcount
+        CallArray = variants[i].contents.CallArray
+        for j in range(0, callcount):
+            tile_rows.append(long(CallArray[j].contents.id))
+    
+    if len(tile_rows) == 0:
+      return dict()
+    # Fetch info from meta DBQuery
+    results = metadb.tileRow2CallSet(array_idx, tile_rows)
+    
+    resultDict = dict()
+    for r in results:
+        resultDict[r[0]] = r[1:]
+    del tile_rows
+    del results
+    return resultDict
 
 def searchVariants(
         workspace,
@@ -133,8 +157,8 @@ def searchVariants(
         end,
         searchLib,
         variantSetIds,
-        callSetIds=None,
-        attrList=[
+        callSetIds = None,
+        attrList = [
             'GT',
             'REF',
             'ALT',
@@ -142,8 +166,8 @@ def searchVariants(
             'AF',
             'AN',
             'AC'],
-        pageSize=-1,
-        pageToken=None):
+        pageSize = -1,
+        pageToken = None):
     gavlist = list()
     attrs = join(attrList, ',')
     if not pageSize:
@@ -185,6 +209,8 @@ def searchVariants(
         varcount = qresp.contents.varcount
         vArray = qresp.contents.VariantArray
 
+        row2callset = getRow2CallSet(array_idx, vArray, varcount, metadb)
+
         for i in range(0, varcount):
             callcount = vArray[i].contents.callcount
             CallArray = vArray[i].contents.CallArray
@@ -213,8 +239,7 @@ def searchVariants(
                 string_count = call_info.string_count
                 # tile row assignment right now is assuming that callsetid =
                 # tilerowid
-                CallSetIdx, callId, cname = metadb.tileRow2CallSet(
-                    array_idx, call_info.id)
+                (CallSetIdx, callId, cname) = row2callset[CallArray[j].contents.id] 
 
                 callData = dict()
 
@@ -269,11 +294,11 @@ def searchVariants(
                             callInfo[iname][index] = str(value)
                             index += 1
                 gac = GACall.GACall(
-                    callSetId=callId,
-                    callSetName=cname,
-                    genotype=gtlist,
-                    genotypeLikelihood=plist,
-                    info=callInfo)
+                    callSetId = callId,
+                    callSetName = cname,
+                    genotype = gtlist,
+                    genotypeLikelihood = plist,
+                    info = callInfo)
 
                 callMatch = True
 
@@ -293,16 +318,16 @@ def searchVariants(
             if(variantValid):
                 gavlist.append(
                     (GAVariant.GAVariant(
-                        id=variantSetIdx,
-                        variantSetId=variantSetGuid,
-                        referenceName=referenceName,
-                        start=startp,
-                        end=endp,
-                        referenceBases=reflist,
-                        alternateBases=altlist,
-                        calls=gaclist)).gavariant_info)
-
+                        id = variantSetIdx,
+                        variantSetId = variantSetGuid,
+                        referenceName = referenceName,
+                        start = startp,
+                        end = endp,
+                        referenceBases = reflist,
+                        alternateBases = altlist,
+                        calls = gaclist)).gavariant_info)
+        # Cleanup the dictionary since it is no longer needed
+        del row2callset
     searchLib.cleanup(token)
     return (GASVResponse.GASVResponse(
-        variants=gavlist, nextPageToken=nextPageToken))
-
+        variants = gavlist, nextPageToken = nextPageToken))

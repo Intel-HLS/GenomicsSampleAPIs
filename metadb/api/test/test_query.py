@@ -197,9 +197,16 @@ class TestQuery:
         with query.DBQuery(self.DBURI).getSession() as session:
             for tile_row_id in range(0, self.numRows):
                 result = session.tileRow2CallSet(idx, tile_row_id)
-                self.typeCheck(result, tuple, long, 3)
-                assert isinstance(result[1], unicode)
-                assert isinstance(result[2], unicode)
+                self.typeCheck(result, list, tuple, 1)
+                self.typeCheck(result[0], tuple, long, 4)
+                assert isinstance(result[0][2], unicode)
+                assert isinstance(result[0][3], unicode)
+            
+            result = session.tileRow2CallSet(idx, range(0, self.numRows))
+            self.typeCheck(result, list, tuple, self.numRows)
+            self.typeCheck(result[0], tuple, long, 4)
+            assert isinstance(result[0][2], unicode)
+            assert isinstance(result[0][3], unicode)
 
     def test_tileRow2CallSet_neg(self):
         idx = 1
@@ -236,7 +243,7 @@ class TestQuery:
         with query.DBQuery(self.DBURI).getSession() as session:
             callset = session.tileRow2CallSet(idx, tile_row_id)
 
-            result = session.callSetId2VariantSet(callset[0])
+            result = session.callSetId2VariantSet(callset[0][1])
             self.typeCheck(result, tuple, long, 2)
             assert isinstance(result[1], unicode)
 
@@ -260,9 +267,9 @@ class TestQuery:
         idx = 1
         callset_guid = [None] * self.numRows
         with query.DBQuery(self.DBURI).getSession() as session:
+            result = session.tileRow2CallSet(idx, range(0, self.numRows))
             for tile_row_id in range(0, self.numRows):
-                result = session.tileRow2CallSet(idx, tile_row_id)
-                callset_guid[tile_row_id] = result[1]
+                callset_guid[tile_row_id] = result[tile_row_id][2]
 
             result = session.getArrayRows(callSets=callset_guid)
             assert isinstance(result, dict)
@@ -292,9 +299,9 @@ class TestQuery:
         idx = 1
         callset_guid = [None] * self.numRows
         with query.DBQuery(self.DBURI).getSession() as session:
+            result = session.tileRow2CallSet(idx, range(0, self.numRows))
             for tile_row_id in range(0, self.numRows):
-                result = session.tileRow2CallSet(idx, tile_row_id)
-                callset_guid[tile_row_id] = result[1]
+                callset_guid[tile_row_id] = result[tile_row_id][2]
 
             result = session.datasetId2VariantSets(self.dataset_id)
             vs = result[0]
@@ -326,10 +333,10 @@ class TestQuery:
         callset_id = [None] * self.numRows
         callset_guid = [None] * self.numRows
         with query.DBQuery(self.DBURI).getSession() as session:
+            result = session.tileRow2CallSet(idx, range(0, self.numRows))
             for tile_row_id in range(0, self.numRows):
-                result = session.tileRow2CallSet(idx, tile_row_id)
-                callset_id[tile_row_id] = result[0]
-                callset_guid[tile_row_id] = result[1]
+                callset_id[tile_row_id] = result[tile_row_id][1]
+                callset_guid[tile_row_id] = result[tile_row_id][2]
 
             tile_rows_for_callset_id = session.callSetIds2TileRowId(
                 callset_id, self.workspace, self.arrayName, isGUID=False)
@@ -363,9 +370,10 @@ class TestQuery:
         callsets_samples = [None] * (self.numRows)
         with query.DBQuery(self.DBURI).getSession() as session:
             idx = session.tileNames2ArrayIdx(self.workspace, self.arrayName)
+            result = session.tileRow2CallSet(idx, range(0, self.numRows))
             for tile_row_id in range(0, self.numRows):
                 s_idx = 2 * tile_row_id + 1
-                callset_guid = session.tileRow2CallSet(idx, tile_row_id)[1]
+                callset_guid = result[tile_row_id][2]
                 callsets_samples[tile_row_id] = (
                     callset_guid, long(s_idx), long(s_idx + 1))
 
