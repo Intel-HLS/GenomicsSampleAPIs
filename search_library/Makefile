@@ -151,7 +151,7 @@ clean_tiledb:
 $(EXAMPLE_BIN_DIR)/example_libquery: $(LIB_LIB_DIR)/libquery.so $(EXAMPLE_OBJ_DIR)/example_libquery.o
 	@test -d $(EXAMPLE_BIN_DIR) || mkdir -p $(EXAMPLE_BIN_DIR)
 	@echo "Linking example $@"
-	@$(CXX) $(COVFLAGS) -Wl,-rpath,'$(LIB_LIB_DIR)' -o $@ $^ -Wl,-Bdynamic -L$(LIB_LIB_DIR) -lquery -Wl,-Bdynamic
+	@$(CXX) $(COVFLAGS) -Wl,-rpath,'$(LIB_LIB_DIR)' -o $@ $^ -Wl,-Bdynamic -L$(LIB_LIB_DIR) -lquery -Wl,-Bdynamic $(LDFLAGS)
 
 ##################
 # TileDB Linking #

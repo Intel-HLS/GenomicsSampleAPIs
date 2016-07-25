@@ -4,17 +4,13 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
-from sqlalchemy.schema import CreateSequence
-from sqlalchemy.schema import Sequence
 
 
 class CallSetToDBArrayAssociation(_Base):
     __tablename__ = "callset_to_db_array_association"
 
-    callset_id = sa.Column(BigInteger, sa.ForeignKey(
-        'callset.id'), nullable=False)
-    db_array_id = sa.Column(BigInteger, sa.ForeignKey(
-        'db_array.id'), nullable=False)
+    callset_id = sa.Column(BigInteger, sa.ForeignKey('callset.id'), nullable=False)
+    db_array_id = sa.Column(BigInteger, sa.ForeignKey('db_array.id'), nullable=False)
     # If tile_row_id is null, gets assigned by the trigger
     tile_row_id = sa.Column(BigInteger)
 

@@ -3,7 +3,7 @@
   set_fact : dependencies_path={{store_dir}}/search_library/dependencies
 
 - name: set variable libcsv_path
-  set_fact: libcsv_path={{dependencies_path}}/libcsv
+  set_fact: libcsv_path={{dependencies_path}}/libcsv-master
 
 - name: Create the libcsv_path 
   file: 
@@ -15,13 +15,14 @@
 
 - name: Get package
   get_url:
-    dest: "{{dependencies_path}}/libcsv.tar.gz"
-    url : http://downloads.sourceforge.net/project/libcsv/libcsv/libcsv-3.0.3/libcsv-3.0.3.tar.gz
+    dest: "{{dependencies_path}}/libcsv.zip"
+    url : https://github.com/robertpostill/libcsv/archive/master.zip
 
 - name: Prepare libcsv package
   shell: >
     cd {{dependencies_path}} &&
-    tar xzf libcsv.tar.gz  -C {{libcsv_path}} --strip-components=1 &&
+    unzip libcsv.zip &&
     cd {{libcsv_path}} &&
+    autoreconf --install &&
     ./configure &&
     make
