@@ -29,10 +29,10 @@
       - "{{client_user_name}}"
   when: owner_user_name != client_user_name
 
-- name  : Create variant db group
+- name  : Create genomics db group
   group : name={{group_name}}
 
-- name       : Create the Variant DB users.
+- name       : Create the genomics DB users.
   user       : name={{item}} group={{group_name}}
   with_items : "{{users_list}}"
 
@@ -60,17 +60,17 @@
     line: "{{owner_user_name}} ALL=(ALL) NOPASSWD: ALL"
 
 # Create directories and set permissions
-- name     : Set fact variantdb_dir
-  set_fact : variantdb_dir={{default_variantdb_dir}}
-  when     : variantdb_dir is not defined
+- name     : Set fact genomicsdb_dir
+  set_fact : genomicsdb_dir={{default_genomicsdb_dir}}
+  when     : genomicsdb_dir is not defined
 
 - name     : Set fact workspace_dir
-  set_fact : workspace_dir={{variantdb_dir}}/{{default_workspace_name}}
+  set_fact : workspace_dir={{genomicsdb_dir}}/{{default_workspace_name}}
   when     : workspace_dir is not defined
 
-- name: Create the Variant DB directory with the right permissions
+- name: Create the genomics DB directory with the right permissions
   file: 
-    path  : "{{variantdb_dir}}"
+    path  : "{{genomicsdb_dir}}"
     group : "{{group_name}}"
     owner : "{{owner_user_name}}"
     mode  : "{{permissions}}"

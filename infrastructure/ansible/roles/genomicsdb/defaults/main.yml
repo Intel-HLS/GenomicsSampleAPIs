@@ -14,7 +14,7 @@ default_owner_user_name  : ga4gh_writer
 default_permissions      : "u=rwx,g=rx,o=x"
 
 # Directories
-default_variantdb_dir    : /home/variantdb
+default_genomicsdb_dir    : /home/genomicsdb
 default_workspace_name   : DB
 
 # ssh variables

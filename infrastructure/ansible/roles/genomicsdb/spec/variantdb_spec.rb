@@ -1,34 +1,34 @@
 require 'spec_helper'
 
-describe file('/home/variantdb/repos/GenomicsSampleAPIs') do
+describe file('/home/genomicsdb/repos/GenomicsSampleAPIs') do
   it { should be_directory }
 end
 
-describe file('/home/variantdb/repos/GenomicsSampleAPIs/search_library/lib/libquery.so') do
+describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/search_library/lib/libquery.so') do
   it { should be_file }
 end
 
-describe file('/home/variantdb/repos/GenomicsSampleAPIs/web/templates') do
+describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/web/templates') do
   it { should be_directory }
 end
 
-describe file('/home/variantdb/repos/TileDB') do
+describe file('/home/genomicsdb/repos/TileDB') do
   it { should be_directory }
 end
 
-describe file('/home/variantdb/repos/TileDB/tiledb_cmd/bin/release/tiledb_load_csv') do
+describe file('/home/genomicsdb/repos/TileDB/tiledb_cmd/bin/release/tiledb_load_csv') do
   it { should be_file }
 end
 
-describe file('/home/variantdb/repos/htslib') do
+describe file('/home/genomicsdb/repos/htslib') do
   it { should be_directory }
 end
 
-describe file('/home/variantdb/repos/rapidjson') do
+describe file('/home/genomicsdb/repos/rapidjson') do
   it { should be_directory }
 end
 
-describe file('/home/variantdb/DB') do
+describe file('/home/genomicsdb/DB') do
   it { should be_directory }
 end
 

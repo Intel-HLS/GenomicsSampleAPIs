@@ -1,5 +1,5 @@
 ---
-# Update Variant DB variables
+# Update genomics DB variables
 - name     : Set variable array_name
   set_fact : array_name={{default_array_name}}
   when     : array_name is not defined

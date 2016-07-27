@@ -1,1 +1,1 @@
-variantdb-webserver
+genomicsdb-webserver

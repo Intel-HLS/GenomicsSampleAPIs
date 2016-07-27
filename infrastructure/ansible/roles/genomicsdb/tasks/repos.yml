@@ -1,6 +1,6 @@
 ---
 - name     : Set variable store_dir
-  set_fact : store_dir={{variantdb_dir}}/repos/GenomicsSampleAPIs
+  set_fact : store_dir={{genomicsdb_dir}}/repos/GenomicsSampleAPIs
   when     : store_dir is not defined
 
 - name     : Set variable GenomicsDB_dir
