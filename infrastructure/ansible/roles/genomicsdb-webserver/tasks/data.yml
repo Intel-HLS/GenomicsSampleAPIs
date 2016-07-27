@@ -7,14 +7,6 @@
   set_fact : import_data_path={{import_path}}
   when : skip_data_rsync is defined and skip_data_rsync == "true"
 
-- name        : Fetch the CSV
-  synchronize : 
-    src        : "{{import_path}}/{{tiledb_csv}}"
-    dest       : "{{import_data_path}}/"
-    archive    : no
-    rsync_path : "sudo rsync"
-  when : tiledb_csv is defined and skip_data_rsync is not defined or skip_data_rsync == "false"
-
 - name        : Fetch the DB
   synchronize : 
     src        : "{{import_path}}/{{metadb_file}}"
