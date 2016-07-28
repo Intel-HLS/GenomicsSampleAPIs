@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe file('/home/variantdb/DB/StorageManager/test') do
+describe file('/home/genomicsdb/DB/StorageManager/test') do
   it { should be_directory }
 end
 
-describe file('/home/variantdb/repos/GenomicsSampleAPIs/web/ga4gh_test.ini') do
+describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/web/ga4gh_test.ini') do
   it { should exist }
 end
 
-describe file('/home/variantdb/repos/GenomicsSampleAPIs/web/ga4gh_test.conf') do
+describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/web/ga4gh_test.conf') do
   it { should exist }
 end
 

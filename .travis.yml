@@ -11,8 +11,8 @@ before_script:
   - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
   - cd $inf_dir
   - if [ -e ansible_requirements.txt ]; then ansible-galaxy install -p ./ansible/roles -r ansible_requirements.txt; fi
-  - sudo ansible-playbook -i 'default,' -e "store_branch=$TRAVIS_COMMIT store_dir=$TRAVIS_BUILD_DIR owner_user_name=$USER client_user_name=$USER" ansible/variantdb-webserver.yml --connection=local
-  - source /home/variantdb/venv/bin/activate
+  - sudo ansible-playbook -i 'default,' -e "store_branch=$TRAVIS_COMMIT store_dir=$TRAVIS_BUILD_DIR owner_user_name=$USER client_user_name=$USER" ansible/genomicsdb-webserver.yml --connection=local
+  - source /home/genomicsdb/venv/bin/activate
   - pip install pytest pytest-cov coverage pytest-flask pytest-mock
   - pip install sqlalchemy-utils
   - source $HOME/.bashrc

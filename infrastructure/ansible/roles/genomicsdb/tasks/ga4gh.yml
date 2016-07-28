@@ -46,7 +46,7 @@
   with_items: "{{users_list}}"
 
 - name     : Set variable ga4gh_virtualenv 
-  set_fact : ga4gh_virtualenv={{variantdb_dir}}/venv
+  set_fact : ga4gh_virtualenv={{genomicsdb_dir}}/venv
   when     : ga4gh_virtualenv is not defined
 
 - name : Create and install virtualenv for GA4GH webserver

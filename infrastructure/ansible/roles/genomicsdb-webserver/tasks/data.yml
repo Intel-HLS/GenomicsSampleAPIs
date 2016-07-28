@@ -1,6 +1,6 @@
 ---
 - name : Set source path for import data path 
-  set_fact : import_data_path={{variantdb_dir}}/data
+  set_fact : import_data_path={{genomicsdb_dir}}/data
   when : skip_data_rsync is not defined or skip_data_rsync == "false"
 
 - name : Set source path for import data path
