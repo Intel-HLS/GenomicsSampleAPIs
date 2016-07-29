@@ -14,8 +14,20 @@
   postgresql_db : 
     name  : "{{meta_db_name}}"
     owner : "{{owner_user_name}}"
-  become        : yes
-  become_user   : "{{owner_user_name}}"
+  become : yes
+  become_user : postgres
+
+# This task is required when the DB was created before Ansible was run
+# and we try to add a new owner_user to the existing DB
+- name            : Update priviledges for the owner user role
+  postgresql_privs :
+    roles        : "{{owner_user_name}}"
+    db           : "{{meta_db_name}}"
+    grant_option : yes
+    privs        : ALL
+    type         : database
+  become          : yes
+  become_user     : postgres
 
 - name            : Setup the reader/client for the db
   postgresql_user : 
