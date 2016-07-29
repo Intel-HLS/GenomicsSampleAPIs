@@ -3,19 +3,20 @@
   set_fact : meta_db_name={{default_meta_db_name}}
   when     : meta_db_name is not defined
 
-- name          : Create the postgres db
-  postgresql_db : name={{meta_db_name}}
-  become        : yes
-  become_user   : postgres
-
 - name            : Setup the owner for the db
   postgresql_user :
-    db              : "{{meta_db_name}}"
     name            : "{{owner_user_name}}"
     role_attr_flags : "CREATEDB"
     priv            : ALL
   become          : yes
   become_user     : postgres
+
+- name          : Create the postgres db
+  postgresql_db : 
+    name  : "{{meta_db_name}}"
+    owner : "{{owner_user_name}}"
+  become        : yes
+  become_user   : "{{owner_user_name}}"
 
 - name            : Setup the reader/client for the db
   postgresql_user : 
