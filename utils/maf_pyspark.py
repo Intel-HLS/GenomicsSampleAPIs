@@ -275,7 +275,6 @@ def updateIds(keys, callset_mapping, output_file):
 
             CallSet = metadb.registerCallSet(
                 guid=str(uuid.uuid4()),
-                individual_guid=Individual.guid,
                 source_sample_guid=SourceSample.guid,
                 target_sample_guid=TargetSample.guid,
                 workspace=config.TileDBSchema['workspace'],
