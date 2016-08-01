@@ -520,7 +520,7 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile):
     callset_mapping["callsets"].update(maf.callset_mapping)
 
     helper.createMappingFiles(
-        outputDir, combinedOutputFile, callset_mapping, rs.id, config.DB_URI)
+        outputDir, callset_mapping, rs.id, config.DB_URI, combinedOutputFile=combinedOutputFile)
 
 if __name__ == "__main__":
 
