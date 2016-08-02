@@ -301,9 +301,6 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(test_header)))
             inFP.write("{0}\n".format("\t".join(test_data)))
 
-        # output_file = self.tmpdir.join("out.txt")
-        # output_file.write("")
-
         with open(self.config_path, 'r') as fp:
             config_json = json.load(fp)
         config_json["DB_URI"] = self.TESTDB_URI

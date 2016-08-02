@@ -20,13 +20,6 @@ if __name__ == "__main__":
         help="input configuration file for MAF conversion")
     
     parser.add_argument(
-        "-o",
-        "--output",
-        required=False,
-        type=str,
-        help="output Tile DB CSV file (without the path) which will be stored in the output directory. Required for spark.")
-    
-    parser.add_argument(
         "-d",
         "--outputdir",
         required=True,
@@ -47,12 +40,26 @@ if __name__ == "__main__":
         action="store_true",
         required=False,
         help="True/False indicating if the input file is a gzipped file or not")
-    
+
     parser.add_argument(
         "-s",
         "--spark",
         action="store_true",
         help="Run as spark.")
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        required=False,
+        type=str,
+        help="output Tile DB CSV file (without the path) which will be stored in the output directory. Required for spark.")
+
+    parser.add_argument(
+        "-a",
+        "--append_callsets",
+        required=False,
+        type=str,
+        help="CallSet mapping file to append.")
 
     parser.add_argument(
         "-l",
@@ -65,6 +72,7 @@ if __name__ == "__main__":
 
     if args.spark:
         # call spark from within import script
+        # output file is required
         if args.output:
             spark_cmd = [
                 "spark-submit", 
@@ -80,8 +88,8 @@ if __name__ == "__main__":
                 raise Exception("Error running converter")
         else:
             print """
-            usage: maf2tile.py [-h] -c CONFIG [-o OUTPUT] -d OUTPUTDIR -i INPUTS
-                   [INPUTS ...] [-z] [-s] [-l LOADER]
+            usage: maf2tile.py [-h] -c CONFIG -d OUTPUTDIR -i INPUTS
+                   [INPUTS ...] [-z] [-s] [-o OUTPUT] [-l LOADER]
             maf2tile.py: error: argument -o/--output is required when -s is sets
             """
     else:
@@ -90,7 +98,8 @@ if __name__ == "__main__":
             args.config,
             args.inputs,
             args.outputdir,
-            args.gzipped)
+            args.gzipped,
+            callset_file=args.append_callsets)
 
     if args.loader:
         callset_mapping_file = "{0}/callset_mapping".format(args.outputdir)

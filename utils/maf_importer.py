@@ -418,7 +418,7 @@ def poolGenerateCSV(file_params):
     return (0, outFile, maf.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir, bGzipped):
+def parallelGen(config_file, inputFileList, outputDir, bGzipped, callset_file=None):
     """
     Function that spawns the Pool of MAF objects to work on each of the input files
     Once the BookKeeping support moves to a real DB, move from threads to multiprocessing.Pool
@@ -432,10 +432,19 @@ def parallelGen(config_file, inputFileList, outputDir, bGzipped):
         outFile = outputDir + "/" + helper.getFileName(inFile) + ".csv"
         function_args[index] = (config_file, inFile, outFile, bGzipped)
         index += 1
-    callset_mapping = dict()
-    callset_mapping["unsorted_csv_files"] = list()
-    callset_mapping["callsets"] = dict()
-    callsets = callset_mapping["callsets"]
+    # append to existing callset file
+    if callset_file:
+        import json
+        with open(callset_file) as cf:
+            callset_mapping = json.load(cf)
+            callset_mapping["unsorted_csv_files"] = callset_mapping.get("unsorted_csv_files", list())
+            callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
+            callsets = callset_mapping["callsets"]
+    else:
+        callset_mapping = dict()
+        callset_mapping["unsorted_csv_files"] = list()
+        callset_mapping["callsets"] = dict()
+        callsets = callset_mapping["callsets"]
 
     pool = Pool()
     failed = list()
