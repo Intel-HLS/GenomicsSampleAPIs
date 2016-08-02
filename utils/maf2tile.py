@@ -22,9 +22,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--output",
-        required=True,
+        required=False,
         type=str,
-        help="output Tile DB CSV file (without the path) which will be stored in the output directory")
+        help="output Tile DB CSV file (without the path) which will be stored in the output directory. Required for spark.")
     
     parser.add_argument(
         "-d",
@@ -65,29 +65,34 @@ if __name__ == "__main__":
 
     if args.spark:
         # call spark from within import script
-        spark_cmd = [
-            "spark-submit", 
-            "maf_pyspark.py", 
-            "-c", args.config, 
-            "-d", args.outputdir, 
-            "-o", args.output, 
-            "-i"]
+        if args.output:
+            spark_cmd = [
+                "spark-submit", 
+                "maf_pyspark.py", 
+                "-c", args.config, 
+                "-d", args.outputdir, 
+                "-o", args.output, 
+                "-i"]
 
-        spark_cmd.extend(args.inputs)
+            spark_cmd.extend(args.inputs)
 
-        if subprocess.call(spark_cmd) != 0:
-            raise Exception("Error running converter")
+            if subprocess.call(spark_cmd) != 0:
+                raise Exception("Error running converter")
+        else:
+            print """
+            usage: maf2tile.py [-h] -c CONFIG [-o OUTPUT] -d OUTPUTDIR -i INPUTS
+                   [INPUTS ...] [-z] [-s] [-l LOADER]
+            maf2tile.py: error: argument -o/--output is required when -s is sets
+            """
     else:
 
         multiprocess_import.parallelGen(
             args.config,
             args.inputs,
             args.outputdir,
-            args.output,
             args.gzipped)
 
     if args.loader:
-        baseFileName = helper.getFileName(args.output)
-        callset_mapping_file = "{0}/{1}.callset_mapping".format(args.outputdir, baseFileName)
-        vid_mapping_file = "{0}/{1}.vid_mapping".format(args.outputdir, baseFileName)
+        callset_mapping_file = "{0}/callset_mapping".format(args.outputdir)
+        vid_mapping_file = "{0}/vid_mapping".format(args.outputdir)
         loader.load2Tile(args.loader, callset_mapping_file, vid_mapping_file)
