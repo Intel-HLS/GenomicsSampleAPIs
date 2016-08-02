@@ -3,17 +3,30 @@
   set_fact : meta_db_name={{default_meta_db_name}}
   when     : meta_db_name is not defined
 
-- name          : Create the postgres db
-  postgresql_db : name={{meta_db_name}}
-  become        : yes
-  become_user   : postgres
-
-- name            : Setup the owner for the db
+- name            : Setup the owner user role
   postgresql_user :
-    db              : "{{meta_db_name}}"
     name            : "{{owner_user_name}}"
     role_attr_flags : "CREATEDB"
-    priv            : ALL
+  become          : yes
+  become_user     : postgres
+
+- name          : Create the postgres db
+  postgresql_db : 
+    name  : "{{meta_db_name}}"
+    owner : "{{owner_user_name}}"
+  become : yes
+  become_user : postgres
+
+# This task is required when the DB was created before Ansible was run
+# and we try to add a new owner_user to the existing DB
+- name            : Update priviledges for the owner user role
+  postgresql_privs :
+    roles        : "{{owner_user_name}}"
+    db           : "{{meta_db_name}}"
+    grant_option : yes
+    privs        : ALL
+    type         : table
+    obj          : ALL_IN_SCHEMA
   become          : yes
   become_user     : postgres
 
