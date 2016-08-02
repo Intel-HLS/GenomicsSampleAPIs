@@ -25,7 +25,8 @@
     db           : "{{meta_db_name}}"
     grant_option : yes
     privs        : ALL
-    type         : database
+    type         : table
+    obj          : ALL_IN_SCHEMA
   become          : yes
   become_user     : postgres
 
