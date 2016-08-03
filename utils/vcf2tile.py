@@ -34,6 +34,13 @@ if __name__ == "__main__":
         help="VCF files to be imported.")
 
     parser.add_argument(
+        "-a",
+        "--append_callsets",
+        required=False,
+        type=str,
+        help="CallSet mapping file to append.")
+
+    parser.add_argument(
         "-l",
         "--loader",
         required=False,
@@ -42,7 +49,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    multiprocess_import.parallelGen(args.config, args.inputs, args.outputdir)
+    multiprocess_import.parallelGen(
+        args.config, 
+        args.inputs, 
+        args.outputdir, 
+        callset_file=args.append_callsets)
 
     if args.loader:
         callset_mapping_file = "{0}/callset_mapping".format(args.outputdir)

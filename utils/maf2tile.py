@@ -80,6 +80,7 @@ if __name__ == "__main__":
                 "-c", args.config, 
                 "-d", args.outputdir, 
                 "-o", args.output, 
+                "-a", args.append_callsets,
                 "-i"]
 
             spark_cmd.extend(args.inputs)

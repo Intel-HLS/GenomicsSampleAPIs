@@ -437,14 +437,12 @@ def parallelGen(config_file, inputFileList, outputDir, bGzipped, callset_file=No
         import json
         with open(callset_file) as cf:
             callset_mapping = json.load(cf)
-            callset_mapping["unsorted_csv_files"] = callset_mapping.get("unsorted_csv_files", list())
-            callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
-            callsets = callset_mapping["callsets"]
     else:
         callset_mapping = dict()
-        callset_mapping["unsorted_csv_files"] = list()
-        callset_mapping["callsets"] = dict()
-        callsets = callset_mapping["callsets"]
+        
+    callset_mapping["unsorted_csv_files"] = callset_mapping.get("unsorted_csv_files", list())
+    callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
+    callsets = callset_mapping["callsets"]
 
     pool = Pool()
     failed = list()

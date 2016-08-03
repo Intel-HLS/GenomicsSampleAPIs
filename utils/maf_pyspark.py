@@ -494,7 +494,7 @@ def updateRefAltPos(iter):
     return m_csv_line_list
 
 
-def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile):
+def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, callset_file=None):
     """
     Function that spawns  Spark RDD objects to work on each of the input files
     """
@@ -514,9 +514,16 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile):
     maf.sparkConvert(inputFileList)
     print "Completed: {0} with {1} Call Sets".format(combinedOutput, len(maf.callset_mapping))
 
-    callset_mapping = dict()
-    callset_mapping["unsorted_csv_files"] = [combinedOutput]
-    callset_mapping["callsets"] = dict()
+    if callset_file:
+        import json
+        with open(callset_file) as cf:
+            callset_mapping = json.load(cf)
+    else:
+        callset_mapping = dict()
+
+    callset_mapping["unsorted_csv_files"] = callset_mapping.get("unsorted_csv_files", list())
+    callset_mapping["unsorted_csv_files"].append(combinedOutput)
+    callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
     callset_mapping["callsets"].update(maf.callset_mapping)
 
     helper.createMappingFiles(
@@ -558,6 +565,18 @@ if __name__ == "__main__":
         required=True,
         help="List of input MAF files to convert")
 
+    parser.add_argument(
+        "-a",
+        "--append_callsets",
+        required=False,
+        type=str,
+        help="CallSet mapping file to append.")
+
     args = parser.parse_args()
 
-    parallelGen(args.config, args.inputs, args.outputdir, args.output)
+    parallelGen(
+        args.config, 
+        args.inputs, 
+        args.outputdir, 
+        args.output, 
+        callset_file=args.append_callsets)
