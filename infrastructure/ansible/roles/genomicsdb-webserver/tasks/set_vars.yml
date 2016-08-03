@@ -43,3 +43,6 @@
   set_fact : delete_and_create_tiledb_array={{default_delete_and_create_tiledb_array}}
   when     : delete_and_create_tiledb_array is not defined
 
+- name     : Set variable lb_callset_row_idx
+  set_fact : lb_callset_row_idx={{default_lb_callset_row_id}}
+  when     : lb_callset_row_idx is not defined
