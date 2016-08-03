@@ -147,8 +147,8 @@ class TestVMEnd2End(TestCase):
 
         # setup web app
 
-        ga4ghPath = "./test/data"
-        configE2E = os.path.join(ga4ghPath, "ga4gh_e2e.conf")
+        configE2E = os.path.join(os.path.realpath(sys.argv[-1]), "test/data/ga4gh_e2e.conf")
+        #configE2E = os.path.join(ga4ghPath, "ga4gh_e2e.conf")
         parser = ConfigParser.RawConfigParser()
         parser.read(configE2E)
         parser.set('tiledb', 'WORKSPACE', self.vcf_config['workspace'])
@@ -159,6 +159,9 @@ class TestVMEnd2End(TestCase):
         parser.set('virtualenv', 'SITE_PACKAGES', venv+"lib/python2.7/site-packages")
         parser.set('auto_configuration', 'SEARCHLIB', os.path.join(os.path.realpath(
             sys.argv[-1]), "search_library/lib/libquery.so"))
+	
+	with open(configE2E, 'w') as fp:
+	    parser.write(fp)
 
         sys.path.append("./web")
 
@@ -247,14 +250,14 @@ class TestVMEnd2End(TestCase):
         with open(str(loader_config), 'w') as fp:
             self.parser.write(fp)
 
-        # loader.load2Tile(str(loader_config), str(test_output_dir)+"/callset_mapping", str(test_output_dir)+"/vid_mapping")
+        loader.load2Tile(str(loader_config), str(test_output_dir)+"/callset_mapping", str(test_output_dir)+"/vid_mapping")
 
         response = self.tester.post(
             '/variants/search',
             data=json.dumps(payload),
             content_type='application/json')
         read_resp = json.loads(response.data)
-        # assert read_resp == True
+        assert len(read_resp['variants']) == 1
         
     @classmethod
     def tearDownClass(self):
