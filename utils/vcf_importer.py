@@ -160,7 +160,6 @@ def sortAndIndex(inFile, outdir):
     GenomicsDB import will fail if these four requirements aren't satisfied.
     """
     splitFile = os.path.basename(inFile).split(".")
-
     if splitFile[-1] == 'vcf':
         #.vcf
         file_name = ".".join(splitFile[:-1])
