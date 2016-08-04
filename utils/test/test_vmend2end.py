@@ -5,14 +5,13 @@ import sys
 from sqlalchemy import and_
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, drop_database, database_exists
-import metadb.api.query as dbquery
 import metadb.models as models
 from unittest import TestCase
 import utils.vcf2tile as vcimp
 import utils.maf2tile as imp
-from utils.vcf_importer import VCF
-import pysam.bcftools
 from utils.configuration import ConfigReader
+import ConfigParser
+import utils.loader as loader
 
 
 sampleN = 'sampleN'
@@ -119,6 +118,21 @@ class TestVMEnd2End(TestCase):
         self.maf_config.DB_URI = self.DBURI
         imp.helper.registerWithMetadb(self.maf_config)
 
+        self.parser = ConfigParser.RawConfigParser()
+        self.parser.read('utils/example_configs/load_to_tile.cfg')
+        self.parser.set('loader', 'executable', os.path.join(os.path.realpath(
+            sys.argv[-1]), "search_library/dependencies/GenomicsDB/bin/vcf2tiledb"))
+        self.parser.set('mpi', 'hosts', os.path.join(os.path.realpath(
+            sys.argv[-1]), "utils/example_configs/hosts.txt"))
+
+        self.tile_loader_path = os.path.abspath(
+            "utils/example_configs/tile_loader.json")
+        with open(self.tile_loader_path, 'r') as readFP:
+            self.tile_loader = json.load(readFP)
+            self.tile_loader['column_partitions'][0]['workspace'] = self.vcf_config['workspace']
+            self.tile_loader['column_partitions'][0]['array'] = self.vcf_config['array']
+
+
 
     @pytest.fixture(autouse=True)
     def set_tmpdir(self, tmpdir):
@@ -182,6 +196,17 @@ class TestVMEnd2End(TestCase):
             assert len(cm['callsets']) == 3
             assert len(cm['unsorted_csv_files']) == 1
 
+        # LOAD INTO GENOMICSDB
+        tiledb_loader_file = self.tmpdir.join("tile_loader.json")
+        with open(str(tiledb_loader_file), 'w') as fp:
+            fp.write(json.dumps(self.tile_loader))
+
+        self.parser.set('loader', 'tile_loader_json', str(tiledb_loader_file))
+        loader_config = self.tmpdir.join("loader_config.cfg")
+        with open(str(loader_config), 'w') as fp:
+            self.parser.write(fp)
+
+        # loader.load2Tile(str(loader_config), str(test_output_dir)+"/callset_mapping", str(test_output_dir)+"/vid_mapping")
 
     @classmethod
     def tearDownClass(self):
