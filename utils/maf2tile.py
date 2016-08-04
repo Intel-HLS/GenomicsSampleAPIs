@@ -51,8 +51,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-s",
         "--spark",
-        action="store_true",
-        help="Run as spark.")
+        type=str,
+        help="Run as spark. Pass local[*] to run spark locally or the spark master URI")
 
     parser.add_argument(
         "-l",
@@ -66,7 +66,9 @@ if __name__ == "__main__":
     if args.spark:
         # call spark from within import script
         spark_cmd = [
-            "spark-submit", 
+            "spark-submit",
+            "--master",
+            args.spark,
             "maf_pyspark.py", 
             "-c", args.config, 
             "-d", args.outputdir, 
@@ -75,8 +77,12 @@ if __name__ == "__main__":
 
         spark_cmd.extend(args.inputs)
 
-        if subprocess.call(spark_cmd) != 0:
-            raise Exception("Error running converter")
+        pipe = subprocess.Popen(
+            spark_cmd, stderr=subprocess.PIPE)
+        output, error = pipe.communicate()
+
+        if pipe.returncode != 0:
+            raise Exception("Error running converter\n\nERROR: \n{}".format(error))
     else:
 
         multiprocess_import.parallelGen(
