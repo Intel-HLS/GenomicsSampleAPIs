@@ -13,6 +13,11 @@ from utils.configuration import ConfigReader
 import ConfigParser
 import utils.loader as loader
 
+# flask app imports
+from flask import current_app
+from flask.ext.cors import CORS
+from flask.ext.cors import cross_origin
+import web.config as config
 
 sampleN = 'sampleN'
 sampleT = 'sampleT'
@@ -73,6 +78,14 @@ test_data = [
     "90",
     "0"]
 
+payload = {
+    "end": 75908600,
+    "pageToken": None,
+    "start": 1,
+    "callSetIds": None,
+    "referenceName": "1",
+    "variantSetIds": ["testing"]}
+
 
 class TestVMEnd2End(TestCase):
 
@@ -132,7 +145,35 @@ class TestVMEnd2End(TestCase):
             self.tile_loader['column_partitions'][0]['workspace'] = self.vcf_config['workspace']
             self.tile_loader['column_partitions'][0]['array'] = self.vcf_config['array']
 
+        # setup web app
 
+        ga4ghPath = "./test/data"
+        configE2E = os.path.join(ga4ghPath, "ga4gh_e2e.conf")
+        parser = ConfigParser.RawConfigParser()
+        parser.read(configE2E)
+        parser.set('tiledb', 'WORKSPACE', self.vcf_config['workspace'])
+        parser.set('tiledb', 'ARRAYNAME', self.vcf_config['array'])
+        parser.set('tiledb', 'SQLALCHEMY_DATABASE_URI', self.DBURI)
+        venv = os.getenv('VIRTUALENV', '/home/genomicsdb/venv/')
+        parser.set('virtualenv', 'VIRTUALENV', venv)
+        parser.set('virtualenv', 'SITE_PACKAGES', venv+"lib/python2.7/site-packages")
+        parser.set('auto_configuration', 'SEARCHLIB', os.path.join(os.path.realpath(
+            sys.argv[-1]), "search_library/lib/libquery.so"))
+
+        sys.path.append("./web")
+
+        config.initConfig(configE2E)
+
+        from web.ga4gh import create_app
+        from web.ga4gh.views import ga4gh
+
+        self.application = create_app('config.LoadedConfig')
+        self.ctx = self.application.app_context()
+        self.ctx.push()
+        current_app.config.from_object(config.LoadedConfig)
+        current_app.register_blueprint(ga4gh)
+        current_app.testing = True
+        self.tester = current_app.test_client()
 
     @pytest.fixture(autouse=True)
     def set_tmpdir(self, tmpdir):
@@ -208,6 +249,14 @@ class TestVMEnd2End(TestCase):
 
         # loader.load2Tile(str(loader_config), str(test_output_dir)+"/callset_mapping", str(test_output_dir)+"/vid_mapping")
 
+        response = self.tester.post(
+            '/variants/search',
+            data=json.dumps(payload),
+            content_type='application/json')
+        read_resp = json.loads(response.data)
+        # assert read_resp == True
+        
     @classmethod
     def tearDownClass(self):
+        self.ctx.pop()
         drop_database(self.DBURI)
