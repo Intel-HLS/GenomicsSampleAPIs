@@ -275,7 +275,6 @@ def updateIds(keys, callset_mapping, output_file):
 
             CallSet = metadb.registerCallSet(
                 guid=str(uuid.uuid4()),
-                individual_guid=Individual.guid,
                 source_sample_guid=SourceSample.guid,
                 target_sample_guid=TargetSample.guid,
                 workspace=config.TileDBSchema['workspace'],
@@ -521,7 +520,7 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile):
     callset_mapping["callsets"].update(maf.callset_mapping)
 
     helper.createMappingFiles(
-        outputDir, combinedOutputFile, callset_mapping, rs.id, config.DB_URI)
+        outputDir, callset_mapping, rs.id, config.DB_URI, combinedOutputFile=combinedOutputFile)
 
 if __name__ == "__main__":
 
