@@ -20,7 +20,7 @@ ipython==3.0.0
 itsdangerous==0.24
 passlib==1.6.2
 requests==2.6.0
-uwsgi-2.0.13.1
+uwsgi==2.0.13.1
 wsgiref==0.1.2
 alembic==0.8.2
 psycopg2==2.6.1
