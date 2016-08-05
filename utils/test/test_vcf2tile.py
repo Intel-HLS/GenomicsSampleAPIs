@@ -215,7 +215,8 @@ class TestVCFImporter(TestCase):
 
         conf = self.tmpdir.join("vcf7_import.config")
         this_conf = dict(self.config)
-        this_conf['callset_loc'] = 'SampleName'
+        this_conf['derive_sample_by'] = 'tag'
+        this_conf['get_sample_by'] = 'SampleName'
         conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test7.vcf")
@@ -238,7 +239,8 @@ class TestVCFImporter(TestCase):
 
         conf = self.tmpdir.join("vcf8_import.config")
         this_conf = dict(self.config)
-        this_conf['callset_loc'] = 'SampleName'
+        this_conf['derive_sample_by'] = 'tag'
+        this_conf['get_sample_by'] = 'SampleName'
         conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test8.vcf")

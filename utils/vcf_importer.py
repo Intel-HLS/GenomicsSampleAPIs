@@ -5,7 +5,7 @@ import json
 import traceback
 from multiprocessing import Pool
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
 import vcf
 import pysam
@@ -45,15 +45,18 @@ class VCF:
         conf = json.load(self.config)
         self.dburi = conf['dburi']
         self.workspace = conf['workspace']
+        self.vcf_type = conf['vcf_type']
+        self.derive_sample = conf.get('derive_sample_from', 'header')
+        self.get_sample_by = conf.get('get_sample_by', None)
+        self.get_sample_at = conf.get('get_sample_at', 0)
+
         # default TN columns normal first column, target second column
         # capture idx in file for GenomicsDB reference
         self.source_idx = conf.get('source_idx', 0)
         self.target_idx = conf.get('target_idx', 1)
 
-        # callset loc specifies callset name reference in sample tag
-        self.callset_map = conf.get('callset_loc', None)
         self.array, self.variantset, self.referenceset = helper.registerWithMetadb(
-            conf, references=self.reader.contigs)
+            conf, vcf=True, references=self.reader.contigs)
 
         return self
 
@@ -63,6 +66,38 @@ class VCF:
         """
         self.file.close()
         self.config.close()
+
+    def setSampleNames(self):
+            
+        if len(self.reader.samples) != 2 and self.vcf_type == 'TN':
+            raise ValueError('Make sure vcf_type is properly set.')
+
+        if len(self.reader.samples) == 0:
+            self.reader.samples = ['']
+        
+        if self.derive_sample == 'tag':
+            if self.get_sample_by is not None:
+                self.reader.samples[self.source_idx] = self.reader.metadata['SAMPLE'][self.source_idx][self.get_sample_by]
+                if self.vcf_type == 'TN':
+                    self.reader.samples[self.target_idx] = self.reader.metadata['SAMPLE'][self.target_idx][self.get_sample_by]
+            else:
+                raise ValueError('Set get_sample_by for reading sample from tag.')
+
+        if self.derive_sample == 'header':
+            if 'NORMAL' in self.reader.samples and self.vcf_type == 'TN':
+                raise ValueError("Set derive_sample_from file or tag in import config.")
+
+        if self.derive_sample == 'file':
+            if self.get_sample_by is not None:
+                sample_prefix = os.path.basename(self.filename).split(self.get_sample_by)[self.get_sample_at]
+                if len(self.reader.samples[0]) > 0:
+                    sample_prefix += "_"
+                self.reader.samples[self.source_idx] = sample_prefix + self.reader.samples[self.source_idx]
+                if self.vcf_type == 'TN':
+                    self.reader.samples[self.target_idx] = sample_prefix + self.reader.samples[self.target_idx]
+            else:
+                raise ValueError("Set derive_sample_from file or tag in import config.")
+
 
     def createCallSetDict(self):
         """
@@ -74,27 +109,14 @@ class VCF:
 
         callsets = OrderedDict()
 
-        # callset names in column headers
-        if self.callset_map is None:
-            if len(self.reader.samples) != 2:
-                raise ValueError(
-                    "Currently only single TN vcf format supported.")
-            elif 'NORMAL' in self.reader.samples:
-                raise ValueError("Set callset_loc in import config.")
-            else:
-                callsets[self.reader.samples[self.source_idx]] = self.reader.samples
-                callsets[self.reader.samples[self.target_idx]] = self.reader.samples
+        self.setSampleNames()
 
-        else:
-            # if not then, callset names are retrieved from VCF SAMPLE tag
-            if len(self.reader.metadata['SAMPLE']) != 2:
-                raise ValueError(
-                    "Currently only single TN vcf format supported.")
-            else:
-                source = self.reader.metadata['SAMPLE'][self.source_idx]['SampleName']
-                target = self.reader.metadata['SAMPLE'][self.target_idx]['SampleName']
-                callsets[source] = [source, target]
-                callsets[target] = [source, target]
+        print self.reader.samples
+
+        callsets[self.reader.samples[self.source_idx]] = self.reader.samples
+        if self.vcf_type == 'TN':
+            callsets[self.reader.samples[self.target_idx]] = self.reader.samples
+ 
 
         return callsets
 
@@ -109,7 +131,7 @@ class VCF:
             for callset in callsets:
                 # source and target names
                 source = callsets[callset][self.source_idx]
-                target = callsets[callset][self.target_idx]
+
                 if callset == source:
                     file_idx = self.source_idx
                 else:
@@ -118,7 +140,7 @@ class VCF:
                 # register individual and samples
                 indv = metadb.registerIndividual(
                     str(uuid.uuid4()), 
-                    source + "_" + target)
+                    "Individual_"+source)
 
                 src = metadb.registerSample(
                     str(uuid.uuid4()),
@@ -126,16 +148,24 @@ class VCF:
                     name=source,
                     info={'type': 'source'})
 
-                trg = metadb.registerSample(
-                    str(uuid.uuid4()),
-                    indv.guid,
-                    name=target,
-                    info={'type': 'target'})
+                target_guid = src.guid
+
+                if self.vcf_type == 'TN':
+                    target = callsets[callset][self.target_idx]
+
+                    # this is a hack, change the model
+                    trg = metadb.registerSample(
+                        str(uuid.uuid4()),
+                        indv.guid,
+                        name=target,
+                        info={'type': 'target'})
+
+                    target_guid = trg.guid
 
                 # register callset
                 cs = metadb.registerCallSet(str(uuid.uuid4()),
                     src.guid,
-                    trg.guid,
+                    target_guid,
                     self.workspace,
                     self.array.name,
                     [self.variantset.id],
@@ -154,30 +184,36 @@ class VCF:
                 }
 
 
-def sortAndIndex(inFile, outdir):
+def sortAndIndex(inFile, outdir, sort=True, index=True):
     """
     Sort and index vcfs to ensure bgzipped, sorted, collapsed and indexed vcfs
     GenomicsDB import will fail if these four requirements aren't satisfied.
     """
-    splitFile = os.path.basename(inFile).split(".")
-    if splitFile[-1] == 'vcf':
-        #.vcf
-        file_name = ".".join(splitFile[:-1])
-    elif splitFile[-2] == 'vcf' and splitFile[-1] == 'gz':
-        # .vcf.gz
-        file_name = ".".join(splitFile[:-2])
-    else:
-        raise ValueError("File extension must be vcf or vcf.gz")
+    return_file = inFile
+    if sort:
+        splitFile = os.path.basename(inFile).split(".")
+        if splitFile[-1] == 'vcf':
+            #.vcf
+            file_name = ".".join(splitFile[:-1])
+        elif splitFile[-2] == 'vcf' and splitFile[-1] == 'gz':
+            # .vcf.gz
+            file_name = ".".join(splitFile[:-2])
+        else:
+            raise ValueError("File extension must be vcf or vcf.gz")
 
-    sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
+        sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
 
-    #bcftools sort, collapse, and compress
-    bcftools.norm("-m", "+any", "-O", "z", "-o",
-                  sorted_file, inFile, catch_stdout=False)
-    #bcftools index
-    bcftools.index(sorted_file, "-t", "-f", catch_stdout=False)
+        #bcftools sort, collapse, and compress
+        bcftools.norm("-m", "+any", "-O", "z", "-o",
+                      sorted_file, inFile, catch_stdout=False)
+        
+        return_file = sorted_file
 
-    return sorted_file
+    if index:
+        #bcftools index
+        bcftools.index(return_file, "-t", "-f", catch_stdout=False)
+
+    return return_file
 
 
 def poolImportVCF(file_info):
@@ -206,17 +242,17 @@ def parallelGen(config_file, inputFileList, outputDir, callset_file=None):
     with open(config_file) as conf:
         config = json.load(conf)
 
-    # register callset parent objects with first input vcf
+    # if no contig information in header, assume it's already registered
     with open(inputFileList[0], 'rb') as vcf_init:
         reader = vcf.Reader(vcf_init)
-        dba, vs, rs = helper.registerWithMetadb(config, references=reader.contigs)
+        dba, vs, rs = helper.registerWithMetadb(config, vcf=True, references=reader.contigs)
 
     # sort and index vcfs, and
     # build arguments for parallel gen
     function_args = [None] * len(inputFileList)
     index = 0
     for inFile in inputFileList:
-        sorted_file = sortAndIndex(inFile, outputDir)
+        sorted_file = sortAndIndex(inFile, outputDir, sort=config.get('sort_compress',True), index=config.get('index', True))
         function_args[index] = (config_file, sorted_file)
         index += 1
 
