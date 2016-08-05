@@ -4,8 +4,8 @@ import metadb.models as models
 
 
 class TestQuery:
-    DBURI = "postgresql+psycopg2://@:5432/testdb"
-    workspace = "/home/jagan/DB"
+    DBURI = "postgresql+psycopg2://@:5432/metadb"
+    workspace = "/home/genomicsdb/DB"
     arrayName = "test"
     numRows = 8
     chromosomes = ["1", "2", "3", "4", "5", "6", "7",
