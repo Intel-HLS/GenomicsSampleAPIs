@@ -194,7 +194,7 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "only single TN" in str(exec_info.value)
+        assert "Make sure vcf_type" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf6_import.config")
         conf.write(json.dumps(self.config))
@@ -211,11 +211,11 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "Set callset_loc" in str(exec_info.value)
+        assert "Set derive_sample_from file" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf7_import.config")
         this_conf = dict(self.config)
-        this_conf['derive_sample_by'] = 'tag'
+        this_conf['derive_sample_from'] = 'tag'
         this_conf['get_sample_by'] = 'SampleName'
         conf.write(json.dumps(this_conf))
 
@@ -233,13 +233,13 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "only single TN" in str(exec_info.value)
+        assert "Make sure vcf_type" in str(exec_info.value)
 
     def test_createCallSetDict(self):
 
         conf = self.tmpdir.join("vcf8_import.config")
         this_conf = dict(self.config)
-        this_conf['derive_sample_by'] = 'tag'
+        this_conf['derive_sample_from'] = 'tag'
         this_conf['get_sample_by'] = 'SampleName'
         conf.write(json.dumps(this_conf))
 
