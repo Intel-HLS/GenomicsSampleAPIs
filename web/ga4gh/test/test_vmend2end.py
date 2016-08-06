@@ -27,7 +27,7 @@ normal_tag = '##SAMPLE=<ID=NORMAL,Description="Wild type",Platform=ILLUMINA,Prot
 tumor_tag = '##SAMPLE=<ID=TUMOUR,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=sampleT>'
 extra_tag = '##SAMPLE=<ID=EXTRA,Description="Mutant",Platform=ILLUMINA,Protocol=WGS,SampleName=extra>'
 
-test_data = [
+test_data_vcf = [
     "1",
     "10177",
     "rs367896724",
@@ -86,11 +86,25 @@ payload = {
     "referenceName": "1",
     "variantSetIds": ["testing"]}
 
+payload_maf = {
+    "end": 102,
+    "start": 100,
+    "referenceName": "1",
+    "variantSetIds": ["testing"]
+}
+
+payload_vcf = {
+    "end": 10179,
+    "start": 10176,
+    "referenceName": "1",
+    "variantSetIds": ["testing"] 
+}
 
 class TestVMEnd2End(TestCase):
 
     @classmethod
     def setUpClass(self):
+	# SET METADB
         self.DBURI = "postgresql+psycopg2://@:5432/end2end"
 
         if database_exists(self.DBURI):
@@ -101,19 +115,18 @@ class TestVMEnd2End(TestCase):
         engine = create_engine(self.DBURI)
         models.bind_engine(engine)
 
+	# READY VCF CONFIGURATION
         self.assembly = "testAssembly"
-
-        # test files
         with open("test/data/header.vcf", "r") as f:
             self.header = f.read()
 
-        # create the base config
         self.vcf_config_path = os.path.abspath(
             "utils/example_configs/vcf_import.config")
         with open(self.vcf_config_path, 'r') as readFP:
             self.vcf_config = json.load(readFP)
             self.vcf_config["dburi"] = self.DBURI
 
+	# READY MAF CONFIGURATION
         self.maf_config_path = os.path.join(os.path.realpath(
             sys.argv[-1]), "utils/example_configs/icgc_config.json")
         with open(self.maf_config_path, 'r') as readFP:
@@ -131,7 +144,8 @@ class TestVMEnd2End(TestCase):
         self.maf_config.DB_URI = self.DBURI
         imp.helper.registerWithMetadb(self.maf_config)
 
-        self.parser = ConfigParser.RawConfigParser()
+        # SET LOADER CONFIGURATION
+	self.parser = ConfigParser.RawConfigParser()
         self.parser.read('utils/example_configs/load_to_tile.cfg')
         self.parser.set('loader', 'executable', os.path.join(os.path.realpath(
             sys.argv[-1]), "search_library/dependencies/GenomicsDB/bin/vcf2tiledb"))
@@ -145,10 +159,8 @@ class TestVMEnd2End(TestCase):
             self.tile_loader['column_partitions'][0]['workspace'] = self.vcf_config['workspace']
             self.tile_loader['column_partitions'][0]['array'] = self.vcf_config['array']
 
-        # setup web app
-
-        ga4ghPath = "./test/data"
-        configE2E = os.path.join(ga4ghPath, "ga4gh_e2e.conf")
+        # SET WEB APP CONFIGURATION
+        configE2E = os.path.join(os.path.realpath(sys.argv[-1]), "test/data/ga4gh_e2e.conf")
         parser = ConfigParser.RawConfigParser()
         parser.read(configE2E)
         parser.set('tiledb', 'WORKSPACE', self.vcf_config['workspace'])
@@ -159,6 +171,9 @@ class TestVMEnd2End(TestCase):
         parser.set('virtualenv', 'SITE_PACKAGES', venv+"lib/python2.7/site-packages")
         parser.set('auto_configuration', 'SEARCHLIB', os.path.join(os.path.realpath(
             sys.argv[-1]), "search_library/lib/libquery.so"))
+	
+	with open(configE2E, 'w') as fp:
+	    parser.write(fp)
 
         sys.path.append("./web")
 
@@ -166,7 +181,8 @@ class TestVMEnd2End(TestCase):
 
         from web.ga4gh import create_app
         from web.ga4gh.views import ga4gh
-
+	
+	# START WEB APP
         self.application = create_app('config.LoadedConfig')
         self.ctx = self.application.app_context()
         self.ctx.push()
@@ -185,7 +201,6 @@ class TestVMEnd2End(TestCase):
         """
 
         # LOAD VCF
-
         conf = self.tmpdir.join("vcf_import.config")
         conf.write(json.dumps(self.vcf_config))
 
@@ -197,12 +212,12 @@ class TestVMEnd2End(TestCase):
         with open(str(vcfile), 'w') as inVCF:
             inVCF.write("{0}".format(self.header))
             inVCF.write("{0}\n".format("\t".join(test1_header)))
-            inVCF.write("{0}\n".format("\t".join(test_data)))
+            inVCF.write("{0}\n".format("\t".join(test_data_vcf)))
 
         vcimp.multiprocess_import.parallelGen(
             str(conf), [str(vcfile)], str(self.tmpdir))
 
-        # check callset_map reflects callsets imported
+        # checkpoint: callset_map reflects callsets imported from vcf
         with open(str(self.tmpdir.join("callset_mapping")), "r") as cmf:
             cm = json.load(cmf)
             assert len(cm['callsets']) == 2
@@ -231,7 +246,7 @@ class TestVMEnd2End(TestCase):
             str(test_config), [
                 str(input_file)], str(test_output_dir), True, callset_file=str(self.tmpdir.join("callset_mapping")))
 
-        # check callset_map reflects callsets imported
+        # checkpoint: callset_map reflects callsets imported from maf and vcf callsets persist
         with open(str(test_output_dir)+"/callset_mapping", "r") as cmf:
             cm = json.load(cmf)
             assert len(cm['callsets']) == 3
@@ -247,15 +262,34 @@ class TestVMEnd2End(TestCase):
         with open(str(loader_config), 'w') as fp:
             self.parser.write(fp)
 
-        # loader.load2Tile(str(loader_config), str(test_output_dir)+"/callset_mapping", str(test_output_dir)+"/vid_mapping")
+        loader.load2Tile(str(loader_config), str(test_output_dir)+"/callset_mapping", str(test_output_dir)+"/vid_mapping")
 
+	# QUERY APP FOR AVAILABLE DATA
         response = self.tester.post(
             '/variants/search',
             data=json.dumps(payload),
             content_type='application/json')
         read_resp = json.loads(response.data)
-        # assert read_resp == True
+        assert len(read_resp['variants']) == 2
         
+	# VALIDATE MAF DATA LOAD AND QUERIABLE
+	response_maf = self.tester.post(
+	    '/variants/search',
+            data=json.dumps(payload_maf),
+            content_type='application/json')
+        read_resp_maf = json.loads(response_maf.data)
+        assert len(read_resp_maf['variants']) == 1
+	assert read_resp_maf['variants'][0]['end'] == 101
+	
+	# VALIDATE VCF DATA LOAD AND QUERIABLE 
+	response_vcf = self.tester.post(
+	    '/variants/search',
+	    data=json.dumps(payload_vcf),
+	    content_type='application/json')
+	read_resp_vcf = json.loads(response_vcf.data)
+	assert len(read_resp_vcf['variants'][0]['calls']) == 2
+	assert read_resp_vcf['variants'][0]['end'] == 10177
+
     @classmethod
     def tearDownClass(self):
         self.ctx.pop()
