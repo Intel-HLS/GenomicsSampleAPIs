@@ -194,7 +194,7 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "Make sure vcf_type" in str(exec_info.value)
+        assert "Currently only single" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf6_import.config")
         conf.write(json.dumps(self.config))
@@ -233,7 +233,7 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "Make sure vcf_type" in str(exec_info.value)
+        assert "Currently only single" in str(exec_info.value)
 
     def test_createCallSetDict(self):
 

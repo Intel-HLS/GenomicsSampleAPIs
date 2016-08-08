@@ -45,7 +45,7 @@ class VCF:
         conf = json.load(self.config)
         self.dburi = conf['dburi']
         self.workspace = conf['workspace']
-        self.vcf_type = conf['vcf_type']
+        self.vcf_type = conf.get('vcf_type', None)
 
         self.derive_sample = conf.get('derive_sample_from', 'header')
         self.get_sample_by = conf.get('get_sample_by', None)
@@ -70,9 +70,11 @@ class VCF:
 
     def setSampleNames(self):
             
-        if len(self.reader.samples) != 2 and self.vcf_type == 'TN':
+        if len(self.reader.samples) < 2 and self.vcf_type == 'TN':
             # assume that this is a mixed batch and unset self.vcf_type
             self.vcf_type = None
+        elif len(self.reader.samples) != 2 and self.vcf_type == 'TN':
+            raise ValueError("Currently only single sample, composite, or TN support.")
 
         if len(self.reader.samples) == 0:
             self.reader.samples = ['']
@@ -92,8 +94,7 @@ class VCF:
         if self.derive_sample == 'file':
             if self.get_sample_by is not None:
                 sample_prefix = os.path.basename(self.filename).split(self.get_sample_by)[self.get_sample_at]
-                if len(self.reader.samples[0]) > 0:
-                    sample_prefix += "_"
+
                 self.reader.samples[self.source_idx] = sample_prefix + self.reader.samples[self.source_idx]
                 if self.vcf_type == 'TN':
                     self.reader.samples[self.target_idx] = sample_prefix + self.reader.samples[self.target_idx]
