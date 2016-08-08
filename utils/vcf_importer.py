@@ -46,6 +46,7 @@ class VCF:
         self.dburi = conf['dburi']
         self.workspace = conf['workspace']
         self.vcf_type = conf['vcf_type']
+
         self.derive_sample = conf.get('derive_sample_from', 'header')
         self.get_sample_by = conf.get('get_sample_by', None)
         self.get_sample_at = conf.get('get_sample_at', 0)
@@ -70,7 +71,8 @@ class VCF:
     def setSampleNames(self):
             
         if len(self.reader.samples) != 2 and self.vcf_type == 'TN':
-            raise ValueError('Make sure vcf_type is properly set.')
+            # assume that this is a mixed batch and unset self.vcf_type
+            self.vcf_type = None
 
         if len(self.reader.samples) == 0:
             self.reader.samples = ['']
