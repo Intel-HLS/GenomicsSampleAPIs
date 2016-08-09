@@ -22,6 +22,10 @@ before_script:
   - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
 
 script:
+  - curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
+  - echo "source $HOME/.rvm/scripts/rvm" >> ~/.bash_profile
+  - source $HOME/.rvm/scripts/rvm
+  - rvm install 2.2.3
   - gem install bundler
   - bundle install
   - bash -x tools/runspec.sh
