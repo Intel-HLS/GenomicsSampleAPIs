@@ -34,7 +34,8 @@ script:
   - rvm install 2.2.3
   - gem install bundler
   - bundle install
-  - bash -x tools/runspec.sh
+  - rake:serverspec:site
+#  - bash -x tools/runspec.sh
   - cd $TRAVIS_BUILD_DIR
   - py.test --cov .
 
