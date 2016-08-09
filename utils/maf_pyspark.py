@@ -63,6 +63,7 @@ class MAF_Spark:
         Updates the indices of the fields of interest in the MAF file from the
         config file
         """
+
         position = 0
         self.indices['SourceSampleName'] = \
             [self.header.index(self.config.SourceSampleIdMap), position]
@@ -141,7 +142,7 @@ class MAF_Spark:
         Executes the spark context, the transformations and actions required to
         convert MAF to CSV
         """
-        
+
         HeaderStartsWith = self.config.HeaderStartsWith
         LineSperator = self.config.SeperatorMap['line']
 
@@ -155,7 +156,9 @@ class MAF_Spark:
                    os.path.abspath('helper.py'),
                    os.path.abspath('file2tile.py')]
 
-        sc = SparkContext(conf=conf, pyFiles=pyFiles)
+        sc = \
+            SparkContext(appName='MAF to CSV - {}'.format(self.config.TileDBSchema['array'
+                         ]), conf=conf, pyFiles=pyFiles)
 
         # Convert text files to RDD
 
@@ -246,6 +249,7 @@ def getFields(fields):
     
     @param fields: a tuple of all the fields in a MAF file
     """
+
     global indices
 
     outFields = ['*'] * len(indices)
@@ -304,6 +308,7 @@ def updateIds(keys, callset_mapping, output_file):
     @param callset_mapping: dict that gets updated with the callsets information
     @param output_file: File where the csv will be. This is a required field in the callset_mappping dict 
     """
+
     global rowIdMap, indices, dbimport, dbquery, variantSetId
 
     rowIdMap = dict()
@@ -411,6 +416,7 @@ def getSnapshot(attributeList):
     """
     Returns the values that are in the csv line required field format
     """
+
     global otherAttributes, GTMap
     snapshot = [None] * len(otherAttributes)
     for i in xrange(0, len(otherAttributes)):
@@ -441,6 +447,7 @@ def combineData(combinedSnapshot, newSnapshot):
     Called when there are 2 items with the same key. The function merges the
     values and returns the new value for the key.
     """
+
     global otherAttributes
     if 'ALT' in otherAttributes:
         indexOfALT = otherAttributes.index('ALT')
