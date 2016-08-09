@@ -1,6 +1,10 @@
 language: ruby
 rvm:
  - "2.2.3"
+cache:
+  - directories:
+    - $HOME/.cache/pip
+    - vendor/bundle
 before_install:
   - sudo apt-get update
   - sudo service postgresql stop
