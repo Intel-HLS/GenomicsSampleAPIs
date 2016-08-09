@@ -21,9 +21,12 @@ before_script:
   - source $HOME/.bashrc
 
 script:
+  - gem install bundler
+  - bundle install
   - bash -x tools/runspec.sh
   - cd $TRAVIS_BUILD_DIR
   - py.test --cov .
+
 
 sudo: required
 dist: trusty
