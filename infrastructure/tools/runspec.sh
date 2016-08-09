@@ -21,7 +21,9 @@ if [ -n "${CONTINUOUS_INTEGRATION}" ]
 then
     export INVENTORY=${TMPDIR}/hosts
     cat_ansible_hosts
-    sudo -E su -c "source ${rvm_path}/scripts/rvm; rake serverspec:site"
+    source ${rvm_path}/scripts/rvm
+    rake serverspec:site"
+    #sudo -E su -c "source ${rvm_path}/scripts/rvm; rake serverspec:site"
 else
     export INVENTORY=../.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
     # Add extra parameters to Ansible inventory for serverspec to function
