@@ -19,6 +19,7 @@ before_script:
   - pip install pytest pytest-cov coverage pytest-flask pytest-mock
   - pip install sqlalchemy-utils
   - source $HOME/.bashrc
+  - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
 
 script:
   - gem install bundler
