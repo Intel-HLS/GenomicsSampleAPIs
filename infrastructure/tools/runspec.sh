@@ -22,7 +22,7 @@ then
     export INVENTORY=${TMPDIR}/hosts
     cat_ansible_hosts
     source ${rvm_path}/scripts/rvm
-    rake serverspec:site"
+    rake serverspec:site
     #sudo -E su -c "source ${rvm_path}/scripts/rvm; rake serverspec:site"
 else
     export INVENTORY=../.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
