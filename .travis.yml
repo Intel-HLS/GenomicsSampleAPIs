@@ -25,6 +25,7 @@ script:
   - curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
   - echo "source $HOME/.rvm/scripts/rvm" >> ~/.bash_profile
   - source $HOME/.rvm/scripts/rvm
+  - rvm cleanup all
   - rvm install 2.2.3
   - gem install bundler
   - bundle install
