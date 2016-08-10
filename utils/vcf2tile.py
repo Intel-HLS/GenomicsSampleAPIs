@@ -2,7 +2,6 @@
 
 import utils.vcf_importer as multiprocess_import
 import utils.helper as helper
-import utils.loader as loader
 
 if __name__ == "__main__":
 
