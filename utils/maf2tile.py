@@ -79,11 +79,14 @@ if __name__ == "__main__":
                 "-c", args.config, 
                 "-d", args.outputdir, 
                 "-o", args.output, 
-                "-a", args.append_callsets,
                 "-i"]
 
             spark_cmd.extend(args.inputs)
-
+            if args.loader:
+                spark_cmd.extend(['-l', args.loader])
+            if args.append_callsets:
+                spark_cmd.extend(['-a', args.append_callsets])
+            print spark_cmd
             if subprocess.call(spark_cmd) != 0:
                 raise Exception("Error running converter")
         else:
