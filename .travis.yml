@@ -34,6 +34,7 @@ script:
   - rvm install 2.2.3
   - gem install bundler
   - bundle install
+  - cd ansible
   - rake serverspec:site
 #  - bash -x tools/runspec.sh
   - cd $TRAVIS_BUILD_DIR
