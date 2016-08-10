@@ -36,7 +36,6 @@ script:
   - bundle install
   - cd ansible
   - rake serverspec:site
-#  - bash -x tools/runspec.sh
   - cd $TRAVIS_BUILD_DIR
   - py.test --cov .
 
