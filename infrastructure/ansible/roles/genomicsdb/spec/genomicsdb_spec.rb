@@ -12,11 +12,11 @@ describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/web/templates') do
   it { should be_directory }
 end
 
-describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/dependencies/GenomicsDB') do
+describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/search_library/dependencies/GenomicsDB') do
   it { should be_directory }
 end
 
-describe file('/home/genomicsdb/dependencies/htslib') do
+describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/search_library/dependencies/GenmoicsDB/dependencies/htslib') do
   it { should be_directory }
 end
 

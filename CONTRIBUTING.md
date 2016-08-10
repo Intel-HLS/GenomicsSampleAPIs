@@ -6,6 +6,8 @@ We are excited you are interested in improving the sample APIs  Thanks for takin
 
 ## Code Layout
 
+The code layout is descrived in the [README](https://github.com/Intel-HLS/GenomicsSampleAPIs/blob/spec_tests/README.md#repository-organization).
+
 ## Code Style
 
 We are somewhat loose on coding style.  Generally try to stay consistant with the naming, spacing, and layout of the language as used thus far.
@@ -18,6 +20,8 @@ Generally [pep8](https://www.python.org/dev/peps/pep-0008) is a good goal, but n
 - Classes are usually named with CapitalizedWords
 - variables are usually named with lowercase
 
+### C / C++
+
 ## Pull Request Workflow
 
 ## Testing
@@ -25,6 +29,7 @@ Generally [pep8](https://www.python.org/dev/peps/pep-0008) is a good goal, but n
 ## Questions
 
 ### FAQ
+
 To be added as questions are frequently asked
 
 ### Answers

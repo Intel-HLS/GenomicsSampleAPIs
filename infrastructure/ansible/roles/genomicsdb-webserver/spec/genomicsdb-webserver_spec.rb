@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe file('/home/genomicsdb/DB/StorageManager/test') do
+describe file('/home/genomicsdb/DB/test') do
   it { should be_directory }
 end
 
