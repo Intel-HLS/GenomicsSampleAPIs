@@ -8,6 +8,16 @@ We are excited you are interested in improving the sample APIs  Thanks for takin
 
 ## Code Style
 
+We are somewhat loose on coding style.  Generally try to stay consistant with the naming, spacing, and layout of the language as used thus far.
+
+### Python
+
+Generally [pep8](https://www.python.org/dev/peps/pep-0008) is a good goal, but not an absolute requirement.  Line length is done for readability, so not strictly 79 chars.
+
+- Functions are usually named with under_scores or mixedCase.
+- Classes are usually named with CapitalizedWords
+- variables are usually named with lowercase
+
 ## Pull Request Workflow
 
 ## Testing

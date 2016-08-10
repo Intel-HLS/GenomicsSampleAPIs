@@ -16,11 +16,7 @@ describe file('/home/genomicsdb/repos/GenomicsSampleAPIs/dependencies/GenomicsDB
   it { should be_directory }
 end
 
-describe file('/home/genomicsdb/repos/search_library/dependencies/GenomicsDB/dependencies/htslib') do
-  it { should be_directory }
-end
-
-describe file('/home/genomicsdb/repos/search_library/dependencies/GenomicsDB/dependencies/rapidjson') do
+describe file('/home/genomicsdb/dependencies/htslib') do
   it { should be_directory }
 end
 
