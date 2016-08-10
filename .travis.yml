@@ -24,20 +24,20 @@ before_script:
   - pip install sqlalchemy-utils
   - source $HOME/.bashrc
   - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
-
-script:
   - curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
   - echo "source $HOME/.rvm/scripts/rvm" >> ~/.bash_profile
-  - source $HOME/.rvm/scripts/rvm
   - rvm reload
   - rvm cleanup all
   - rvm install 2.2.3
   - gem install bundler
   - bundle install
-  - cd ansible
-  - rake serverspec:site
+
+script:
   - cd $TRAVIS_BUILD_DIR
   - py.test --cov .
+  - source $HOME/.rvm/scripts/rvm
+  - cd $inf_dir/ansible
+  - rake serverspec:site
 
 
 sudo: required
