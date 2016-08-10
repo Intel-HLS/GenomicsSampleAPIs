@@ -187,6 +187,7 @@ def createMappingFiles(outputDir, callset_mapping, rs_id, DB_URI, array, loader_
     print "Generated VID Mapping File : {0}".format(vid_mapping_file)
 
     if loader_config:
+        import utils.loader as loader
         loader.load2Tile(loader_config, callset_mapping_file, vid_mapping_file)
 
 
