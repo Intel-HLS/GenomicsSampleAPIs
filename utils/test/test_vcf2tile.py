@@ -93,12 +93,12 @@ class TestVCFImporter(TestCase):
             assert len(result) == 2
 
         # check callset_map reflects callsets imported
-        with open(str(self.tmpdir.join("callset_mapping")), "r") as cmf:
+        with open(str(self.tmpdir.join(self.config['array']+".callset_mapping")), "r") as cmf:
             cm = json.load(cmf)
             assert len(cm['callsets']) == 2
 
         # check vid_map reflects the contigs in vcf header
-        with open(str(self.tmpdir.join("vid_mapping")), "r") as vidf, VCF(str(vcfile), str(conf)) as vc:
+        with open(str(self.tmpdir.join(self.config['array']+".vid_mapping")), "r") as vidf, VCF(str(vcfile), str(conf)) as vc:
             vid = json.load(vidf)
             assert len(vid['contigs']) == len(vc.reader.contigs)
 
