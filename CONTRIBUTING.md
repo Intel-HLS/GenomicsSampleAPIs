@@ -21,6 +21,6 @@ To be added as questions are frequently asked
 
 If you have any questsions, checkout out the [Questions](#Questions) section.  Most of our documentation is in the project [wiki](https://github.com/Intel-HLS/GenomicsSampleAPIs/wiki)
 
-If you have any further questions, contact the project [maintainers or authors](https://github.com/Intel-HLS/GenomicsSampleAPIs/AUTHORS).
+If you have any further questions, contact the project [maintainers or authors](https://github.com/Intel-HLS/GenomicsSampleAPIs/blob/master/AUTHORS).
 
 
