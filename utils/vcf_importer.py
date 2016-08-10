@@ -197,7 +197,7 @@ def poolImportVCF(file_info):
         return (0, inputFile, vc.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir, callset_file=None):
+def parallelGen(config_file, inputFileList, outputDir, callset_file=None, loader_config=None):
     """
     Spawns the Pool of VCF objects to work on each input VCF
     Creates callset mapping and vid mapping files for GenomicsDB import
@@ -246,4 +246,4 @@ def parallelGen(config_file, inputFileList, outputDir, callset_file=None):
         raise Exception("Execution failed on {0}".format(failed))
 
     # create GenomicsDB vid mapping and callset mapping files 
-    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config['dburi'])
+    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config['dburi'], dba.name, loader_config=loader_config)

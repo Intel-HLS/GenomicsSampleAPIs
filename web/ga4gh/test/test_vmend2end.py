@@ -218,7 +218,7 @@ class TestVMEnd2End(TestCase):
             str(conf), [str(vcfile)], str(self.tmpdir))
 
         # checkpoint: callset_map reflects callsets imported from vcf
-        with open(str(self.tmpdir.join("callset_mapping")), "r") as cmf:
+        with open(str(self.tmpdir.join(self.vcf_config['array']+".callset_mapping")), "r") as cmf:
             cm = json.load(cmf)
             assert len(cm['callsets']) == 2
 
@@ -244,10 +244,10 @@ class TestVMEnd2End(TestCase):
 
         imp.multiprocess_import.parallelGen(
             str(test_config), [
-                str(input_file)], str(test_output_dir), True, callset_file=str(self.tmpdir.join("callset_mapping")))
+                str(input_file)], str(test_output_dir), True, callset_file=str(self.tmpdir.join(self.vcf_config['array']+".callset_mapping")))
 
         # checkpoint: callset_map reflects callsets imported from maf and vcf callsets persist
-        with open(str(test_output_dir)+"/callset_mapping", "r") as cmf:
+        with open(str(test_output_dir)+"/"+self.vcf_config['array']+".callset_mapping", "r") as cmf:
             cm = json.load(cmf)
             assert len(cm['callsets']) == 3
             assert len(cm['unsorted_csv_files']) == 1
@@ -262,7 +262,7 @@ class TestVMEnd2End(TestCase):
         with open(str(loader_config), 'w') as fp:
             self.parser.write(fp)
 
-        loader.load2Tile(str(loader_config), str(test_output_dir)+"/callset_mapping", str(test_output_dir)+"/vid_mapping")
+        loader.load2Tile(str(loader_config), str(test_output_dir)+"/"+self.vcf_config['array']+".callset_mapping", str(test_output_dir)+"/"+self.vcf_config['array']+".vid_mapping")
 
 	# QUERY APP FOR AVAILABLE DATA
         response = self.tester.post(
