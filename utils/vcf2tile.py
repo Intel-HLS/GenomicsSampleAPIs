@@ -2,7 +2,6 @@
 
 import utils.vcf_importer as multiprocess_import
 import utils.helper as helper
-import utils.loader as loader
 
 if __name__ == "__main__":
 
@@ -53,9 +52,5 @@ if __name__ == "__main__":
         args.config, 
         args.inputs, 
         args.outputdir, 
-        callset_file=args.append_callsets)
-
-    if args.loader:
-        callset_mapping_file = "{0}/callset_mapping".format(args.outputdir)
-        vid_mapping_file = "{0}/vid_mapping".format(args.outputdir)
-        loader.load2Tile(args.loader, callset_mapping_file, vid_mapping_file)
+        callset_file=args.append_callsets,
+        loader_config=args.loader)

@@ -418,7 +418,7 @@ def poolGenerateCSV(file_params):
     return (0, outFile, maf.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir, bGzipped, callset_file=None):
+def parallelGen(config_file, inputFileList, outputDir, bGzipped, callset_file=None, loader_config=None):
     """
     Function that spawns the Pool of MAF objects to work on each of the input files
     Once the BookKeeping support moves to a real DB, move from threads to multiprocessing.Pool
@@ -464,4 +464,6 @@ def parallelGen(config_file, inputFileList, outputDir, bGzipped, callset_file=No
         outputDir,
         callset_mapping,
         rs.id,
-        config.DB_URI)
+        config.DB_URI,
+        dba.name,
+        loader_config=loader_config)

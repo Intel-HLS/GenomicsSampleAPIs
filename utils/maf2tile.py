@@ -3,7 +3,6 @@
 import subprocess
 import utils.maf_importer as multiprocess_import
 import utils.helper as helper
-import utils.loader as loader
 
 if __name__ == "__main__":
 
@@ -80,11 +79,14 @@ if __name__ == "__main__":
                 "-c", args.config, 
                 "-d", args.outputdir, 
                 "-o", args.output, 
-                "-a", args.append_callsets,
                 "-i"]
 
             spark_cmd.extend(args.inputs)
-
+            if args.loader:
+                spark_cmd.extend(['-l', args.loader])
+            if args.append_callsets:
+                spark_cmd.extend(['-a', args.append_callsets])
+            print spark_cmd
             if subprocess.call(spark_cmd) != 0:
                 raise Exception("Error running converter")
         else:
@@ -100,9 +102,5 @@ if __name__ == "__main__":
             args.inputs,
             args.outputdir,
             args.gzipped,
-            callset_file=args.append_callsets)
-
-    if args.loader:
-        callset_mapping_file = "{0}/callset_mapping".format(args.outputdir)
-        vid_mapping_file = "{0}/vid_mapping".format(args.outputdir)
-        loader.load2Tile(args.loader, callset_mapping_file, vid_mapping_file)
+            callset_file=args.append_callsets,
+            loader_config=args.loader)
