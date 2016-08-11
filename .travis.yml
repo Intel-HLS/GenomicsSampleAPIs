@@ -30,7 +30,6 @@ before_script:
   - rvm cleanup all
   - rvm install 2.2.3
   - gem install bundler
-  - bundle install
 
 script:
 #  - cd $TRAVIS_BUILD_DIR
@@ -38,6 +37,7 @@ script:
   - py.test --cov .
   - source $HOME/.rvm/scripts/rvm
   - cd $inf_dir/ansible
+  - bundle install
   - rake serverspec:site
 
 
