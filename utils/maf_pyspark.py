@@ -494,7 +494,7 @@ def updateRefAltPos(iter):
     return m_csv_line_list
 
 
-def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, callset_file=None):
+def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, callset_file=None, loader_config=None):
     """
     Function that spawns  Spark RDD objects to work on each of the input files
     """
@@ -527,7 +527,7 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, calls
     callset_mapping["callsets"].update(maf.callset_mapping)
 
     helper.createMappingFiles(
-        outputDir, callset_mapping, rs.id, config.DB_URI, combinedOutputFile=combinedOutputFile)
+        outputDir, callset_mapping, rs.id, config.DB_URI, dba.name, loader_config=loader_config)
 
 if __name__ == "__main__":
 
@@ -572,6 +572,13 @@ if __name__ == "__main__":
         type=str,
         help="CallSet mapping file to append.")
 
+    parser.add_argument(
+        "-l",
+        "--loader",
+        required=False,
+        type=str,
+        help="Loader JSON to load data into Tile DB.")
+
     args = parser.parse_args()
 
     parallelGen(
@@ -579,4 +586,5 @@ if __name__ == "__main__":
         args.inputs, 
         args.outputdir, 
         args.output, 
-        callset_file=args.append_callsets)
+        callset_file=args.append_callsets,
+        loader_config=args.loader)
