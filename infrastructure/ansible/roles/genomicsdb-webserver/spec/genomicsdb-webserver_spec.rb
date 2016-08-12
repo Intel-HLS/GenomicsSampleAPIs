@@ -36,5 +36,5 @@ end
 
 #describe command('curl -H "Content-Type: application/json" -X POST -d \'{"end": 27507000, "pageSize": 31, "start": 27506000, "pageToken": null, "variantSetIds": [], "variantName": null, "referenceName": "13"}\'  localhost:8990/variants/search | grep alternateBases | wc -l') do
 describe command('curl -H "Content-Type: application/json" -X POST -d \'{"end": 27507000, "pageSize": 31, "start": 27506000, "pageToken": null, "variantSetIds": [], "variantName": null, "referenceName": "13"}\'  localhost:8990/variants/search') do
-  its(:stdout) { should match /2/}
+  its(:stdout) { should match /somethingneverseen/}
 end
