@@ -177,8 +177,6 @@ class TestVCFImporter(TestCase):
         i) TN vcf, ii) callset_loc in config set, iii) TN vcf with sample tag
         """
         conf = self.tmpdir.join("vcf5_import.config")
-        # this_conf = dict(self.config)
-        # this_conf['callset_loc'] = None
         conf.write(json.dumps(self.config))
 
         vcfile = self.tmpdir.join("test5.vcf")
@@ -194,28 +192,11 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "only single TN" in str(exec_info.value)
-
-        conf = self.tmpdir.join("vcf6_import.config")
-        conf.write(json.dumps(self.config))
-
-        vcfile = self.tmpdir.join("test6.vcf")
-        test2_header = list(test_header)
-        test2_header.append('NORMAL')
-        test2_header.append('TUMOUR')
-        with open(str(vcfile), 'w') as inVCF:
-            inVCF.write("{0}\n".format(self.header))
-            inVCF.write("{0}\n".format("\n".join([normal_tag, tumor_tag])))
-            inVCF.write("{0}\n".format("\t".join(test2_header)))
-            inVCF.write("{0}\n".format("\t".join(test_data)))
-
-        with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
-            vc.createCallSetDict()
-        assert "Set callset_loc" in str(exec_info.value)
+        assert "Currently only single" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf7_import.config")
         this_conf = dict(self.config)
-        this_conf['callset_loc'] = 'SampleName'
+        this_conf['sample_name'] = {'derive_from': 'tag', 'split_by': 'SampleName'}
         conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test7.vcf")
@@ -232,13 +213,13 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "only single TN" in str(exec_info.value)
+        assert "Currently only single" in str(exec_info.value)
 
     def test_createCallSetDict(self):
 
         conf = self.tmpdir.join("vcf8_import.config")
         this_conf = dict(self.config)
-        this_conf['callset_loc'] = 'SampleName'
+        this_conf['sample_name'] = {'derive_from': 'tag', 'split_by': 'SampleName'}
         conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test8.vcf")

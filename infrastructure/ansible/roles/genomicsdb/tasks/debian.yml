@@ -18,10 +18,11 @@
     dest: "{{dependencies_path}}/libcsv.zip"
     url : https://github.com/robertpostill/libcsv/archive/master.zip
 
+# force override with unzip -o 
 - name: Prepare libcsv package
   shell: >
     cd {{dependencies_path}} &&
-    unzip libcsv.zip &&
+    unzip -o libcsv.zip &&
     cd {{libcsv_path}} &&
     autoreconf --install &&
     ./configure &&
