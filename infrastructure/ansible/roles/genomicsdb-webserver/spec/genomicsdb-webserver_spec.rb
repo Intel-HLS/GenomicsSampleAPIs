@@ -34,7 +34,6 @@ describe port(8990) do
   it { should be_listening }
 end
 
-describe command('curl -H "Content-Type: application/json" -X POST -d \'{"end": 27507000, "pageSize": 31, "start": 27506000, "pageToken": null, "variantSetIds": [], "variantName": null, "referenceName": "13"}\'  localhost:8990/variants/search') do
-#describe command('curl -H "Content-Type: application/json" -X POST -d \'{"end": 27507000, "pageSize": 31, "start": 27506000, "pageToken": null, "variantSetIds": [], "variantName": null, "referenceName": "13"}\'  localhost:8990/variants/search | grep alternateBases | wc -l') do
-  its(:stdout) { should match /somethingishouldneversee/}
+describe command('curl -H "Content-Type: application/json" -X POST -d \'{"end": 27507000, "pageSize": 31, "start": 27506000, "pageToken": null, "variantSetIds": [], "variantName": null, "referenceName": "13"}\'  localhost:8990/variants/search | grep alternateBases | wc -l') do
+  its(:stdout) { should match /2/}
 end
