@@ -26,17 +26,16 @@ before_script:
   - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
   - curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
   - echo "source $HOME/.rvm/scripts/rvm" >> ~/.bash_profile
-  - rvm reload
-  - rvm cleanup all
-  - rvm install 2.2.3
-  - gem install bundler
 
 script:
 #  - cd $TRAVIS_BUILD_DIR
   - cd /home/genomicsdb/repos/GenomicsSampleAPIs
   - py.test --cov .
+  - rvm reload
+  - rvm cleanup all
+  - rvm install 2.2.3
+  - gem install bundler
   - source $HOME/.rvm/scripts/rvm
-  - cd $inf_dir/ansible
   - bundle install
   - rake serverspec:site
 
