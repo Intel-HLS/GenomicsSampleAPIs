@@ -160,7 +160,6 @@ def sortAndIndex(inFile, outdir):
     GenomicsDB import will fail if these four requirements aren't satisfied.
     """
     splitFile = os.path.basename(inFile).split(".")
-
     if splitFile[-1] == 'vcf':
         #.vcf
         file_name = ".".join(splitFile[:-1])
@@ -198,7 +197,7 @@ def poolImportVCF(file_info):
         return (0, inputFile, vc.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir):
+def parallelGen(config_file, inputFileList, outputDir, callset_file=None, loader_config=None):
     """
     Spawns the Pool of VCF objects to work on each input VCF
     Creates callset mapping and vid mapping files for GenomicsDB import
@@ -221,9 +220,14 @@ def parallelGen(config_file, inputFileList, outputDir):
         function_args[index] = (config_file, sorted_file)
         index += 1
 
-    # set for callset mapping recording
-    callset_mapping = dict()
-    callset_mapping["callsets"] = dict()
+    # append to callset
+    if callset_file:
+        with open(callset_file) as cf:
+            callset_mapping = json.load(cf)
+    else:
+        callset_mapping = dict()
+
+    callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
     callsets = callset_mapping["callsets"]
 
     pool = Pool()
@@ -242,4 +246,4 @@ def parallelGen(config_file, inputFileList, outputDir):
         raise Exception("Execution failed on {0}".format(failed))
 
     # create GenomicsDB vid mapping and callset mapping files 
-    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config['dburi'])
+    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config['dburi'], dba.name, loader_config=loader_config)

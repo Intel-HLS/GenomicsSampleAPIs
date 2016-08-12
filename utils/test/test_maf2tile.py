@@ -301,9 +301,6 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(test_header)))
             inFP.write("{0}\n".format("\t".join(test_data)))
 
-        output_file = self.tmpdir.join("out.txt")
-        output_file.write("")
-
         with open(self.config_path, 'r') as fp:
             config_json = json.load(fp)
         config_json["DB_URI"] = self.TESTDB_URI
@@ -317,9 +314,9 @@ class TestMAF(unittest.TestCase):
 
         imp.multiprocess_import.parallelGen(
             str(test_config), [
-                str(input_file)], str(test_output_dir), "out.txt", True)
+                str(input_file)], str(test_output_dir), True)
 
-        output_file = test_output_dir.join("out.txt")
+        output_file = test_output_dir.join("in.csv")
         with open(str(output_file), 'r') as outputFP:
             line = outputFP.readline().strip()
         assert line == self.getCSVLine(test_data, 0)
@@ -349,7 +346,7 @@ class TestMAF(unittest.TestCase):
 
         with pytest.raises(Exception) as exec_info:
             imp.multiprocess_import.parallelGen(str(test_config), [str(
-                input_file)], str(test_output_dir), "out.txt", False)
+                input_file)], str(test_output_dir), False)
         assert "Execution failed" in str(exec_info.value)
 
     def getCSVLine(self, input_list, SampleId,
