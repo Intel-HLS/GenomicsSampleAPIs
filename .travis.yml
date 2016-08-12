@@ -32,6 +32,7 @@ script:
   - cd /home/genomicsdb/repos/GenomicsSampleAPIs
   - py.test --cov .
   - cd $inf_dir/ansible
+  - cd $TRAVIS_BUILD_DIR/infrastructure/ansible
   - rvm reload
   - rvm cleanup all
   - rvm install 2.2.3
