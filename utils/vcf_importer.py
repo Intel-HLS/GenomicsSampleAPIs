@@ -5,7 +5,7 @@ import json
 import traceback
 from multiprocessing import Pool
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
 import vcf
 import pysam
@@ -43,17 +43,24 @@ class VCF:
 
         self.config = open(self.configfile, 'r')
         conf = json.load(self.config)
-        self.dburi = conf['dburi']
-        self.workspace = conf['workspace']
-        # default TN columns normal first column, target second column
-        # capture idx in file for GenomicsDB reference
+        self.dburi = utils.getDictValue(conf, 'dburi')
+        self.workspace = utils.getDictValue(conf, 'workspace')
+        # assume TN pair
+        # validate in setSampleNames: single or comp if < 2
+        self.vcf_type = conf.get('vcf_type', "TN")
+
+        # how to capture sample name from file
+        sample_name_map = conf.get('sample_name', {})
+        self.derive_sample = sample_name_map.get('derive_from', 'header')
+        self.split_sample_by = sample_name_map.get('split_by', None)
+        self.split_sample_index = sample_name_map.get('split_index', 0)
+
+        # set source and target location 
         self.source_idx = conf.get('source_idx', 0)
         self.target_idx = conf.get('target_idx', 1)
 
-        # callset loc specifies callset name reference in sample tag
-        self.callset_map = conf.get('callset_loc', None)
         self.array, self.variantset, self.referenceset = helper.registerWithMetadb(
-            conf, references=self.reader.contigs)
+            conf, vcf=True, references=self.reader.contigs)
 
         return self
 
@@ -64,37 +71,47 @@ class VCF:
         self.file.close()
         self.config.close()
 
+    def setSampleNames(self):
+        """
+        Reconstruct pyvcf reader sample list to reflect the callset names desired. 
+        """
+            
+        if len(self.reader.samples) < 2 and self.vcf_type == 'TN':
+            # assume that this is a mixed batch and unset self.vcf_type
+            self.vcf_type = None
+        elif len(self.reader.samples) != 2 and self.vcf_type == 'TN':
+            raise ValueError("Currently only single sample, composite, or TN support.")
+
+        # composite vcf
+        if len(self.reader.samples) == 0:
+            self.reader.samples = ['']
+        
+        # read sample from sample tag
+        if self.derive_sample == 'tag':
+            if self.split_sample_by is not None:
+                for s in range(0, len(self.reader.samples)):
+                    self.reader.samples[s] = self.reader.metadata['SAMPLE'][s][self.split_sample_by]
+            else:
+                raise ValueError('Set get_sample_by for reading sample from tag.')
+
+        # read sample from file
+        if self.derive_sample == 'file':
+            sample_prefix = os.path.basename(self.filename).split(self.split_sample_by)[self.split_sample_index]
+            for s in range(0, len(self.reader.samples)):
+                self.reader.samples[s] = sample_prefix + self.reader.samples[s]
+
+
     def createCallSetDict(self):
         """
-        Creates a callset dictionary ordered in terms of callset index in vcf
-        If callset_loc is not specified, the sample headers are the main identifier
-        of the callset. Designed to be later expanded for mulitsample TN vcf, currently
-        assumes single sample TN pair VCFs defaulted to NORMAL TUMOUR column order. 
+        Creates a callset dictionary ordered in terms of callset index in vcf.
         """
 
         callsets = OrderedDict()
 
-        # callset names in column headers
-        if self.callset_map is None:
-            if len(self.reader.samples) != 2:
-                raise ValueError(
-                    "Currently only single TN vcf format supported.")
-            elif 'NORMAL' in self.reader.samples:
-                raise ValueError("Set callset_loc in import config.")
-            else:
-                callsets[self.reader.samples[self.source_idx]] = self.reader.samples
-                callsets[self.reader.samples[self.target_idx]] = self.reader.samples
+        self.setSampleNames()
 
-        else:
-            # if not then, callset names are retrieved from VCF SAMPLE tag
-            if len(self.reader.metadata['SAMPLE']) != 2:
-                raise ValueError(
-                    "Currently only single TN vcf format supported.")
-            else:
-                source = self.reader.metadata['SAMPLE'][self.source_idx]['SampleName']
-                target = self.reader.metadata['SAMPLE'][self.target_idx]['SampleName']
-                callsets[source] = [source, target]
-                callsets[target] = [source, target]
+        for s in range(0, len(self.reader.samples)):
+            callsets[self.reader.samples[s]] = self.reader.samples
 
         return callsets
 
@@ -105,20 +122,31 @@ class VCF:
         """
         callsets = self.createCallSetDict()
 
+        source_idx = self.source_idx 
+        target_idx = self.target_idx
+        # validate tumor/normal order
+        if self.vcf_type == 'TN':
+            for i in range(0, len(self.reader.samples)):
+                sample = self.reader.samples[i].lower()
+                if 'normal' in sample:
+                    source_idx = i
+                if 'target' in sample or 'primary' in sample:
+                    target_idx = i
+
         with DBImport(self.dburi).getSession() as metadb:
             for callset in callsets:
                 # source and target names
-                source = callsets[callset][self.source_idx]
-                target = callsets[callset][self.target_idx]
-                if callset == source:
-                    file_idx = self.source_idx
-                else:
-                    file_idx = self.target_idx
+                source = callsets[callset][source_idx]
+                file_idx = source_idx
+
+                # set proper file idex
+                if callset != source:
+                    file_idx = target_idx
 
                 # register individual and samples
                 indv = metadb.registerIndividual(
                     str(uuid.uuid4()), 
-                    source + "_" + target)
+                    "Individual_"+source)
 
                 src = metadb.registerSample(
                     str(uuid.uuid4()),
@@ -126,16 +154,24 @@ class VCF:
                     name=source,
                     info={'type': 'source'})
 
-                trg = metadb.registerSample(
-                    str(uuid.uuid4()),
-                    indv.guid,
-                    name=target,
-                    info={'type': 'target'})
+                target_guid = src.guid
+
+                if self.vcf_type == 'TN':
+                    target = callsets[callset][target_idx]
+
+                    # need to address change in the metadb models
+                    trg = metadb.registerSample(
+                        str(uuid.uuid4()),
+                        indv.guid,
+                        name=target,
+                        info={'type': 'target'})
+
+                    target_guid = trg.guid
 
                 # register callset
                 cs = metadb.registerCallSet(str(uuid.uuid4()),
                     src.guid,
-                    trg.guid,
+                    target_guid,
                     self.workspace,
                     self.array.name,
                     [self.variantset.id],
@@ -154,31 +190,36 @@ class VCF:
                 }
 
 
-def sortAndIndex(inFile, outdir):
+def sortAndIndex(inFile, outdir, sort=True, index=True):
     """
     Sort and index vcfs to ensure bgzipped, sorted, collapsed and indexed vcfs
     GenomicsDB import will fail if these four requirements aren't satisfied.
     """
-    splitFile = os.path.basename(inFile).split(".")
+    return_file = inFile
+    if sort:
+        splitFile = os.path.basename(inFile).split(".")
+        if splitFile[-1] == 'vcf':
+            #.vcf
+            file_name = ".".join(splitFile[:-1])
+        elif splitFile[-2] == 'vcf' and splitFile[-1] == 'gz':
+            # .vcf.gz
+            file_name = ".".join(splitFile[:-2])
+        else:
+            raise ValueError("File extension must be vcf or vcf.gz")
 
-    if splitFile[-1] == 'vcf':
-        #.vcf
-        file_name = ".".join(splitFile[:-1])
-    elif splitFile[-2] == 'vcf' and splitFile[-1] == 'gz':
-        # .vcf.gz
-        file_name = ".".join(splitFile[:-2])
-    else:
-        raise ValueError("File extension must be vcf or vcf.gz")
+        sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
 
-    sorted_file = "/".join([outdir, file_name + ".sorted.vcf.gz"])
+        #bcftools sort, collapse, and compress
+        bcftools.norm("-m", "+any", "-O", "z", "-o",
+                      sorted_file, inFile, catch_stdout=False)
+        
+        return_file = sorted_file
 
-    #bcftools sort, collapse, and compress
-    bcftools.norm("-m", "+any", "-O", "z", "-o",
-                  sorted_file, inFile, catch_stdout=False)
-    #bcftools index
-    bcftools.index(sorted_file, "-t", "-f", catch_stdout=False)
+    if index:
+        #bcftools index
+        bcftools.index(return_file, "-t", "-f", catch_stdout=False)
 
-    return sorted_file
+    return return_file
 
 
 def poolImportVCF(file_info):
@@ -198,7 +239,7 @@ def poolImportVCF(file_info):
         return (0, inputFile, vc.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir):
+def parallelGen(config_file, inputFileList, outputDir, callset_file=None, loader_config=None):
     """
     Spawns the Pool of VCF objects to work on each input VCF
     Creates callset mapping and vid mapping files for GenomicsDB import
@@ -207,23 +248,28 @@ def parallelGen(config_file, inputFileList, outputDir):
     with open(config_file) as conf:
         config = json.load(conf)
 
-    # register callset parent objects with first input vcf
+    # if no contig information in header, assume it's already registered
     with open(inputFileList[0], 'rb') as vcf_init:
         reader = vcf.Reader(vcf_init)
-        dba, vs, rs = helper.registerWithMetadb(config, references=reader.contigs)
+        dba, vs, rs = helper.registerWithMetadb(config, vcf=True, references=reader.contigs)
 
     # sort and index vcfs, and
     # build arguments for parallel gen
     function_args = [None] * len(inputFileList)
     index = 0
     for inFile in inputFileList:
-        sorted_file = sortAndIndex(inFile, outputDir)
+        sorted_file = sortAndIndex(inFile, outputDir, sort=config.get('sort_compress',True), index=config.get('index', True))
         function_args[index] = (config_file, sorted_file)
         index += 1
 
-    # set for callset mapping recording
-    callset_mapping = dict()
-    callset_mapping["callsets"] = dict()
+    # append to callset
+    if callset_file:
+        with open(callset_file) as cf:
+            callset_mapping = json.load(cf)
+    else:
+        callset_mapping = dict()
+
+    callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
     callsets = callset_mapping["callsets"]
 
     pool = Pool()
@@ -242,4 +288,4 @@ def parallelGen(config_file, inputFileList, outputDir):
         raise Exception("Execution failed on {0}".format(failed))
 
     # create GenomicsDB vid mapping and callset mapping files 
-    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config['dburi'])
+    helper.createMappingFiles(outputDir, callset_mapping, rs.id, config['dburi'], dba.name, loader_config=loader_config)

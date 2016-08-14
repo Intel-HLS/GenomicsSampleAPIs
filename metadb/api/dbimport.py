@@ -48,7 +48,7 @@ class Import():
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
 
-    def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=None):
+    def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=OrderedDict()):
         """
         ReferenceSet registration for MAF occurs from an assembly config file. See hg19.json for example.
         ReferenceSet registration for VCF occurs from reading VCF contig tags in header. 
@@ -71,7 +71,7 @@ class Import():
                 self.session.rollback()
                 raise ValueError("{0} : {1} ".format(str(e), guid))
 
-            if references:
+            if len(references) > 0:
                 # use pyvcf like ordered dict to avoiding having to specify
                 # reference order manually
                 refs = sortReferences(references)

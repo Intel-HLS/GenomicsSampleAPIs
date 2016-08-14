@@ -14,3 +14,4 @@ default_vid_mapping_file     : "test.vid_mapping"
 # defaults for tiledb_loader
 default_size_per_column_partition : 3000
 default_delete_and_create_tiledb_array : false
+default_lb_callset_row_id : 0
