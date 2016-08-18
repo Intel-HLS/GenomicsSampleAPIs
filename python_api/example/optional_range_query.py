@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
   The MIT License (MIT)
   Copyright (c) 2016 Intel Corporation
@@ -20,7 +21,6 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-#!/usr/bin/env python
 
 import sys
 import Pyro4
