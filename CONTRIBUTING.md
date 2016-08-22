@@ -25,10 +25,10 @@ Generally [pep8](https://www.python.org/dev/peps/pep-0008) is a good goal, but n
 
 ## Pull Request Workflow
 
-0. Pull Requests should be limited to a feature or bug fix.
-1. Create a branch in which to work. 
-2. Submit a PR back to master.
-3. Once it is tested and checked, the PR can be accepted and merged into master.
+1. Pull Requests should be limited to a feature or bug fix.
+2. Create a branch in which to work. 
+3. Submit a PR back to master.
+4. Once it is tested and checked, the PR can be accepted and merged into master.
 
 ## Testing
 
