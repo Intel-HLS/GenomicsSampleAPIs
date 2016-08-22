@@ -27,13 +27,13 @@ Generally [pep8](https://www.python.org/dev/peps/pep-0008) is a good goal, but n
 
 ## Testing
 
+Best effort should be made to maintain or improve the code coverage with each PR.  Pleast write new unit tests were appropriate for new functions.
+
 ### Automation
 
 To test the ansible code, and perform end to end testing, we use serverspec.  Please write new tests to cover new functionality, endpoints, edge cases, and install artifacts.  For examples, see the spec directory in each role under [infrastructure/ansible](https://github.com/Intel-HLS/GenomicsSampleAPIs/tree/master/infrastructure/ansible/roles).
 
 ### Unit
-
-Best effort should be made to maintain or improve the code coverage.  Pleast write new unit tests were appropriate for new functions.
 
 For python we use pytest.
 
