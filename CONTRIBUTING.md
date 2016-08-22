@@ -25,6 +25,11 @@ Generally [pep8](https://www.python.org/dev/peps/pep-0008) is a good goal, but n
 
 ## Pull Request Workflow
 
+0. Pull Requests should be limited to a feature or bug fix.
+1. Create a branch in which to work. 
+2. Submit a PR back to master.
+3. Once it is tested and checked, the PR can be accepted and merged into master.
+
 ## Testing
 
 Best effort should be made to maintain or improve the code coverage with each PR.  Pleast write new unit tests were appropriate for new functions.
@@ -35,7 +40,7 @@ To test the ansible code, and perform end to end testing, we use serverspec.  Pl
 
 ### Unit
 
-For python we use pytest.
+For python use pytest.
 
 ## Questions
 
