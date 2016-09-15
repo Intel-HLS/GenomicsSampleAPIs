@@ -6,7 +6,7 @@ We are excited you are interested in improving the sample APIs  Thanks for takin
 
 ## Code Layout
 
-The code layout is descrived in the [README](https://github.com/Intel-HLS/GenomicsSampleAPIs/blob/spec_tests/README.md#repository-organization).
+The code layout is described in the [README](https://github.com/Intel-HLS/GenomicsSampleAPIs/blob/spec_tests/README.md#repository-organization).
 
 ## Code Style
 
