@@ -65,8 +65,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-s",
         "--spark",
-        action="store_true",
-        help="Run as spark.")
+        type=str,
+        help="Run as spark. Pass local[*] to run spark locally or the spark master URI")
 
     parser.add_argument(
         "-o",
@@ -93,30 +93,30 @@ if __name__ == "__main__":
 
     if args.spark:
         # call spark from within import script
-        # output file is required
-        if args.output:
-            spark_cmd = [
-                "spark-submit", 
-                "maf_pyspark.py", 
-                "-c", args.config, 
-                "-d", args.outputdir, 
-                "-o", args.output, 
-                "-i"]
 
-            spark_cmd.extend(args.inputs)
-            if args.loader:
-                spark_cmd.extend(['-l', args.loader])
-            if args.append_callsets:
-                spark_cmd.extend(['-a', args.append_callsets])
-            print spark_cmd
-            if subprocess.call(spark_cmd) != 0:
-                raise Exception("Error running converter")
-        else:
-            print """
-            usage: maf2tile.py [-h] -c CONFIG -d OUTPUTDIR -i INPUTS
-                   [INPUTS ...] [-z] [-s] [-o OUTPUT] [-l LOADER]
-            maf2tile.py: error: argument -o/--output is required when -s is sets
-            """
+        spark_cmd = [
+            "spark-submit",
+            "--master",
+            args.spark,
+            "maf_pyspark.py", 
+            "-c", args.config, 
+            "-d", args.outputdir, 
+            "-o", args.output, 
+            "-i"]
+
+        spark_cmd.extend(args.inputs)
+        if args.loader:
+            spark_cmd.extend(['-l', args.loader])
+        if args.append_callsets:
+            spark_cmd.extend(['-a', args.append_callsets])
+        print spark_cmd
+        pipe = subprocess.Popen(
+            spark_cmd, stderr=subprocess.PIPE)
+        output, error = pipe.communicate()
+
+        if pipe.returncode != 0:
+            raise Exception("Error running converter\n\nERROR: \n{}".format(error))
+
     else:
 
         multiprocess_import.parallelGen(

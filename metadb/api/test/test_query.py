@@ -166,18 +166,22 @@ class TestQuery:
                 contig_position = 1
                 result = session.contig2Tile(idx, contig, contig_position)
                 self.typeCheck(result, list, long, 1)
-
+                
+                result_100 = session.contig2Tile(idx, contig, contig_position + 100)
+                self.typeCheck(result, list, long, 1)
+                
                 if contig == 'M':
                     MT_result = session.contig2Tile(idx, 'MT', contig_position)
                     self.typeCheck(MT_result, list, long, 1)
                     assert MT_result == result
 
                 resultContigList, resultPositionList = session.tile2Contig(
-                    idx, result)
-                self.typeCheck(resultContigList, list, str, 1)
-                self.typeCheck(resultPositionList, list, long, 1)
+                    idx, [result[0], result_100[0]])
+                self.typeCheck(resultContigList, list, str, 2)
+                self.typeCheck(resultPositionList, list, long, 2)
                 assert resultContigList[0] == contig
                 assert resultPositionList[0] == contig_position
+                assert resultPositionList[1] == contig_position + 100
 
                 if i == 0:
                     with pytest.raises(ValueError) as exec_info:

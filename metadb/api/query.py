@@ -69,6 +69,7 @@ class Query():
     def __init__(self, db):
         self.db = db
         # cache for translating tile to contig quickly
+        self.array_id = None
         self.contig = None
         self.offset = None
         self.length = None
@@ -178,22 +179,24 @@ class Query():
             contig = 'M'
         if not isinstance(positionList, list):
             positionList = [positionList]
-        result = self.session.query(
-            Reference.tiledb_column_offset,
-            Reference.length)\
-            .join(ReferenceSet, DBArray)\
-            .filter(DBArray.id == array_idx)\
-            .filter(Reference.name == contig)\
-            .all()
-
-        if len(result) != 1:
-            raise ValueError(
-                "Invalid array id: {0} or contig: {1}".format(
-                    array_idx, contig))
-
-        self.contig = contig
-        self.offset = result[0][0]
-        self.length = result[0][1]
+        if not (self.contig and self.contig == contig and self.array_id == array_idx): 
+            result = self.session.query(
+                Reference.tiledb_column_offset,
+                Reference.length)\
+                .join(ReferenceSet, DBArray)\
+                .filter(DBArray.id == array_idx)\
+                .filter(Reference.name == contig)\
+                .all()
+    
+            if len(result) != 1:
+                raise ValueError(
+                    "Invalid array id: {0} or contig: {1}".format(
+                        array_idx, contig))
+            
+            self.array_id = array_idx
+            self.contig = contig
+            self.offset = result[0][0]
+            self.length = result[0][1]
 
         count = len(positionList)
 
@@ -224,7 +227,7 @@ class Query():
         for i in xrange(0, count):
             # Check if we can optimize the translation without going to the DB
             if self.offset is not None and positionList[i] >= self.offset and (
-                    positionList[i] - self.offset) <= self.length:
+                    positionList[i] - self.offset) <= self.length and self.array_id == array_idx:
                 # Since the all positions in the input list is greater than or equal to offset and
                 # less than or equal to the lenth of the contig, use the current result from the DB to
                 # translate all the positions
@@ -249,6 +252,7 @@ class Query():
                     "Invalid Position {0} for array id {1}".format(
                         positionList[i], array_idx))
             # Update cache
+            self.array_id = array_idx
             self.contig = result[0]
             self.offset = result[1]
             self.length = result[2]

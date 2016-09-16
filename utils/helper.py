@@ -199,12 +199,13 @@ def createMappingFiles(outputDir, callset_mapping, rs_id, DB_URI, array, loader_
     Creates Callset mapping and VID mapping file required for GenomicsDB loading.
     """
 
-    callset_mapping_file = "{0}/{1}.callset_mapping".format(
-        outputDir, array)
+    callset_mapping_file = os.path.join(outputDir, "{0}.callset_mapping".format(
+        array))
     writeJSON2File(callset_mapping, callset_mapping_file)
     print "Generated Call Set Mapping File : {0}".format(callset_mapping_file)
 
-    vid_mapping_file = "{0}/{1}.vid_mapping".format(outputDir, array)
+    vid_mapping_file = os.path.join(outputDir, "{0}.vid_mapping".format(array))
+
     writeVIDMappingFile(DB_URI, rs_id, vid_mapping_file)
     print "Generated VID Mapping File : {0}".format(vid_mapping_file)
 
