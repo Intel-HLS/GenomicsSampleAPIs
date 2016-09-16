@@ -1,9 +1,30 @@
 #!/usr/bin/env python
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 
 import subprocess
 import utils.maf_importer as multiprocess_import
 import utils.helper as helper
-import utils.loader as loader
 
 if __name__ == "__main__":
 
@@ -18,13 +39,6 @@ if __name__ == "__main__":
         required=True, 
         type=str,
         help="input configuration file for MAF conversion")
-    
-    parser.add_argument(
-        "-o",
-        "--output",
-        required=True,
-        type=str,
-        help="output Tile DB CSV file (without the path) which will be stored in the output directory")
     
     parser.add_argument(
         "-d",
@@ -47,12 +61,26 @@ if __name__ == "__main__":
         action="store_true",
         required=False,
         help="True/False indicating if the input file is a gzipped file or not")
-    
+
     parser.add_argument(
         "-s",
         "--spark",
         type=str,
         help="Run as spark. Pass local[*] to run spark locally or the spark master URI")
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        required=False,
+        type=str,
+        help="output Tile DB CSV file (without the path) which will be stored in the output directory. Required for spark.")
+
+    parser.add_argument(
+        "-a",
+        "--append_callsets",
+        required=False,
+        type=str,
+        help="CallSet mapping file to append.")
 
     parser.add_argument(
         "-l",
@@ -65,6 +93,7 @@ if __name__ == "__main__":
 
     if args.spark:
         # call spark from within import script
+
         spark_cmd = [
             "spark-submit",
             "--master",
@@ -76,24 +105,24 @@ if __name__ == "__main__":
             "-i"]
 
         spark_cmd.extend(args.inputs)
-
+        if args.loader:
+            spark_cmd.extend(['-l', args.loader])
+        if args.append_callsets:
+            spark_cmd.extend(['-a', args.append_callsets])
+        print spark_cmd
         pipe = subprocess.Popen(
             spark_cmd, stderr=subprocess.PIPE)
         output, error = pipe.communicate()
 
         if pipe.returncode != 0:
             raise Exception("Error running converter\n\nERROR: \n{}".format(error))
+
     else:
 
         multiprocess_import.parallelGen(
             args.config,
             args.inputs,
             args.outputdir,
-            args.output,
-            args.gzipped)
-
-    if args.loader:
-        baseFileName = helper.getFileName(args.output)
-        callset_mapping_file = "{0}/{1}.callset_mapping".format(args.outputdir, baseFileName)
-        vid_mapping_file = "{0}/{1}.vid_mapping".format(args.outputdir, baseFileName)
-        loader.load2Tile(args.loader, callset_mapping_file, vid_mapping_file)
+            args.gzipped,
+            callset_file=args.append_callsets,
+            loader_config=args.loader)

@@ -1,4 +1,26 @@
 #!/usr/bin/env python
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 
 import sys
 import os
@@ -418,7 +440,7 @@ def poolGenerateCSV(file_params):
     return (0, outFile, maf.callset_mapping)
 
 
-def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzipped):
+def parallelGen(config_file, inputFileList, outputDir, bGzipped, callset_file=None, loader_config=None):
     """
     Function that spawns the Pool of MAF objects to work on each of the input files
     Once the BookKeeping support moves to a real DB, move from threads to multiprocessing.Pool
@@ -432,10 +454,16 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzip
         outFile = outputDir + "/" + helper.getFileName(inFile) + ".csv"
         function_args[index] = (config_file, inFile, outFile, bGzipped)
         index += 1
-    combinedOutput = outputDir + "/" + combinedOutputFile
-    callset_mapping = dict()
-    callset_mapping["unsorted_csv_files"] = list()
-    callset_mapping["callsets"] = dict()
+    # append to existing callset file
+    if callset_file:
+        import json
+        with open(callset_file) as cf:
+            callset_mapping = json.load(cf)
+    else:
+        callset_mapping = dict()
+        
+    callset_mapping["unsorted_csv_files"] = callset_mapping.get("unsorted_csv_files", list())
+    callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
     callsets = callset_mapping["callsets"]
 
     pool = Pool()
@@ -445,7 +473,6 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzip
             failed.append(returncode[1])
         else:
             print "Completed: {0} with {1} Call Sets".format(returncode[1], len(returncode[2]))
-            os.system('cat %s >> %s' % (returncode[1], combinedOutput))
             callset_mapping["unsorted_csv_files"].append(returncode[1])
             callsets.update(returncode[2])
 
@@ -460,4 +487,5 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, bGzip
         callset_mapping,
         rs.id,
         config.DB_URI,
-        combinedOutputFile=combinedOutputFile)
+        dba.name,
+        loader_config=loader_config)

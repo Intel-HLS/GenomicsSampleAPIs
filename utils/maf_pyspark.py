@@ -1,6 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
+
 from pyspark import SparkContext, SparkConf
 import uuid
 import os
@@ -593,12 +616,8 @@ def updateRefAltPos(iter):
     return m_csv_line_list
 
 
-def parallelGen(
-    config_file,
-    inputFileList,
-    outputDir,
-    combinedOutputFile,
-    ):
+def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, callset_file=None, loader_config=None):
+
     """
     Function that spawns  Spark RDD objects to work on each of the input files
     """
@@ -617,15 +636,20 @@ def parallelGen(
     print 'Completed: {0} with {1} Call Sets'.format(combinedOutput,
             len(maf.callset_mapping))
 
-    callset_mapping = dict()
-    callset_mapping['unsorted_csv_files'] = [combinedOutput]
-    callset_mapping['callsets'] = dict()
-    callset_mapping['callsets'].update(maf.callset_mapping)
+    if callset_file:
+        import json
+        with open(callset_file) as cf:
+            callset_mapping = json.load(cf)
+    else:
+        callset_mapping = dict()
 
-    helper.createMappingFiles(outputDir, callset_mapping, rs.id,
-                              config.DB_URI,
-                              combinedOutputFile=combinedOutputFile)
+    callset_mapping["unsorted_csv_files"] = callset_mapping.get("unsorted_csv_files", list())
+    callset_mapping["unsorted_csv_files"].append(combinedOutput)
+    callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
+    callset_mapping["callsets"].update(maf.callset_mapping)
 
+    helper.createMappingFiles(
+        outputDir, callset_mapping, rs.id, config.DB_URI, dba.name, loader_config=loader_config)
 
 if __name__ == '__main__':
 
@@ -656,6 +680,26 @@ if __name__ == '__main__':
         help='List of input MAF files to convert',
         )
 
+    parser.add_argument(
+        "-a",
+        "--append_callsets",
+        required=False,
+        type=str,
+        help="CallSet mapping file to append.")
+
+    parser.add_argument(
+        "-l",
+        "--loader",
+        required=False,
+        type=str,
+        help="Loader JSON to load data into Tile DB.")
+
     args = parser.parse_args()
 
-    parallelGen(args.config, args.inputs, args.outputdir, args.output)
+    parallelGen(
+        args.config, 
+        args.inputs, 
+        args.outputdir, 
+        args.output, 
+        callset_file=args.append_callsets,
+        loader_config=args.loader)

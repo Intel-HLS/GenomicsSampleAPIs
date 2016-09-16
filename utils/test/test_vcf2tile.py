@@ -1,3 +1,25 @@
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 import pytest
 import json
 import os
@@ -93,12 +115,12 @@ class TestVCFImporter(TestCase):
             assert len(result) == 2
 
         # check callset_map reflects callsets imported
-        with open(str(self.tmpdir.join("callset_mapping")), "r") as cmf:
+        with open(str(self.tmpdir.join(self.config['array']+".callset_mapping")), "r") as cmf:
             cm = json.load(cmf)
             assert len(cm['callsets']) == 2
 
         # check vid_map reflects the contigs in vcf header
-        with open(str(self.tmpdir.join("vid_mapping")), "r") as vidf, VCF(str(vcfile), str(conf)) as vc:
+        with open(str(self.tmpdir.join(self.config['array']+".vid_mapping")), "r") as vidf, VCF(str(vcfile), str(conf)) as vc:
             vid = json.load(vidf)
             assert len(vid['contigs']) == len(vc.reader.contigs)
 
@@ -177,8 +199,6 @@ class TestVCFImporter(TestCase):
         i) TN vcf, ii) callset_loc in config set, iii) TN vcf with sample tag
         """
         conf = self.tmpdir.join("vcf5_import.config")
-        # this_conf = dict(self.config)
-        # this_conf['callset_loc'] = None
         conf.write(json.dumps(self.config))
 
         vcfile = self.tmpdir.join("test5.vcf")
@@ -194,28 +214,11 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "only single TN" in str(exec_info.value)
-
-        conf = self.tmpdir.join("vcf6_import.config")
-        conf.write(json.dumps(self.config))
-
-        vcfile = self.tmpdir.join("test6.vcf")
-        test2_header = list(test_header)
-        test2_header.append('NORMAL')
-        test2_header.append('TUMOUR')
-        with open(str(vcfile), 'w') as inVCF:
-            inVCF.write("{0}\n".format(self.header))
-            inVCF.write("{0}\n".format("\n".join([normal_tag, tumor_tag])))
-            inVCF.write("{0}\n".format("\t".join(test2_header)))
-            inVCF.write("{0}\n".format("\t".join(test_data)))
-
-        with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
-            vc.createCallSetDict()
-        assert "Set callset_loc" in str(exec_info.value)
+        assert "Currently only single" in str(exec_info.value)
 
         conf = self.tmpdir.join("vcf7_import.config")
         this_conf = dict(self.config)
-        this_conf['callset_loc'] = 'SampleName'
+        this_conf['sample_name'] = {'derive_from': 'tag', 'split_by': 'SampleName'}
         conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test7.vcf")
@@ -232,13 +235,13 @@ class TestVCFImporter(TestCase):
 
         with pytest.raises(Exception) as exec_info, VCF(str(vcfile), str(conf)) as vc:
             vc.createCallSetDict()
-        assert "only single TN" in str(exec_info.value)
+        assert "Currently only single" in str(exec_info.value)
 
     def test_createCallSetDict(self):
 
         conf = self.tmpdir.join("vcf8_import.config")
         this_conf = dict(self.config)
-        this_conf['callset_loc'] = 'SampleName'
+        this_conf['sample_name'] = {'derive_from': 'tag', 'split_by': 'SampleName'}
         conf.write(json.dumps(this_conf))
 
         vcfile = self.tmpdir.join("test8.vcf")
