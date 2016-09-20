@@ -1,5 +1,7 @@
 #How to contribute
+GenomicsSampleAPIs is released under the MIT License. Hence, we expect the external contributors to grant an MIT License for their contributions. We have adopted the Developer Certificate of Origin from the Linux project, and request the developer to include a 'Signed-off-by' line in the commit message to indicate they understand and agree to the DCO.
 
+Signed-off-by: First Last developeremail@example.com (github: developer_githubid)
 ## Thank you!
 
 We are excited you are interested in improving the sample APIs  Thanks for taking the interest and time!
