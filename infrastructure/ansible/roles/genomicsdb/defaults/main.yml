@@ -37,9 +37,6 @@ default_permissions      : "u=rwx,g=rx,o=x"
 default_genomicsdb_dir    : /home/genomicsdb
 default_workspace_name   : DB
 
-# ssh variables
-default_ssh_key_file : id_git_nopass
-default_ssh_key_dir  : /home/user/.ssh
 # Set default ssh_proxy to none, users can override with ssh_proxy
 default_ssh_proxy    : ""
 # default_ssh_proxy    : "ProxyCommand ncat --proxy-type socks4 --proxy 192.168.100.1:2001 %h %p"
