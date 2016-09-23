@@ -427,7 +427,8 @@ class MAF(File2Tile):
             aggCSV.set('End', newEnd)
             aggCSV.set('REF', ref)
             aggCSV.values[aggCSV.fields.index('ALT')] = aggAlt
-
+        
+        isNew = False
         aggALT = aggCSV.get('ALT')
         for alt in newCSV.get('ALT'):
             if alt not in aggALT:
