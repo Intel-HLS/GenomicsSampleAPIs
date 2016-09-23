@@ -485,14 +485,13 @@ def combineData(combinedSnapshot_w_end, newSnapshot_w_end):
         elif combinedSnapshot_w_end[CONST.END_IDX] \
             > newSnapshot_w_end[CONST.END_IDX]:
 
-        # If the condition above failed and we waterfall into the next set of if-else
-        # it implies that the end do not match.
-        # Note that at this point both the snapshots have the same start
-        # Move the end to the biggest of the 2 - in other words pick the deletion's end
-        # Append the REF value from the deletion to the insertion's ALT value
-            # combinedSnapshot represents a deletion and newSnapshot represents a insertion
+            # If the condition above failed and we waterfall into the next set of if-else
+            # it implies that the end do not match.
             # Note that at this point both the snapshots have the same start
             # Move the end to the biggest of the 2 - in other words pick the deletion's end
+            # Append the REF value from the deletion to the insertion's ALT value
+
+            # combinedSnapshot represents a deletion and newSnapshot represents a insertion
 
             end = combinedSnapshot_w_end[CONST.END_IDX]
             ref = combinedSnapshot[otherAttributes.index('REF')]
@@ -530,8 +529,8 @@ def combineData(combinedSnapshot_w_end, newSnapshot_w_end):
             for i in xrange(0, len(otherAttributes)):
                 if otherAttributes[i] in CSVLine.arrayFields:
                     if 'GT' == otherAttributes[i]:
-                        combinedSnapshot[i].append(str(len(combinedSnapshot[i])
-                                + 1))
+                        combinedSnapshot[i] = [0] * CONST.PLOIDY  # .append(str(len(combinedSnapshot[i]) + 1))
+                        combinedSnapshot[i][0] = CONST.PLOIDY
                     else:
                         combinedSnapshot[i].extend(newSnapshot[i])
     del newSnapshot
