@@ -1,6 +1,7 @@
 #How to contribute
 
-GenomicsSampleAPIs is released under the MIT License. Hence, we expect the external contributors to grant an MIT License for their contributions. We have adopted the Developer Certificate of Origin from the Linux project, and request the developer to include a 'Signed-off-by' line in the commit message to indicate they understand and agree to the DCO.
+GenomicsDB is released under the MIT License. Hence, we expect the external contributors to grant an MIT License for their contributions. We have adopted the Developer Certificate of Origin from the Linux project, and request the developer to include a 'Signed-off-by' line in the commit message to indicate they understand and agree to the DCO.
+
 
 Signed-off-by: First Last developeremail@example.com (github: developer_githubid)
 ## Thank you!
@@ -13,7 +14,7 @@ The code layout is described in the [README](https://github.com/Intel-HLS/Genomi
 
 ## Code Style
 
-We are somewhat loose on coding style.  Generally try to stay consistant with the naming, spacing, and layout of the language as used thus far.
+We are somewhat loose on coding style.  Generally try to stay consistent with the naming, spacing, and layout of the language as used thus far.
 
 ### Python
 
@@ -35,7 +36,7 @@ Generally [pep8](https://www.python.org/dev/peps/pep-0008) is a good goal, but n
 
 ## Testing
 
-Best effort should be made to maintain or improve the code coverage with each PR.  Pleast write new unit tests were appropriate for new functions.
+Best effort should be made to maintain or improve the code coverage with each PR.  Please write new unit tests were appropriate for new functions.
 
 ### Automation
 
@@ -53,7 +54,7 @@ To be added as questions are frequently asked
 
 ### Answers
 
-If you have any questsions, checkout out the [Questions](#Questions) section.  Most of our documentation is in the project [wiki](https://github.com/Intel-HLS/GenomicsSampleAPIs/wiki)
+If you have any questions, checkout out the [Questions](#Questions) section.  Most of our documentation is in the project [wiki](https://github.com/Intel-HLS/GenomicsSampleAPIs/wiki)
 
 If you have any further questions, contact the project [maintainers or authors](https://github.com/Intel-HLS/GenomicsSampleAPIs/blob/master/AUTHORS).
 
