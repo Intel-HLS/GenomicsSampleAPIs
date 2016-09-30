@@ -1,4 +1,8 @@
-#Variant Store
+#GenomicsSampleAPIs
+
+This repository contains sample API using https://github.com/Intel-HLS/GenomicsDB
+
+##Variant Store
 
 The Variant Store is a GA4GH compliant RESTful query interface for TileDB. The Variant Store uses Flask and SQLAlchemy to communicate with a Tile database through a c++ search library. The Tile database backend is specifically designed to work with genomic variant data. 
 
