@@ -4,7 +4,7 @@ This repository contains sample API using https://github.com/Intel-HLS/GenomicsD
 
 ##Variant Store
 
-The Variant Store is a GA4GH compliant RESTful query interface for TileDB. The Variant Store uses Flask and SQLAlchemy to communicate with a Tile database through a c++ search library. The Tile database backend is specifically designed to work with genomic variant data. 
+The Variant Store is a GA4GH compliant RESTful query interface for GenomicsDB. The Variant Store uses Flask and SQLAlchemy to communicate with a Tile database through a c++ search library. The Tile database backend is specifically designed to work with genomic variant data. 
 
 This document describes the various documents in this repository with respect to their role to the Variant Store and general organization. For more detailed information about setting up the Variant Store, interacting with the Variant Store, or further documentation on a specific module or library see the [wiki](https://github.com/Intel-HLS/GenomicsSampleAPIs/wiki).
 
@@ -31,7 +31,7 @@ Overview of the repository structure (individual files omitted):
 │   ├── include
 │   ├── lib
 │   ├── src
-│   └── tileDB
+│   └── genomicsDB
 │       ├── include
 │       └── src
 ├── test
@@ -61,7 +61,7 @@ The metadb api includes the query and import api that supports registration and 
 Each metadb model has an associated alembic revision associated with the creation/deletion of that models table in the respective sql database. 
 
 ### `search_library/`
-The search_library holds the libraries that interface with TileDB from GA4GH/Python as well as some c++ test utilites. Information on how to compile the search_library (along with TileDB) can be found in the wiki.
+The search_library holds the libraries that interface with genomicsDB from GA4GH/Python as well as some c++ test utilites. Information on how to compile the search_library (along with genomicsDB) can be found in the wiki.
 
 #### `include/`
 This directory contains 'query.h' which defines the data stucture for the return objects from the library and defines the APIs that the library exposes.  
@@ -77,9 +77,9 @@ The example directory contains a synthetic data generator. To generate the examp
   *  `make example`  
   This generates an executable - `example_query_processor` - under the `example/bin/` folder.  
   
-#### `tileDB/`  
+#### `genomicsDB/`  
 This directory implements the library that  
-   1.  Interfaces with the TileDB Library.  
+   1.  Interfaces with the genomicsDB Library.  
    2.  Implements the APIs that the GA4GH module can use.  
 
 ### `test/data`
@@ -95,10 +95,12 @@ The web module includes a script (`install.py`) to generate the config files req
 The gatypes directory holds all the classes that define the currently supported ga4gh datatypes.
 
 #### `ga4gh`
-The ga4gh directory houses the application code relating to the avaiable endpoints and the tileSearch library that calls out to search_library to communicate with TileDB.
+The ga4gh directory houses the application code relating to the avaiable endpoints and the tileSearch library that calls out to search_library to communicate with genomicsDB.
 
 ## Resources
 
 GA4GH API: http://ga4gh.org/#/api/v0.5.1 and https://github.com/ga4gh/schemas.
+
+GenomicsDB: https://github.com/Intel-HLS/genomicsDB
 
 TileDB: https://github.com/Intel-HLS/TileDB
