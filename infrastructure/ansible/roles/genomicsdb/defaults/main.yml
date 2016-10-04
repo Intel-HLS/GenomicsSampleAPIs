@@ -37,10 +37,6 @@ default_permissions      : "u=rwx,g=rx,o=x"
 default_genomicsdb_dir    : /home/genomicsdb
 default_workspace_name   : DB
 
-# Set default ssh_proxy to none, users can override with ssh_proxy
-default_ssh_proxy    : ""
-# default_ssh_proxy    : "ProxyCommand ncat --proxy-type socks4 --proxy 192.168.100.1:2001 %h %p"
-
 # Tile DB/Search Library 
 default_mpi_path         : /usr/lib64/openmpi
 default_mpi_runner       : mpirun
