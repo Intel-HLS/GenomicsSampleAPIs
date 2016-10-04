@@ -41,10 +41,8 @@
 
 - name : GIT pull APIs repo
   git:
-    repo           : git@github.com:Intel-HLS/GenomicsSampleAPIs.git
+    repo           : https://github.com/Intel-HLS/GenomicsSampleAPIs.git
     dest           : "{{store_dir}}"
-    key_file       : "{{ssh_key_dest_dir}}/{{ssh_key_file}}"
-    accept_hostkey : yes
     recursive      : yes
     force          : yes
     version        : "{{ store_branch }}"
