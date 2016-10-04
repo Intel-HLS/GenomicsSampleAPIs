@@ -38,9 +38,6 @@
 # Setup up group, users, and directories
 - include : policy.yml
 
-# Setup ssh keys and configuration
-- include : ssh_keys.yml
-
 # Pull down the required repos
 - include : repos.yml
 
