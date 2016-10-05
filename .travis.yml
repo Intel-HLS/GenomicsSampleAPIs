@@ -1,10 +1,23 @@
-language: ruby
-rvm:
- - "2.2.3"
-cache:
-  - directories:
-    - $HOME/.cache/pip
-    - vendor/bundle
+# The MIT License (MIT)
+# Copyright (c) 2016 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of 
+# this software and associated documentation files (the "Software"), to deal in 
+# the Software without restriction, including without limitation the rights to 
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+# the Software, and to permit persons to whom the Software is furnished to do so, 
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all 
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 before_install:
   - sudo apt-get update
   - sudo service postgresql stop
@@ -18,18 +31,14 @@ before_script:
   - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
   - cd $inf_dir
   - if [ -e ansible_requirements.txt ]; then ansible-galaxy install -p ./ansible/roles -r ansible_requirements.txt; fi
-  - sudo ansible-playbook -i 'default,' -e "store_branch=$TRAVIS_COMMIT owner_user_name=$USER client_user_name=$USER" ansible/genomicsdb-webserver.yml --connection=local
+  - sudo ansible-playbook -i 'default,' -e "store_branch=$TRAVIS_COMMIT store_dir=$TRAVIS_BUILD_DIR owner_user_name=$USER client_user_name=$USER" ansible/genomicsdb-webserver.yml --connection=local
   - source /home/genomicsdb/venv/bin/activate
   - pip install pytest pytest-cov coverage pytest-flask pytest-mock
   - pip install sqlalchemy-utils
   - source $HOME/.bashrc
-  - echo "127.0.0.1 localhost "`hostname` | sudo tee /etc/hosts
-  - curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
-  - echo "source $HOME/.rvm/scripts/rvm" >> ~/.bash_profile
 
 script:
-#  - cd $TRAVIS_BUILD_DIR
-  - cd /home/genomicsdb/repos/GenomicsSampleAPIs
+  - cd $TRAVIS_BUILD_DIR
   - py.test --cov .
   - cd $inf_dir/ansible
   - cd $TRAVIS_BUILD_DIR/infrastructure/ansible
@@ -40,7 +49,6 @@ script:
   - source $HOME/.rvm/scripts/rvm
   - bundle install
   - rake serverspec:site
-
 
 sudo: required
 dist: trusty

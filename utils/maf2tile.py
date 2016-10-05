@@ -1,4 +1,26 @@
 #!/usr/bin/env python
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 
 import subprocess
 import utils.maf_importer as multiprocess_import
@@ -43,8 +65,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-s",
         "--spark",
-        action="store_true",
-        help="Run as spark.")
+        type=str,
+        help="Run as spark. Pass local[*] to run spark locally or the spark master URI")
 
     parser.add_argument(
         "-o",
@@ -71,30 +93,30 @@ if __name__ == "__main__":
 
     if args.spark:
         # call spark from within import script
-        # output file is required
-        if args.output:
-            spark_cmd = [
-                "spark-submit", 
-                "maf_pyspark.py", 
-                "-c", args.config, 
-                "-d", args.outputdir, 
-                "-o", args.output, 
-                "-i"]
 
-            spark_cmd.extend(args.inputs)
-            if args.loader:
-                spark_cmd.extend(['-l', args.loader])
-            if args.append_callsets:
-                spark_cmd.extend(['-a', args.append_callsets])
-            print spark_cmd
-            if subprocess.call(spark_cmd) != 0:
-                raise Exception("Error running converter")
-        else:
-            print """
-            usage: maf2tile.py [-h] -c CONFIG -d OUTPUTDIR -i INPUTS
-                   [INPUTS ...] [-z] [-s] [-o OUTPUT] [-l LOADER]
-            maf2tile.py: error: argument -o/--output is required when -s is sets
-            """
+        spark_cmd = [
+            "spark-submit",
+            "--master",
+            args.spark,
+            "maf_pyspark.py", 
+            "-c", args.config, 
+            "-d", args.outputdir, 
+            "-o", args.output, 
+            "-i"]
+
+        spark_cmd.extend(args.inputs)
+        if args.loader:
+            spark_cmd.extend(['-l', args.loader])
+        if args.append_callsets:
+            spark_cmd.extend(['-a', args.append_callsets])
+        print spark_cmd
+        pipe = subprocess.Popen(
+            spark_cmd, stderr=subprocess.PIPE)
+        output, error = pipe.communicate()
+
+        if pipe.returncode != 0:
+            raise Exception("Error running converter\n\nERROR: \n{}".format(error))
+
     else:
 
         multiprocess_import.parallelGen(

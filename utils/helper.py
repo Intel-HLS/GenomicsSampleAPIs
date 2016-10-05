@@ -1,3 +1,25 @@
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 import requests
 import json
 import uuid
@@ -177,12 +199,13 @@ def createMappingFiles(outputDir, callset_mapping, rs_id, DB_URI, array, loader_
     Creates Callset mapping and VID mapping file required for GenomicsDB loading.
     """
 
-    callset_mapping_file = "{0}/{1}.callset_mapping".format(
-        outputDir, array)
+    callset_mapping_file = os.path.join(outputDir, "{0}.callset_mapping".format(
+        array))
     writeJSON2File(callset_mapping, callset_mapping_file)
     print "Generated Call Set Mapping File : {0}".format(callset_mapping_file)
 
-    vid_mapping_file = "{0}/{1}.vid_mapping".format(outputDir, array)
+    vid_mapping_file = os.path.join(outputDir, "{0}.vid_mapping".format(array))
+
     writeVIDMappingFile(DB_URI, rs_id, vid_mapping_file)
     print "Generated VID Mapping File : {0}".format(vid_mapping_file)
 
