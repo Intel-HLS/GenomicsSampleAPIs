@@ -216,7 +216,7 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             csvlines[1] = [self.getCSVLine(
-                new_data, 1, ALT=["A", "G"], GT=["-1", "-1"])]
+                new_data, 1, ALT=["A", "G"], GT=["2", "0"])]
 
         output_file = self.tmpdir.join("out.txt")
         output_file.write("")

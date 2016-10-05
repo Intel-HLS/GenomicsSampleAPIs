@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -22,7 +22,6 @@
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
 
 from pyspark import SparkContext, SparkConf
 import uuid
@@ -56,6 +55,7 @@ class CONST(IDX):
     POSITION = 1
     INDEX = 1
     PLOIDY = 0
+    END_IDX = 0
 
 
 class MAF_Spark:
@@ -431,7 +431,8 @@ def kvPairsByLocation(keys_tuple):
                 - indices[key][CONST.POSITION]]
 
     formattedValues = getSnapshot(values)
-    return ((RowID, assembly, chromosome, start, end),
+    formattedValues.insert(0, end)
+    return ((RowID, assembly, chromosome, start),
             tuple(formattedValues))
 
 
@@ -465,7 +466,7 @@ def getSnapshot(attributeList):
     return snapshot
 
 
-def combineData(combinedSnapshot, newSnapshot):
+def combineData(combinedSnapshot_w_end, newSnapshot_w_end):
     """
     Called when there are 2 items with the same key. The function merges the
     values and returns the new value for the key.
@@ -474,6 +475,51 @@ def combineData(combinedSnapshot, newSnapshot):
     global otherAttributes
     if 'ALT' in otherAttributes:
         indexOfALT = otherAttributes.index('ALT')
+
+        combinedSnapshot = list(combinedSnapshot_w_end[1:])
+        newSnapshot = list(newSnapshot_w_end[1:])
+        if combinedSnapshot_w_end[CONST.END_IDX] \
+            == newSnapshot_w_end[CONST.END_IDX]:
+            end = combinedSnapshot_w_end[CONST.END_IDX]
+            ref = combinedSnapshot[otherAttributes.index('REF')]
+        elif combinedSnapshot_w_end[CONST.END_IDX] \
+            > newSnapshot_w_end[CONST.END_IDX]:
+
+            # If the condition above failed and we waterfall into the next set of if-else
+            # it implies that the end do not match.
+            # Note that at this point both the snapshots have the same start
+            # Move the end to the biggest of the 2 - in other words pick the deletion's end
+            # Append the REF value from the deletion to the insertion's ALT value
+
+            # combinedSnapshot represents a deletion and newSnapshot represents a insertion
+
+            end = combinedSnapshot_w_end[CONST.END_IDX]
+            ref = combinedSnapshot[otherAttributes.index('REF')]
+
+            # Append the REF value from the deletion to the insertion's ALT value
+
+            for index in xrange(0, len(newSnapshot[indexOfALT])):
+                if newSnapshot[indexOfALT][index] != '-':
+                    newSnapshot[indexOfALT][index] += ref
+        else:
+
+            # newSnapshot represents a deletion and combinedSnapshot represents a insertion
+            # Note that at this point both the snapshots have the same start
+            # Move the end to the biggest of the 2 - in other words pick the deletion's end
+
+            end = newSnapshot_w_end[CONST.END_IDX]
+            ref = newSnapshot[otherAttributes.index('REF')]
+
+            # Append the REF value from the deletion to the insertion's ALT value
+
+            for index in xrange(0, len(combinedSnapshot[indexOfALT])):
+                if combinedSnapshot[indexOfALT][index] != '-':
+                    combinedSnapshot[indexOfALT][index] += ref
+
+        # Update ref in case we updated in the chain of if-else above
+
+        combinedSnapshot[otherAttributes.index('REF')] = ref
+
         newAllele = False
         for allele in newSnapshot[indexOfALT]:
             if allele not in combinedSnapshot[indexOfALT]:
@@ -483,11 +529,12 @@ def combineData(combinedSnapshot, newSnapshot):
             for i in xrange(0, len(otherAttributes)):
                 if otherAttributes[i] in CSVLine.arrayFields:
                     if 'GT' == otherAttributes[i]:
-                        combinedSnapshot[i].append(str(len(combinedSnapshot[i])
-                                + 1))
+                        combinedSnapshot[i] = [0] * CONST.PLOIDY  # .append(str(len(combinedSnapshot[i]) + 1))
+                        combinedSnapshot[i][0] = CONST.PLOIDY
                     else:
                         combinedSnapshot[i].extend(newSnapshot[i])
     del newSnapshot
+    combinedSnapshot.insert(0, end)
     return tuple(combinedSnapshot)
 
 
@@ -518,7 +565,8 @@ def updateRefAltPos(iter):
     m_csv_line_list = list()
     with dbquery.getSession() as query:
         m_csv_line = CSVLine()
-        for (location, combinedSnapshot) in iter:
+        for (location, combinedSnapshot_w_end) in iter:
+            combinedSnapshot = combinedSnapshot_w_end[1:]
 
             # rowid is actually the callset id, pass this information
 
@@ -527,7 +575,7 @@ def updateRefAltPos(iter):
             assembly = location[level2KeysList.index('assembly')]
             chromosome = location[level2KeysList.index('chromosome')]
             start = long(location[level2KeysList.index('start')])
-            end = long(location[level2KeysList.index('end')])
+            end = combinedSnapshot_w_end[CONST.END_IDX]
 
             alt = combinedSnapshot[otherAttributes.index('ALT')]
             ref = combinedSnapshot[otherAttributes.index('REF')]
@@ -616,8 +664,14 @@ def updateRefAltPos(iter):
     return m_csv_line_list
 
 
-def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, callset_file=None, loader_config=None):
-
+def parallelGen(
+    config_file,
+    inputFileList,
+    outputDir,
+    combinedOutputFile,
+    callset_file=None,
+    loader_config=None,
+    ):
     """
     Function that spawns  Spark RDD objects to work on each of the input files
     """
@@ -643,13 +697,22 @@ def parallelGen(config_file, inputFileList, outputDir, combinedOutputFile, calls
     else:
         callset_mapping = dict()
 
-    callset_mapping["unsorted_csv_files"] = callset_mapping.get("unsorted_csv_files", list())
-    callset_mapping["unsorted_csv_files"].append(combinedOutput)
-    callset_mapping["callsets"] = callset_mapping.get("callsets", dict())
-    callset_mapping["callsets"].update(maf.callset_mapping)
+    callset_mapping['unsorted_csv_files'] = \
+        callset_mapping.get('unsorted_csv_files', list())
+    callset_mapping['unsorted_csv_files'].append(combinedOutput)
+    callset_mapping['callsets'] = callset_mapping.get('callsets',
+            dict())
+    callset_mapping['callsets'].update(maf.callset_mapping)
 
     helper.createMappingFiles(
-        outputDir, callset_mapping, rs.id, config.DB_URI, dba.name, loader_config=loader_config)
+        outputDir,
+        callset_mapping,
+        rs.id,
+        config.DB_URI,
+        dba.name,
+        loader_config=loader_config,
+        )
+
 
 if __name__ == '__main__':
 
@@ -680,26 +743,20 @@ if __name__ == '__main__':
         help='List of input MAF files to convert',
         )
 
-    parser.add_argument(
-        "-a",
-        "--append_callsets",
-        required=False,
-        type=str,
-        help="CallSet mapping file to append.")
+    parser.add_argument('-a', '--append_callsets', required=False,
+                        type=str, help='CallSet mapping file to append.'
+                        )
 
-    parser.add_argument(
-        "-l",
-        "--loader",
-        required=False,
-        type=str,
-        help="Loader JSON to load data into Tile DB.")
+    parser.add_argument('-l', '--loader', required=False, type=str,
+                        help='Loader JSON to load data into Tile DB.')
 
     args = parser.parse_args()
 
     parallelGen(
-        args.config, 
-        args.inputs, 
-        args.outputdir, 
-        args.output, 
+        args.config,
+        args.inputs,
+        args.outputdir,
+        args.output,
         callset_file=args.append_callsets,
-        loader_config=args.loader)
+        loader_config=args.loader,
+        )
