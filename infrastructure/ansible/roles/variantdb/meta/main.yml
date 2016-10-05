@@ -1,6 +1,0 @@
----
-dependencies:
-  - { role: epel-release }
-  - { role: gcc, gcc_version: 4.9.3, gcc_prefix: /opt/rh/devtoolset-3/root/ }
-  - { role: postgresql-server }
-  - { role: nginx }

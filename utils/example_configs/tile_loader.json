@@ -12,7 +12,7 @@
     {
       "begin": 0,
       "array": "test",
-      "workspace": "/home/variantdb/DB"
+      "workspace": "/home/genomicsdb/DB"
     }
   ],
   "row_based_partitioning": false,

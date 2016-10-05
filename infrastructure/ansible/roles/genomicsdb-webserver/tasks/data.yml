@@ -1,0 +1,121 @@
+# The MIT License (MIT)
+# Copyright (c) 2016 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of 
+# this software and associated documentation files (the "Software"), to deal in 
+# the Software without restriction, including without limitation the rights to 
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+# the Software, and to permit persons to whom the Software is furnished to do so, 
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all 
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+- name : Set source path for import data path 
+  set_fact : import_data_path={{genomicsdb_dir}}/data
+  when : skip_data_rsync is not defined or skip_data_rsync == "false"
+
+- name : Set source path for import data path
+  set_fact : import_data_path={{import_path}}
+  when : skip_data_rsync is defined and skip_data_rsync == "true"
+
+- name        : Fetch the DB
+  synchronize : 
+    src        : "{{import_path}}/{{metadb_file}}"
+    dest       : "{{import_data_path}}/"
+    archive    : no
+    rsync_path : "sudo rsync"
+  when : skip_data_rsync is not defined or skip_data_rsync == "false"
+
+- name        : Fetch the callset_mapping file
+  synchronize : 
+    src        : "{{import_path}}/{{callset_mapping_file}}"
+    dest       : "{{import_data_path}}/"
+    archive    : no
+    rsync_path : "sudo rsync"
+  when : skip_data_rsync is not defined or skip_data_rsync == "false"
+
+- name        : Fetch the vid_mapping file
+  synchronize : 
+    src        : "{{import_path}}/{{vid_mapping_file}}"
+    dest       : "{{import_data_path}}/"
+    archive    : no
+    rsync_path : "sudo rsync"
+  when : skip_data_rsync is not defined or skip_data_rsync == "false"
+
+- name: Set the right permissions on imported data
+  file: 
+    path    : "{{import_data_path}}/"
+    owner   : "{{owner_user_name}}"
+    group   : "{{group_name}}"
+    mode    : "u=rwx,g=rwx,o=x"
+    recurse : yes
+    state   : directory
+  when : skip_data_rsync is not defined or skip_data_rsync == "false"
+
+- name     : Setup tiledb_loader template
+  template :
+    src  : tiledb_loader.json.j2
+    dest : "{{import_data_path}}/{{array_name}}_tiledb_loader.json"
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "{{permissions}}"
+
+- name     : Setup load_to_tile.cfg template
+  template :
+    src  : load_to_tile.cfg.j2
+    dest : "{{import_data_path}}/{{array_name}}_load_to_tile.cfg"
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "{{permissions}}"
+
+- name    : Import data into Tile DB - import data
+  shell : >
+    . {{ga4gh_virtualenv}}/bin/activate &&
+    {{store_dir}}/utils/loader.py
+    -c {{import_data_path}}/{{array_name}}_load_to_tile.cfg
+  args :
+    creates : "{{workspace_dir}}/{{array_name}}/__array_schema.tdb"
+  environment :
+    PATH            : "{{env_path}}:{{ansible_env.PATH}}"
+    LD_LIBRARY_PATH : "{{env_ld_library_path}}"
+  become      : yes
+  become_user : "{{owner_user_name}}"
+
+- name: Correct permissions on tile db workspace
+  file: 
+    path    : "{{workspace_dir}}"
+    owner   : "{{owner_user_name}}"
+    group   : "{{group_name}}"
+    mode    : "u=rwx,g=rwx,o=x"
+    recurse : yes
+    state   : directory
+
+- name      : Import data into Meta DB
+  shell     : "zcat {{import_data_path}}/{{metadb_file}} | psql {{meta_db_name}}"
+  become      : yes
+  become_user : "{{owner_user_name}}"
+
+- name: Update the workspace table to reflect the workspace_dir
+  command: >
+    psql
+    -d {{meta_db_name}}
+    -c "update workspace set name='{{workspace_dir}}' where id=1"
+  become      : yes
+  become_user : "{{owner_user_name}}"
+
+- name: Update the db_array table to reflect the array_name
+  command: >
+    psql
+    -d {{meta_db_name}}
+    -c "update db_array set name='{{array_name}}' where id=1"
+  become      : yes
+  become_user : "{{owner_user_name}}"

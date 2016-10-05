@@ -1,3 +1,25 @@
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 import pytest
 import unittest
 import os
@@ -194,7 +216,7 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             csvlines[1] = [self.getCSVLine(
-                new_data, 1, ALT=["A", "G"], GT=["-1", "-1"])]
+                new_data, 1, ALT=["A", "G"], GT=["2", "0"])]
 
         output_file = self.tmpdir.join("out.txt")
         output_file.write("")
@@ -301,9 +323,6 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(test_header)))
             inFP.write("{0}\n".format("\t".join(test_data)))
 
-        output_file = self.tmpdir.join("out.txt")
-        output_file.write("")
-
         with open(self.config_path, 'r') as fp:
             config_json = json.load(fp)
         config_json["DB_URI"] = self.TESTDB_URI
@@ -317,9 +336,9 @@ class TestMAF(unittest.TestCase):
 
         imp.multiprocess_import.parallelGen(
             str(test_config), [
-                str(input_file)], str(test_output_dir), "out.txt", True)
+                str(input_file)], str(test_output_dir), True)
 
-        output_file = test_output_dir.join("out.txt")
+        output_file = test_output_dir.join("in.csv")
         with open(str(output_file), 'r') as outputFP:
             line = outputFP.readline().strip()
         assert line == self.getCSVLine(test_data, 0)
@@ -349,7 +368,7 @@ class TestMAF(unittest.TestCase):
 
         with pytest.raises(Exception) as exec_info:
             imp.multiprocess_import.parallelGen(str(test_config), [str(
-                input_file)], str(test_output_dir), "out.txt", False)
+                input_file)], str(test_output_dir), False)
         assert "Execution failed" in str(exec_info.value)
 
     def getCSVLine(self, input_list, SampleId,

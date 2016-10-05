@@ -1,0 +1,44 @@
+# The MIT License (MIT)
+# Copyright (c) 2016 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of 
+# this software and associated documentation files (the "Software"), to deal in 
+# the Software without restriction, including without limitation the rights to 
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+# the Software, and to permit persons to whom the Software is furnished to do so, 
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all 
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+- name  : Setup the webserver
+  shell : >
+    {{store_dir}}/web/setup_webserver.py 
+    --port {{webserver_port}} 
+    --socket_path {{uwsgi_socket_path}} 
+    --array_name {{array_name}}
+    --service_directory {{system_services_path}}
+    --service_extension {{system_services_extension}}
+    --nginx_conf_directory {{nginx_conf_path}}
+    --skip_services
+  become      : yes
+  become_user : "{{owner_user_name}}"
+
+- name    : reload systemctl
+  command : systemctl daemon-reload
+  when    : ansible_os_family == 'RedHat'
+
+- name    : "restart ga4gh_{{array_name}}"
+  service :
+    name    : "ga4gh_{{array_name}}"
+    enabled : yes
+    state   : restarted
+  notify   : restart nginx

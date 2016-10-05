@@ -1,8 +1,0 @@
----
-- hosts: default
-  name: site
-  environment:
-    http_proxy : "{{ansible_env.http_proxy|default('')}}"
-    https_proxy : "{{ansible_env.https_proxy|default('')}}"
-  roles:
-    - variantdb

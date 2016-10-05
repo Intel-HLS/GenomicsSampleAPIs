@@ -1,3 +1,25 @@
+"""
+  The MIT License (MIT)
+  Copyright (c) 2016 Intel Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of 
+  this software and associated documentation files (the "Software"), to deal in 
+  the Software without restriction, including without limitation the rights to 
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+  the Software, and to permit persons to whom the Software is furnished to do so, 
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all 
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 from itertools import chain
 
 from sqlalchemy import create_engine
@@ -47,6 +69,7 @@ class Query():
     def __init__(self, db):
         self.db = db
         # cache for translating tile to contig quickly
+        self.array_id = None
         self.contig = None
         self.offset = None
         self.length = None
@@ -156,22 +179,24 @@ class Query():
             contig = 'M'
         if not isinstance(positionList, list):
             positionList = [positionList]
-        result = self.session.query(
-            Reference.tiledb_column_offset,
-            Reference.length)\
-            .join(ReferenceSet, DBArray)\
-            .filter(DBArray.id == array_idx)\
-            .filter(Reference.name == contig)\
-            .all()
-
-        if len(result) != 1:
-            raise ValueError(
-                "Invalid array id: {0} or contig: {1}".format(
-                    array_idx, contig))
-
-        self.contig = contig
-        self.offset = result[0][0]
-        self.length = result[0][1]
+        if not (self.contig and self.contig == contig and self.array_id == array_idx): 
+            result = self.session.query(
+                Reference.tiledb_column_offset,
+                Reference.length)\
+                .join(ReferenceSet, DBArray)\
+                .filter(DBArray.id == array_idx)\
+                .filter(Reference.name == contig)\
+                .all()
+    
+            if len(result) != 1:
+                raise ValueError(
+                    "Invalid array id: {0} or contig: {1}".format(
+                        array_idx, contig))
+            
+            self.array_id = array_idx
+            self.contig = contig
+            self.offset = result[0][0]
+            self.length = result[0][1]
 
         count = len(positionList)
 
@@ -202,7 +227,7 @@ class Query():
         for i in xrange(0, count):
             # Check if we can optimize the translation without going to the DB
             if self.offset is not None and positionList[i] >= self.offset and (
-                    positionList[i] - self.offset) <= self.length:
+                    positionList[i] - self.offset) <= self.length and self.array_id == array_idx:
                 # Since the all positions in the input list is greater than or equal to offset and
                 # less than or equal to the lenth of the contig, use the current result from the DB to
                 # translate all the positions
@@ -227,6 +252,7 @@ class Query():
                     "Invalid Position {0} for array id {1}".format(
                         positionList[i], array_idx))
             # Update cache
+            self.array_id = array_idx
             self.contig = result[0]
             self.offset = result[1]
             self.length = result[2]

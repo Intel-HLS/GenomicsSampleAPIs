@@ -1,0 +1,116 @@
+# The MIT License (MIT)
+# Copyright (c) 2016 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of 
+# this software and associated documentation files (the "Software"), to deal in 
+# the Software without restriction, including without limitation the rights to 
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+# the Software, and to permit persons to whom the Software is furnished to do so, 
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all 
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+# Create group and users
+- name     : Set fact group_name
+  set_fact : group_name={{default_group_name}}
+  when     : group_name is not defined
+
+- name     : Set fact owner_user_name
+  set_fact : owner_user_name={{default_owner_user_name}}
+  when     : owner_user_name is not defined
+
+- name     : Set fact client_user_name
+  set_fact : client_user_name={{default_client_user_name}}
+  when     : client_user_name is not defined
+
+- name     : Set fact permissions
+  set_fact : permissions={{default_permissions}}
+  when     : permissions is not defined
+
+- name : Set fact users_list
+  set_fact : 
+    users_list: 
+      - "{{owner_user_name}}"
+  when: owner_user_name == client_user_name
+
+- name : Set fact users_list
+  set_fact : 
+    users_list: 
+      - "{{owner_user_name}}"
+      - "{{client_user_name}}"
+  when: owner_user_name != client_user_name
+
+- name  : Create genomics db group
+  group : name={{group_name}}
+
+- name       : Create the genomics DB users.
+  user       : name={{item}} group={{group_name}}
+  with_items : "{{users_list}}"
+
+# Add owner_user to the sudoers so that the webserver service files can be created
+- name: Ensure /etc/sudoers.d directory is present
+  file: 
+    path: /etc/sudoers.d 
+    state: directory
+
+- name: Ensure /etc/sudoers.d is scanned by sudo
+  lineinfile: 
+    dest: /etc/sudoers 
+    regexp: '#includedir\s+/etc/sudoers.d' 
+    line: '#includedir /etc/sudoers.d'
+
+- name: Add ga4gh_owner user to the sudoers
+  lineinfile: 
+    dest: /etc/sudoers.d/{{group_name}} 
+    create: yes
+    state: present 
+    owner: root
+    group: root
+    mode: 0440
+    regexp: "{{owner_user_name}} .*" 
+    line: "{{owner_user_name}} ALL=(ALL) NOPASSWD: ALL"
+
+# Create directories and set permissions
+- name     : Set fact genomicsdb_dir
+  set_fact : genomicsdb_dir={{default_genomicsdb_dir}}
+  when     : genomicsdb_dir is not defined
+
+- name     : Set fact workspace_dir
+  set_fact : workspace_dir={{genomicsdb_dir}}/{{default_workspace_name}}
+  when     : workspace_dir is not defined
+
+- name: Create the genomics DB directory with the right permissions
+  file: 
+    path  : "{{genomicsdb_dir}}"
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "{{permissions}}"
+    state : directory
+
+# Setup UWSGI realted paths with right permissions
+- name: Verify that the uwsgi log dir is present with right permissions
+  file:
+    path  : /var/log/uwsgi
+    group : "{{group_name}}"
+    owner : "{{owner_user_name}}"
+    mode  : "u=rwx,g=rwx,o=r"
+    state : directory
+
+- name     : Set variable uwsgi_socket_path
+  set_fact : uwsgi_socket_path={{default_uwsgi_socket_path}}
+  when     : uwsgi_socket_path is not defined
+
+- name: Verify that the uwsgi_socket_path is present with right permissions
+  file: 
+    path  : "{{uwsgi_socket_path}}"
+    mode  : "u=rwx,g=rwx,o=rwx"
+    state : directory

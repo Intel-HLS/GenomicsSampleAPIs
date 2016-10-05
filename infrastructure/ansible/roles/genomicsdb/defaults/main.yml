@@ -1,0 +1,52 @@
+# The MIT License (MIT)
+# Copyright (c) 2016 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of 
+# this software and associated documentation files (the "Software"), to deal in 
+# the Software without restriction, including without limitation the rights to 
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
+# the Software, and to permit persons to whom the Software is furnished to do so, 
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all 
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+# GCC Defaults
+gcc_version : 4.9.3
+gcc_prefix  : /opt/rh/devtoolset-3/root/
+
+# Meta DB Defaults
+default_meta_db_name   : metadb
+default_metadb_adapter : postgresql+psycopg2
+
+# Group and Users - default group, user name and passwords for read (client) and read/write (owner) permissions
+default_group_name       : ga4gh
+default_client_user_name : ga4gh_client
+default_owner_user_name  : ga4gh_writer
+default_permissions      : "u=rwx,g=rx,o=x"
+
+# Directories
+default_genomicsdb_dir    : /home/genomicsdb
+default_workspace_name   : DB
+
+# Tile DB/Search Library 
+default_mpi_path         : /usr/lib64/openmpi
+default_mpi_runner       : mpirun
+default_is_clean_compile : true
+default_store_branch     : HEAD
+default_library_build    : release
+
+default_uwsgi_socket_path          : /var/uwsgi
+template_system_services_extension : service
+# Template overrides
+template_array_name     : "<Array_Name>"
+template_uwsgi_socket   : "<uwsgi_socket_path>"
+template_webserver_port : "<PORT>"

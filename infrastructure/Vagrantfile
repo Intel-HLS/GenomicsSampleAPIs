@@ -1,0 +1,60 @@
+ # -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+
+
+ubuntu_script = %q(
+)
+
+centos_script = %q(
+) 
+
+init_script = nil
+box_type = nil
+extra_vars = { "pkg_manager_proxy_config_file" => "./test_cfg_proxy" }
+
+Vagrant.configure(2) do |config|
+  config.env.enable
+  if ENV["OS_TYPE"] == 'ubuntu'
+    box_type = "ubuntu/trusty64"
+    init_script = ubuntu_script
+    if ENV["HTTP_PROXY"] 
+      init_script += "sudo echo 'Acquire::http::Proxy \"PROXY\";' >> /etc/apt/apt.conf\n"
+      init_script += "sudo echo 'Acquire::https::Proxy \"PROXY\";' >> /etc/apt/apt.conf"
+    end
+  elsif ENV["OS_TYPE"].include? "centos"
+    init_script = centos_script
+    if ENV["HTTP_PROXY"]
+      init_script += "sudo echo 'proxy=PROXY' >> /etc/yum.conf"
+    end
+    if ENV["OS_TYPE"].include? "centos6"
+      box_type = "mhubbard/centos6"
+    else
+      box_type = "mhubbard/centos7"
+    end
+  end
+  if ENV["HTTP_PROXY"]
+    config.proxy.http     = ENV["HTTP_PROXY"]
+    config.proxy.https    = ENV["HTTPS_PROXY"]
+    config.proxy.no_proxy = ENV["NO_PROXY"]
+    extra_vars["env"] = { "http_proxy" => ENV["HTTP_PROXY"], "https_proxy" => ENV["HTTPS_PROXY"], "no_proxy" => ENV["NO_PROXY"] }
+    init_script.sub! 'PROXY', ENV["HTTP_PROXY"]
+  end
+  config.vm.box = box_type
+  config.vm.hostname = "ccc-node"
+  config.vm.provision "shell", inline: init_script
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 10240
+    vb.cpus = 8
+  end
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = ENV["PLAYBOOK"]
+    ansible.extra_vars = extra_vars
+    ansible.sudo = true
+    #ansible.verbose = 'vv'
+  end
+end
