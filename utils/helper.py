@@ -26,6 +26,7 @@ import uuid
 import os
 import sys
 from datetime import datetime
+from pyfasta import Fasta
 try:
     from collections import OrderedDict
 except ImportError:
@@ -62,43 +63,27 @@ class ConstTileFields(OrderedDict):
         self["GT"] = {"vcf_field_class": ["FORMAT"], "type": "int", "length": "P"}
         self["PS"] = {"vcf_field_class": ["FORMAT"], "type": "int", "length": 1}
 
-
-def getReference(assembly, chromosome, start, end):
+def verifyFasta(REFERENCE_FASTA):
     """
-    Gets the Reference string from rest.ensemble.org
+    Checks if the path exists and opens it to make sure that it is a valid reference file
     """
-    # Ensemble takes MT and not M
-    if(chromosome == "M"):
-        chromosome = "MT"
-    server = "http://rest.ensembl.org"
-    request = "/sequence/region/human/" + chromosome + ":" + \
-        str(start) + ".." + str(end) + ":1?coord_system_version=" + assembly
+    if not os.path.exists(REFERENCE_FASTA):
+        raise Exception('reference file ({}) is invalid'.format(REFERENCE_FASTA))
+    # Check if the library can open the file correctly
+    f = Fasta(REFERENCE_FASTA)
 
-    nRetires = NUM_RETRIES
-    r = None
-    while(nRetires):
-        bFail = False
-        try:
-            r = requests.get(server + request,
-                             headers={"Content-Type": "text/plain"})
-        except Exception as e:
-            bFail = True
-
-        if r is None or not r.ok or bFail:
-            nRetires -= 1
-            bFail = False
-
-            # Use a sleep timer if we are failing
-            import time
-            time.sleep(nRetires)
-            continue
-        else:
-            break
-    if r is None or not r.ok or bFail:
-        print server + request
-        r.raise_for_status()
-
-    return r.text
+def getReference(assembly, chromosome, start, end, REFERENCE_FASTA):
+    """
+    Gets the Reference string from the reference file that was provided
+    """
+    if not os.path.exists(REFERENCE_FASTA):
+        raise Exception('reference file ({}) is invalid'.format(REFERENCE_FASTA))
+    f = Fasta(REFERENCE_FASTA)
+    if not chromosome.startswith('chr'):
+        chromosome = 'chr' + chromosome
+    if(chromosome == 'chrMT'):
+        chromosome = 'chrM'
+    return f[chromosome][start-1:end].upper()
 
 
 def getFileName(inFile, splitStr=None):

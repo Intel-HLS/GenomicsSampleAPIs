@@ -56,6 +56,8 @@ class CONST(IDX):
     INDEX = 1
     PLOIDY = 0
     END_IDX = 0
+    
+    REFERENCE_FASTA = None
 
 
 class MAF_Spark:
@@ -587,7 +589,7 @@ def updateRefAltPos(iter):
                 end = start
 
                 newRef = helper.getReference(assembly, chromosome,
-                        start, start)
+                        start, start, CONST.REFERENCE_FASTA)
                 ref = newRef
 
                 index = 0
@@ -604,7 +606,7 @@ def updateRefAltPos(iter):
                 if bFlag:
                     start = start - 1
                     newRef = helper.getReference(assembly, chromosome,
-                            start, start)
+                            start, start, CONST.REFERENCE_FASTA)
                     ref = newRef + ref
                     index = 0
                     for value in alt:
@@ -749,8 +751,11 @@ if __name__ == '__main__':
 
     parser.add_argument('-l', '--loader', required=False, type=str,
                         help='Loader JSON to load data into Tile DB.')
+    parser.add_argument('-r', '--reference_fasta', required=True, type=str,
+                        help='reference fasta file to get the reference Allele information')
 
     args = parser.parse_args()
+    CONST.REFERENCE_FASTA = args.reference_fasta
 
     parallelGen(
         args.config,

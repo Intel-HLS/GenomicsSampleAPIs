@@ -88,8 +88,11 @@ if __name__ == "__main__":
         required=False,
         type=str,
         help="Loader JSON to load data into Tile DB.")
+    parser.add_argument('-r', '--reference_fasta', required=True, type=str,
+                        help='reference fasta file to get the reference Allele information')
 
     args = parser.parse_args()
+    helper.verifyFasta(args.reference_fasta)
 
     if args.spark:
         # call spark from within import script
@@ -101,7 +104,8 @@ if __name__ == "__main__":
             "maf_pyspark.py", 
             "-c", args.config, 
             "-d", args.outputdir, 
-            "-o", args.output, 
+            "-o", args.output,
+            "-r", args.reference_fasta, 
             "-i"]
 
         spark_cmd.extend(args.inputs)
@@ -118,7 +122,7 @@ if __name__ == "__main__":
             raise Exception("Error running converter\n\nERROR: \n{}".format(error))
 
     else:
-
+        multiprocess_import.REFERENCE_FASTA = args.reference_fasta
         multiprocess_import.parallelGen(
             args.config,
             args.inputs,

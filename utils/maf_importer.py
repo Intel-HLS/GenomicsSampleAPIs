@@ -40,7 +40,7 @@ from metadb.api import DBQuery
 from utils.configuration import ConfigReader
 
 CSVLine = csvline.CSVLine
-
+REFERENCE_FASTA = None
 
 class MAF(File2Tile):
 
@@ -264,7 +264,7 @@ class MAF(File2Tile):
             end = start
 
             ref = helper.getReference(assembly, chromosome, start,
-                    start)
+                    start, REFERENCE_FASTA)
             self.prev_TileDBValues['REF'] = ref
             index = 0
             for value in self.prev_TileDBValues['ALT']:
@@ -288,7 +288,7 @@ class MAF(File2Tile):
                 end = self.prev_ChromosomePosition[IDX.CHR_END]
 
                 ref = helper.getReference(assembly, chromosome, start,
-                        start)
+                        start, REFERENCE_FASTA)
                 self.prev_TileDBValues['REF'] = ref \
                     + self.prev_TileDBValues['REF']
                 index = 0
