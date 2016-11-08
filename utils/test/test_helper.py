@@ -47,6 +47,7 @@ GANN
         assert helper.verifyFasta(str(fastafile)) is None
         assert helper.getReference("GRCh37", "1", 100, 101, str(fastafile)) != ""
         assert helper.getReference("GRCh37", "M", 1, 2, str(fastafile)) == "GA"
+        assert helper.getReference("GRCh37", "MT", 1, 2, str(fastafile)) == "GA"
     
     def test_getReference_neg(self):
         with pytest.raises(Exception) as exec_info:
