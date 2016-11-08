@@ -22,25 +22,36 @@
 
 import pytest
 import gzip
-from mock import patch
+from unittest import TestCase
 import utils.helper as helper
 
+class TestVCFImporter(TestCase):
 
-def test_getReference():
-    assert helper.getReference("GRCh37", "1", 100, 101) != ""
-    assert helper.getReference("GRCh37", "M", 1, 2) == "GA"
+    @classmethod
+    def setUpClass(self):
+        self.fasta = """>chr1
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNA
+CTGNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+>chrM
+GANN
+"""
 
+    @pytest.fixture(autouse=True)
+    def set_tmpdir(self, tmpdir):
+        self.tmpdir = tmpdir
 
-def raiseException():
-    raise Exception("Test")
-
-
-@patch('requests.get', side_effect=raiseException)
-@patch('utils.helper.NUM_RETRIES', 2)
-def test_getReference_neg(patched_fn):
-    with pytest.raises(Exception) as exec_info:
-        helper.getReference("GRCh37", "1", 100, 101)
-    assert patched_fn.call_count == 2
+    def test_getReference(self):
+        fastafile = self.tmpdir.join('test.fasta')
+        fastafile.write(self.fasta)
+        assert helper.getReference("GRCh37", "1", 100, 101, str(fastafile)) != ""
+        assert helper.getReference("GRCh37", "M", 1, 2, str(fastafile)) == "GA"
+    
+    
+    def test_getReference_neg(self):
+        with pytest.raises(Exception) as exec_info:
+            helper.getReference("GRCh37", "1", 100, 101, '/tmp/missing.fasta')
+        assert 'is invalid' in str(exec_info.value)
 
 
 def test_printers():

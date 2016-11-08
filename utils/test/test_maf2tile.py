@@ -75,6 +75,13 @@ class TestMAF(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
+        self.fasta = """>chr1
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNA
+CTGNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+>chrM
+GANN
+"""
         self.TESTDB_URI = "postgresql+psycopg2://@:5432/mafend2end"
         if not database_exists(self.TESTDB_URI):
             create_database(self.TESTDB_URI)
@@ -230,6 +237,11 @@ class TestMAF(unittest.TestCase):
             fp.write(json.dumps(config_json))
 
         test_output_dir = self.tmpdir.mkdir("output")
+        
+        ref_fasta = self.tmpdir.join('test_ref.fasta')
+        ref_fasta.write(self.fasta)
+        
+        imp.multiprocess_import.REFERENCE_FASTA = str(ref_fasta)
 
         imp.multiprocess_import.poolGenerateCSV((str(test_config), str(
             input_file), str(test_output_dir) + "/" + "out.txt", False))
