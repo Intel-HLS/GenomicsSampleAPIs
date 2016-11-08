@@ -25,7 +25,7 @@ import gzip
 from unittest import TestCase
 import utils.helper as helper
 
-class TestVCFImporter(TestCase):
+class TestReferenceFasta(TestCase):
 
     @classmethod
     def setUpClass(self):
@@ -44,15 +44,20 @@ GANN
     def test_getReference(self):
         fastafile = self.tmpdir.join('test.fasta')
         fastafile.write(self.fasta)
+        assert helper.verifyFasta(str(fastafile)) is None
         assert helper.getReference("GRCh37", "1", 100, 101, str(fastafile)) != ""
         assert helper.getReference("GRCh37", "M", 1, 2, str(fastafile)) == "GA"
-    
     
     def test_getReference_neg(self):
         with pytest.raises(Exception) as exec_info:
             helper.getReference("GRCh37", "1", 100, 101, '/tmp/missing.fasta')
         assert 'is invalid' in str(exec_info.value)
-
+        
+    def test_verifyFasta_neg(self):
+        fastafile = self.tmpdir.join('test_neg.fasta')
+        with pytest.raises(Exception) as exec_info:
+            helper.verifyFasta(str(fastafile))
+        assert 'is invalid' in str(exec_info.value)
 
 def test_printers():
     helper.log("test")
