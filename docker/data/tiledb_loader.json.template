@@ -1,0 +1,25 @@
+{
+  "treat_deletions_as_intervals": true,
+  "callset_mapping_file": "${GENOMICSDB_DATA}/${GENOMICSDB_CALLSET_MAPPING}",
+  "compress_tiledb_array": true,
+  "produce_tiledb_array": true,
+  "produce_combined_vcf": false,
+  "row_partitions": [
+    {
+      "begin": 0,
+      "array": "${GENOMICSDB_ARRAY_NAME}",
+      "workspace": "${GENOMICSDB_WORKSPACE}"
+    }
+  ],
+  "size_per_column_partition": 3000000,
+  "delete_and_create_tiledb_array": false,
+  "num_parallel_vcf_files": 1,
+  "discard_vcf_index": true,
+  "offload_vcf_output_processing": true,
+  "vid_mapping_file": "${GENOMICSDB_DATA}/${GENOMICSDB_VID_MAPPING}",
+  "row_based_partitioning": true,
+  "segment_size": 1048576,
+  "do_ping_pong_buffering": true,
+  "num_cells_per_tile": 1000,
+  "lb_callset_row_idx": 0
+}
