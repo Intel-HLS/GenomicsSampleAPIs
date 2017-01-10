@@ -31,7 +31,7 @@ Some starter notes to get going on setting up a docker instance for Genomics DB 
    ```
 1. Load data into the docker volume:  
    **Note #1**: the data directory contains a tiledb_loader.json template that can be used to leverage the ENV variables that have been setup. Update any parameters if necessary.  
-   **Note #2**: data files (callset_mapping, vid_mapping, and csv files) are expected to be under the data directory for the example run command shown below. If those files are located elsewhere please mount and update the load_data.sh accordingly.  
+   **Note #2**: data files (callset_mapping, vid_mapping, db.gz, and csv files) are expected to be under the data directory for the example run command shown below. If those files are located elsewhere please mount and update the load_data.sh accordingly.  
    **Note #3**: callset_mapping files point to the csv with absolute paths. Make sure that the paths map correctly to the mapping in the run command below. 
 
    ```shell
