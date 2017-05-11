@@ -27,17 +27,17 @@ from sqlalchemy.orm import sessionmaker
 
 from itertools import chain
 
-from metadb.models import Field
-from metadb.models import Individual
-from metadb.models import Workspace
-from metadb.models import DBArray
-from metadb.models import CallSetToDBArrayAssociation
-from metadb.models import Reference
-from metadb.models import ReferenceSet
-from metadb.models import CallSet
-from metadb.models import VariantSet
-from metadb.models import CallSetVariantSet
-from metadb.models import Sample
+from mappingdb.models import Field
+from mappingdb.models import Individual
+from mappingdb.models import Workspace
+from mappingdb.models import DBArray
+from mappingdb.models import CallSetToDBArrayAssociation
+from mappingdb.models import Reference
+from mappingdb.models import ReferenceSet
+from mappingdb.models import CallSet
+from mappingdb.models import VariantSet
+from mappingdb.models import CallSetVariantSet
+from mappingdb.models import Sample
 
 class DBQuery():
     """ keeps the engine and the session maker for the database """
@@ -173,7 +173,7 @@ class Query():
         column positions
         If the input positionList is a single element, then the returned list has 1 element
         """
-        # contig MT is same as contig M, in meta db we will always use M to be
+        # contig MT is same as contig M, in mappingdb we will always use M to be
         # consistent
         if contig == 'MT':
             contig = 'M'

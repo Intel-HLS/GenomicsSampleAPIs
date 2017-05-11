@@ -37,7 +37,7 @@ depends_on = None
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
-from metadb.models import get_tiledb_padded_reference_length_string, get_tiledb_padded_reference_length_string_default
+from mappingdb.models import get_tiledb_padded_reference_length_string, get_tiledb_padded_reference_length_string_default
 
 
 def upgrade():

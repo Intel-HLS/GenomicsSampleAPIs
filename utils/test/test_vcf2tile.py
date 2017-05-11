@@ -26,8 +26,8 @@ import os
 from sqlalchemy import and_
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, drop_database, database_exists
-import metadb.api.query as dbquery
-import metadb.models as models
+import mappingdb.api.query as dbquery
+import mappingdb.models as models
 from unittest import TestCase
 import utils.vcf2tile as vcimp
 from utils.vcf_importer import VCF
@@ -108,7 +108,7 @@ class TestVCFImporter(TestCase):
         vcimp.multiprocess_import.parallelGen(
             str(conf), [str(vcfile)], str(self.tmpdir))
 
-        # check proper import into metadb
+        # check proper import into mappingdb
         with dbquery.DBQuery(self.DBURI).getSession() as session:
             result = session.session.query(models.CallSet.name) .filter(
                 models.CallSet.name.in_([sampleN, sampleT])) .all()

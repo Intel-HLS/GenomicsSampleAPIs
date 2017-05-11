@@ -31,8 +31,8 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
-from metadb.api import DBImport, DBQuery
-import metadb.models as models
+from mappingdb.api import DBImport, DBQuery
+import mappingdb.models as models
 
 now = datetime.now
 NUM_RETRIES = 10
@@ -131,9 +131,9 @@ def writeVIDMappingFile(DB_URI, reference_set_id, output_file, fields_dict=Const
     """
     Creates the VID mapping file for GenomicsDB import.
     """
-    with DBQuery(DB_URI).getSession() as metadb:
-        # grab references with tiledb offset from metadb
-        references = metadb.session.query(models.Reference)\
+    with DBQuery(DB_URI).getSession() as mappingdb:
+        # grab references with tiledb offset from mappingdb
+        references = mappingdb.session.query(models.Reference)\
             .filter(models.Reference.reference_set_id == reference_set_id)\
             .all()
 
@@ -152,7 +152,7 @@ def writeVIDMappingFile(DB_URI, reference_set_id, output_file, fields_dict=Const
 
 def registerWithMetadb(config, vcf=False, references=OrderedDict()):
     """
-    Registers parent object of a callset in metadb for both MAF and VCF importing.
+    Registers parent object of a callset in mappingdb for both MAF and VCF importing.
     """
     if not vcf:
         # set MAF specific vars
@@ -173,20 +173,20 @@ def registerWithMetadb(config, vcf=False, references=OrderedDict()):
         array = config['array']
         dbimport = DBImport(config['dburi'])
 
-    with dbimport.getSession() as metadb:
+    with dbimport.getSession() as mappingdb:
         # register workspace, referenceset, array, and variantset
-        ws = metadb.registerWorkspace(
+        ws = mappingdb.registerWorkspace(
             str(uuid.uuid4()), workspace)
-        rs = metadb.registerReferenceSet(
+        rs = mappingdb.registerReferenceSet(
             str(uuid.uuid4()), 
             assembly, 
             references=references)
-        dba = metadb.registerDBArray(
+        dba = mappingdb.registerDBArray(
             guid=str(uuid.uuid4()),
             name=array,
             reference_set_id=rs.id,
             workspace_id=ws.id)
-        vs = metadb.registerVariantSet(
+        vs = mappingdb.registerVariantSet(
             guid=str(uuid.uuid4()),
             reference_set_id=rs.id,
             dataset_id=os.path.basename(workspace))

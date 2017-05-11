@@ -42,7 +42,7 @@
 - include : repos.yml
 
 # Setup Meta DB
-- include : metadb.yml
+- include : mappingdb.yml
 
 # Setup GA4GH
 - include : ga4gh.yml

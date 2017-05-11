@@ -15,7 +15,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from metadb.models import _Base
+from mappingdb.models import _Base
 target_metadata = _Base.metadata
 
 # other values from the config, defined by the needs of env.py,

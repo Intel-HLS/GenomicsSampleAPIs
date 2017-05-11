@@ -32,11 +32,11 @@ describe file('/home/genomicsdb/DB') do
   it { should be_directory }
 end
 
-describe command('sudo -u ga4gh_writer -i psql -l | grep metadb | wc -l') do
+describe command('sudo -u ga4gh_writer -i psql -l | grep mappingdb | wc -l') do
   its(:stdout) { should match /1/}
 end
 
-describe command('sudo -u ga4gh_writer -i psql -c "\dt+" -d metadb | grep table | wc -l') do
+describe command('sudo -u ga4gh_writer -i psql -c "\dt+" -d mappingdb | grep table | wc -l') do
   its(:stdout) { should match /15/}
 end
 

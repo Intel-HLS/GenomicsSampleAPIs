@@ -43,9 +43,9 @@
     skip_data_rsync : "true"
   when     : import_path is not defined
 
-- name     : Set variable metadb_file
-  set_fact : metadb_file={{default_metadb_file}}
-  when     : metadb_file is not defined
+- name     : Set variable mappingdb_file
+  set_fact : mappingdb_file={{default_mappingdb_file}}
+  when     : mappingdb_file is not defined
 
 - name     : Set variable callset_mapping_file
   set_fact : callset_mapping_file={{default_callset_mapping_file}}

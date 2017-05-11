@@ -29,7 +29,7 @@
 
 - name        : Fetch the DB
   synchronize : 
-    src        : "{{import_path}}/{{metadb_file}}"
+    src        : "{{import_path}}/{{mappingdb_file}}"
     dest       : "{{import_data_path}}/"
     archive    : no
     rsync_path : "sudo rsync"
@@ -100,14 +100,14 @@
     state   : directory
 
 - name      : Import data into Meta DB
-  shell     : "zcat {{import_data_path}}/{{metadb_file}} | psql {{meta_db_name}}"
+  shell     : "zcat {{import_data_path}}/{{mappingdb_file}} | psql {{mappingdb_name}}"
   become      : yes
   become_user : "{{owner_user_name}}"
 
 - name: Update the workspace table to reflect the workspace_dir
   command: >
     psql
-    -d {{meta_db_name}}
+    -d {{mappingdb_name}}
     -c "update workspace set name='{{workspace_dir}}' where id=1"
   become      : yes
   become_user : "{{owner_user_name}}"
@@ -115,7 +115,7 @@
 - name: Update the db_array table to reflect the array_name
   command: >
     psql
-    -d {{meta_db_name}}
+    -d {{mappingdb_name}}
     -c "update db_array set name='{{array_name}}' where id=1"
   become      : yes
   become_user : "{{owner_user_name}}"

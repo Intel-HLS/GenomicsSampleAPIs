@@ -49,7 +49,7 @@ setup(
 
     keywords='variant database',
 
-    packages=['utils', 'metadb.models', 'metadb.api', 'python_api'],
+    packages=['utils', 'mappingdb.models', 'mappingdb.api', 'python_api'],
 
     install_requires=['sqlalchemy'],
 

@@ -25,16 +25,16 @@ import uuid
 from time import strftime
 from sqlalchemy import create_engine, and_, or_, exc
 from sqlalchemy.orm import sessionmaker
-from metadb.models import CallSet
-from metadb.models import CallSetToDBArrayAssociation
-from metadb.models import DBArray
-from metadb.models import Individual
-from metadb.models import Reference
-from metadb.models import ReferenceSet
-from metadb.models import Sample
-from metadb.models import VariantSet
-from metadb.models import Workspace
-from metadb.models import bind_engine
+from mappingdb.models import CallSet
+from mappingdb.models import CallSetToDBArrayAssociation
+from mappingdb.models import DBArray
+from mappingdb.models import Individual
+from mappingdb.models import Reference
+from mappingdb.models import ReferenceSet
+from mappingdb.models import Sample
+from mappingdb.models import VariantSet
+from mappingdb.models import Workspace
+from mappingdb.models import bind_engine
 from collections import OrderedDict, namedtuple
 
 
@@ -57,7 +57,7 @@ class DBImport():
 class Import():
     """
     Manages the session for importing
-    This will be the class that verifies registration and imports data into metadb
+    This will be the class that verifies registration and imports data into mappingdb
     """
 
     def __init__(self, db):
@@ -108,7 +108,7 @@ class Import():
         Registers a Reference. Most often called by registerReferenceSet.
         Requires a Reference name be unique for all references in a reference set
         """
-        # contig MT is same as contig M, in meta db we will always use M to be
+        # contig MT is same as contig M, in mappingdb we will always use M to be
         # consistent
         if name == 'MT':
             name = 'M'
@@ -137,7 +137,7 @@ class Import():
     def registerWorkspace(self, guid, name):
         """
         Registers a workspace.
-        Workspace name is the path to the workspace directory. This is assumed unique per metadb instance.
+        Workspace name is the path to the workspace directory. This is assumed unique per mappingdb instance.
         """
 
         # if the name ends with a / then remove it from the name.

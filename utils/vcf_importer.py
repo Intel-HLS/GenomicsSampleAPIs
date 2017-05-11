@@ -33,8 +33,8 @@ import vcf
 import pysam
 from pysam import bcftools
 
-from metadb.api import DBImport
-from metadb.models import CallSetToDBArrayAssociation
+from mappingdb.api import DBImport
+from mappingdb.models import CallSetToDBArrayAssociation
 
 import utils.helper as helper
 import utils.configuration as utils
@@ -42,7 +42,7 @@ import utils.configuration as utils
 
 class VCF:
     """
-    Class handling metadb registration and
+    Class handling mappingdb registration and
     GenomicsDB loading configuration for a tumor normal VCF file
     """
 
@@ -155,7 +155,7 @@ class VCF:
                 if 'target' in sample or 'primary' in sample:
                     target_idx = i
 
-        with DBImport(self.dburi).getSession() as metadb:
+        with DBImport(self.dburi).getSession() as mappingdb:
             for callset in callsets:
                 # source and target names
                 source = callsets[callset][source_idx]
@@ -166,11 +166,11 @@ class VCF:
                     file_idx = target_idx
 
                 # register individual and samples
-                indv = metadb.registerIndividual(
+                indv = mappingdb.registerIndividual(
                     str(uuid.uuid4()), 
                     "Individual_"+source)
 
-                src = metadb.registerSample(
+                src = mappingdb.registerSample(
                     str(uuid.uuid4()),
                     indv.guid,
                     name=source,
@@ -181,8 +181,8 @@ class VCF:
                 if self.vcf_type == 'TN':
                     target = callsets[callset][target_idx]
 
-                    # need to address change in the metadb models
-                    trg = metadb.registerSample(
+                    # need to address change in the mappingdb models
+                    trg = mappingdb.registerSample(
                         str(uuid.uuid4()),
                         indv.guid,
                         name=target,
@@ -191,7 +191,7 @@ class VCF:
                     target_guid = trg.guid
 
                 # register callset
-                cs = metadb.registerCallSet(str(uuid.uuid4()),
+                cs = mappingdb.registerCallSet(str(uuid.uuid4()),
                     src.guid,
                     target_guid,
                     self.workspace,
@@ -200,7 +200,7 @@ class VCF:
                     name=callset)
 
                 # retrieve tile row information for callset
-                tr = metadb.session.query(CallSetToDBArrayAssociation)\
+                tr = mappingdb.session.query(CallSetToDBArrayAssociation)\
                     .filter(CallSetToDBArrayAssociation.callset_id == cs.id)\
                     .first()
 
@@ -246,7 +246,7 @@ def sortAndIndex(inFile, outdir, sort=True, index=True):
 
 def poolImportVCF(file_info):
     """
-    Used by multiprocess.Pool to read vcf, populate metadb, 
+    Used by multiprocess.Pool to read vcf, populate mappingdb, 
     and (optionally) load into GenomicsDB
     """
     (config_file, inputFile) = file_info

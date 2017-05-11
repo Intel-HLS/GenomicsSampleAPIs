@@ -24,8 +24,8 @@ gcc_version : 4.9.3
 gcc_prefix  : /opt/rh/devtoolset-3/root/
 
 # Meta DB Defaults
-default_meta_db_name   : metadb
-default_metadb_adapter : postgresql+psycopg2
+default_mappingdb_name   : mappingdb
+default_mappingdb_adapter : postgresql+psycopg2
 
 # Group and Users - default group, user name and passwords for read (client) and read/write (owner) permissions
 default_group_name       : ga4gh

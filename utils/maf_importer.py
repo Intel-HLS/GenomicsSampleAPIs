@@ -35,8 +35,8 @@ import utils.csvline as csvline
 from utils.file2tile import File2Tile
 from utils.file2tile import IDX
 import utils.helper as helper
-from metadb.api import DBImport
-from metadb.api import DBQuery
+from mappingdb.api import DBImport
+from mappingdb.api import DBQuery
 from utils.configuration import ConfigReader
 
 CSVLine = csvline.CSVLine
@@ -70,7 +70,7 @@ class MAF(File2Tile):
         self.prev_VariantSetId = None
         self.GT = None
 
-        # metadb objects
+        # mappingdb objects
 
         self.curr_Individual = None
         self.curr_SourceSample = None
@@ -191,31 +191,31 @@ class MAF(File2Tile):
             or self.prev_IndividualId != self.IndividualId \
             or self.prev_CallSetName != self.CallSetName:
 
-            with self.dbimport.getSession() as metadb:
+            with self.dbimport.getSession() as mappingdb:
 
                 self.prev_IndividualId = self.IndividualId
                 self.prev_SourceSampleId = self.SourceSampleId
                 self.prev_TargetSampleId = self.TargetSampleId
 
                 self.curr_Individual = \
-                    metadb.registerIndividual(guid=str(uuid.uuid4()),
+                    mappingdb.registerIndividual(guid=str(uuid.uuid4()),
                         name=self.prev_IndividualId)
 
                 self.curr_SourceSample = \
-                    metadb.registerSample(guid=str(uuid.uuid4()),
+                    mappingdb.registerSample(guid=str(uuid.uuid4()),
                         individual_guid=self.curr_Individual.guid,
                         name=self.SourceSampleId, info={'type': 'source'
                         })
 
                 self.curr_TargetSample = \
-                    metadb.registerSample(guid=str(uuid.uuid4()),
+                    mappingdb.registerSample(guid=str(uuid.uuid4()),
                         individual_guid=self.curr_Individual.guid,
                         name=self.TargetSampleId, info={'type': 'target'
                         })
 
                 self.prev_CallSetName = self.CallSetName
 
-                self.curr_CallSet = metadb.registerCallSet(
+                self.curr_CallSet = mappingdb.registerCallSet(
                     guid=str(uuid.uuid4()),
                     source_sample_guid=self.curr_SourceSample.guid,
                     target_sample_guid=self.curr_TargetSample.guid,

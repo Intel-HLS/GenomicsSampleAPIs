@@ -22,7 +22,7 @@
 
 import csvline
 from utils.configuration import ConfigReader
-from metadb.api.query import DBQuery
+from mappingdb.api.query import DBQuery
 
 
 class IDX:

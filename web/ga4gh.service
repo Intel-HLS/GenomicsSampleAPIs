@@ -1,9 +1,0 @@
-[Unit]
-Description = GA4GH Service provider for genomics db
-After = nginx.service postgresql.service
-
-[Service]
-
-[Install]
-WantedBy = multi-user.target
-

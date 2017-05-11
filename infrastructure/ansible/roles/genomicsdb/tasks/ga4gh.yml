@@ -88,18 +88,18 @@
   become      : yes
   become_user : "{{owner_user_name}}"
 
-- name     : Set variable metadb_adapter
-  set_fact : metadb_adapter="{{default_metadb_adapter}}"
-  when     : metadb_adapter is not defined
+- name     : Set variable mappingdb_adapter
+  set_fact : mappingdb_adapter="{{default_mappingdb_adapter}}"
+  when     : mappingdb_adapter is not defined
 
-- name     : Set variable metadb_uri
-  set_fact : metadb_uri="{{metadb_adapter}}://@:5432/{{meta_db_name}}"
-  when     : metadb_uri is not defined
+- name     : Set variable mappingdb_uri
+  set_fact : mappingdb_uri="{{mappingdb_adapter}}://@:5432/{{mappingdb_name}}"
+  when     : mappingdb_uri is not defined
 
 - name     : Update alembic.ini
   template : 
     src   : alembic.ini.j2 
-    dest  : "{{store_dir}}/metadb/alembic.ini"
+    dest  : "{{store_dir}}/mappingdb/alembic.ini"
     group : "{{group_name}}"
     owner : "{{owner_user_name}}"
     mode  : "{{permissions}}"
@@ -107,14 +107,14 @@
 - name  : Run alembic upgrade to head
   shell : ". {{ga4gh_virtualenv}}/bin/activate && alembic upgrade head"
   args  : 
-    chdir : "{{store_dir}}/metadb"
+    chdir : "{{store_dir}}/mappingdb"
   become      : yes
   become_user : "{{owner_user_name}}"
 
 # Priviledges have to be granted on the tables after it is created by alembic.
 - name : Grant SELECT-only priviledges to the client on the DB
   postgresql_privs :
-    db           : "{{meta_db_name}}"
+    db           : "{{mappingdb_name}}"
     role         : "{{client_user_name}}"
     state        : present
     privs        : SELECT

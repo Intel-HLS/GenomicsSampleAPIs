@@ -27,10 +27,10 @@ import sys
 import json
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
-from metadb import models
+from mappingdb import models
 import utils.maf2tile as imp
 from utils.csvline import CSVLine
-from metadb.api.query import DBQuery
+from mappingdb.api.query import DBQuery
 from utils.configuration import ConfigReader
 
 test_header = [
@@ -105,8 +105,8 @@ class TestMAF(unittest.TestCase):
     def test_end2end(self):
         csvlines = dict()
         input_file = self.tmpdir.join("in.txt")
-        db = DBQuery("postgresql+psycopg2://@:5432/metadb")
-        with open(str(input_file), 'w') as inFP, db.getSession() as metadb:
+        db = DBQuery("postgresql+psycopg2://@:5432/mappingdb")
+        with open(str(input_file), 'w') as inFP, db.getSession() as mappingdb:
             inFP.write("# Comment line\n")
             inFP.write("{0}\n".format("\t".join(test_header)))
             inFP.write("{0}\n".format("\t".join(test_data)))
@@ -188,7 +188,7 @@ class TestMAF(unittest.TestCase):
                 inFP.write("{0}\n".format("\t".join(new_data)))
                 inFP.write("{0}\n".format("\t".join(new_data)))
                 inFP.write("{0}\n".format("\t".join(new_data)))
-                Location, End = metadb.contig2Tile(
+                Location, End = mappingdb.contig2Tile(
                     1, contig, [long(new_data[8]), long(new_data[9])])
                 csvlines[7].append(self.getCSVLine(
                     new_data, 7, Location=Location, End=End))
@@ -203,7 +203,7 @@ class TestMAF(unittest.TestCase):
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
             inFP.write("{0}\n".format("\t".join(new_data)))
-            Location, End = metadb.contig2Tile(
+            Location, End = mappingdb.contig2Tile(
                 1, "2", [long(new_data[8]), long(new_data[9])])
             csvlines[0].append(self.getCSVLine(
                 new_data, 0, Location=Location, End=End))

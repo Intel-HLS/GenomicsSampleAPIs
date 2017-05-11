@@ -7,7 +7,7 @@
     "fields_list" : "END,REF,ALT,QUAL,FILTER,BaseQRankSum,ClippingRankSum,MQRankSum,ReadPosRankSum,DP,MQ,MQ0,DP_FORMAT,MIN_DP,GQ,SB,AD,PL,AF,AN,AC,GT,PS",
     "ftypes_list" : "int64,char:var,char:var,float,int:var,float,float,float,float,int,float,int,int,int,int,int:4,int:var,int:var,float:var,int,int:var,int:var,int,int64"
   },
-  "DB_URI"           : "postgresql+psycopg2://@:5432/metadb",
+  "DB_URI"           : "postgresql+psycopg2://@:5432/mappingdb",
   "HeaderStartsWith" : "icgc_mutation_id",
   "VariantSetMap" : {
     "Dynamic"       : true,

@@ -25,8 +25,8 @@ import uuid
 from sqlalchemy import and_
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, drop_database, database_exists
-import metadb.api.dbimport as dbimport
-import metadb.models as models
+import mappingdb.api.dbimport as dbimport
+import mappingdb.models as models
 from unittest import TestCase
 import vcf
 

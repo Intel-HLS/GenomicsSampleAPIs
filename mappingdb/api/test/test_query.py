@@ -21,12 +21,12 @@
 """
 
 import pytest
-import metadb.api.query as query
-import metadb.models as models
+import mappingdb.api.query as query
+import mappingdb.models as models
 
 
 class TestQuery:
-    DBURI = "postgresql+psycopg2://@:5432/metadb"
+    DBURI = "postgresql+psycopg2://@:5432/mappingdb"
     workspace = "/home/genomicsdb/DB"
     arrayName = "test"
     numRows = 8

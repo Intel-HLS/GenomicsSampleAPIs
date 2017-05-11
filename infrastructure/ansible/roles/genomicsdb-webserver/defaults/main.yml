@@ -27,7 +27,7 @@ default_system_services_extension : service
 default_webserver_port            : 8990
 
 # files that will be used for importing
-default_metadb_file          : "test.db.gz"
+default_mappingdb_file          : "test.db.gz"
 default_callset_mapping_file : "test.callset_mapping"
 default_vid_mapping_file     : "test.vid_mapping"
 

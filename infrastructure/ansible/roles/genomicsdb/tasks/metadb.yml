@@ -19,9 +19,9 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
-- name     : Set fact meta_db_name
-  set_fact : meta_db_name={{default_meta_db_name}}
-  when     : meta_db_name is not defined
+- name     : Set fact mappingdb_name
+  set_fact : mappingdb_name={{default_mappingdb_name}}
+  when     : mappingdb_name is not defined
 
 - name            : Setup the owner user role
   postgresql_user :
@@ -32,7 +32,7 @@
 
 - name          : Create the postgres db
   postgresql_db : 
-    name  : "{{meta_db_name}}"
+    name  : "{{mappingdb_name}}"
     owner : "{{owner_user_name}}"
   become : yes
   become_user : postgres
@@ -42,7 +42,7 @@
 - name            : Update priviledges for the owner user role
   postgresql_privs :
     roles        : "{{owner_user_name}}"
-    db           : "{{meta_db_name}}"
+    db           : "{{mappingdb_name}}"
     grant_option : yes
     privs        : ALL
     type         : table
@@ -52,7 +52,7 @@
 
 - name            : Setup the reader/client for the db
   postgresql_user : 
-    db              : "{{meta_db_name}}"
+    db              : "{{mappingdb_name}}"
     name            : "{{client_user_name}}"
     role_attr_flags : "NOSUPERUSER,NOCREATEDB"
   become          : yes

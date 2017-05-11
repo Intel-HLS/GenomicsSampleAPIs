@@ -35,7 +35,7 @@ import utils.helper as helper
 
 # investigate
 
-from metadb.api import DBImport, DBQuery
+from mappingdb.api import DBImport, DBQuery
 from utils.configuration import ConfigReader
 
 indices = None
@@ -335,7 +335,7 @@ def updateIds(keys, callset_mapping, output_file):
     global rowIdMap, indices, dbimport, dbquery, variantSetId
 
     rowIdMap = dict()
-    with dbimport.getSession() as metadb:
+    with dbimport.getSession() as mappingdb:
         for k in keys:
 
             individual_name = k[keysList.index('IndividualName')]
@@ -345,22 +345,22 @@ def updateIds(keys, callset_mapping, output_file):
                     + k[keysList.index('SourceSampleName')]
 
             Individual = \
-                metadb.registerIndividual(guid=str(uuid.uuid4()),
+                mappingdb.registerIndividual(guid=str(uuid.uuid4()),
                     name=individual_name)
 
             SourceSample = \
-                metadb.registerSample(guid=str(uuid.uuid4()),
+                mappingdb.registerSample(guid=str(uuid.uuid4()),
                     name=k[keysList.index('SourceSampleName')],
                     individual_guid=Individual.guid,
                     info={'type': 'source'})
 
             TargetSample = \
-                metadb.registerSample(guid=str(uuid.uuid4()),
+                mappingdb.registerSample(guid=str(uuid.uuid4()),
                     name=k[keysList.index('TargetSampleName')],
                     individual_guid=Individual.guid,
                     info={'type': 'target'})
 
-            CallSet = metadb.registerCallSet(
+            CallSet = mappingdb.registerCallSet(
                 guid=str(uuid.uuid4()),
                 source_sample_guid=SourceSample.guid,
                 target_sample_guid=TargetSample.guid,
