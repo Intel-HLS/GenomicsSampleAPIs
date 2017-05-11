@@ -35,6 +35,7 @@ from mappingdb.models import Sample
 from mappingdb.models import VariantSet
 from mappingdb.models import Workspace
 from mappingdb.models import bind_engine
+from mappingdb.models import tiledb_reference_offset_padding_factor_default
 from collections import OrderedDict, namedtuple
 
 
@@ -70,7 +71,8 @@ class Import():
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
 
-    def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=OrderedDict()):
+    def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=OrderedDict(),
+        tiledb_reference_offset_padding_factor=tiledb_reference_offset_padding_factor_default):
         """
         ReferenceSet registration for MAF occurs from an assembly config file. See hg19.json for example.
         ReferenceSet registration for VCF occurs from reading VCF contig tags in header. 
@@ -85,7 +87,8 @@ class Import():
 
             try:
                 referenceSet = ReferenceSet(
-                    guid=guid, assembly_id=assembly_id, description=description)
+                    guid=guid, assembly_id=assembly_id, description=description,
+                    tiledb_reference_offset_padding_factor=tiledb_reference_offset_padding_factor)
                 self.session.add(referenceSet)
                 self.session.commit()
 
@@ -108,10 +111,6 @@ class Import():
         Registers a Reference. Most often called by registerReferenceSet.
         Requires a Reference name be unique for all references in a reference set
         """
-        # contig MT is same as contig M, in mappingdb we will always use M to be
-        # consistent
-        if name == 'MT':
-            name = 'M'
 
         reference = self.session.query(Reference).filter(
             and_(Reference.reference_set_id == reference_set_id,Reference.name == name))\
@@ -447,9 +446,5 @@ def sortReferences(references):
                 key=lambda key_value: int(
                     key_value[0]) if key_value[0].isdigit() else key_value[0])
             )
-
-    if 'MT' in references:
-        references['M'] = references.pop('MT')
-        references['M'] = Contig(id='M', length=references['M'].length)
 
     return references
