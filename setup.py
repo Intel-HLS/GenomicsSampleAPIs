@@ -26,16 +26,16 @@ from setuptools import setup
 
 
 setup(
-    name='variantstore',
+    name='mappingdb',
 
-    version='0.0.1',
+    version='0.1.0',
 
-    description='SQLAlchemy models for the Variant Database',
-    long_description='SQLAlchemy models for the Variant Database',
+    description='SQLAlchemy models for the mapping DB for GenomicsDS',
+    long_description='SQLAlchemy models for the mapping DB for GenomicsDS',
 
     url='https://github.com/Intel-HLS/GenomicsSampleAPIs',
 
-    author='Intel variant store',
+    author='Intel corp',
     license='MIT',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -47,9 +47,9 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
 
-    keywords='variant database',
+    keywords='mappingdb','variant database', 'GenomicsDS'
 
-    packages=['utils', 'mappingdb.models', 'mappingdb.api', 'python_api'],
+    packages=['utils', 'mappingdb.models', 'mappingdb.api'],
 
     install_requires=['sqlalchemy'],
 
