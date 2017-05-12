@@ -25,13 +25,15 @@ import sqlalchemy as sa
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 
-class Workspace(_Base):
-    __tablename__ = "workspace"
+#Each row describes a GenomicsDS instance
+#Each instance correponds to a single reference set
+#Each instance consists of multiple partitions (possibly scattered across multiple nodes)
+
+class GenomicsDSInstance(_Base):
+    __tablename__ = "genomicsds_instance"
     id = sa.Column(BigInteger, primary_key=True)
     guid = sa.Column(sa.String(36), nullable=False, unique=True)
+    reference_set_id = sa.Column(BigInteger, sa.ForeignKey('reference_set.id'), nullable=False)
     name = sa.Column(sa.Text, nullable=False)
-    #Each workspace may be accessible from one or more machines (* means all machines)
-    machines = sa.Column(sa.Text, nullable=False, server_default='*')
-
-    arrays = relationship('DBArray', backref='workspace')
-    genomicsds_partition = relationship('GenomicsDSPartition', backref='workspace')
+    
+    genomicsds_partitions = relationship('GenomicsDSPartition', backref='genomicsds_instance')

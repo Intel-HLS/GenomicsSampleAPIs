@@ -48,6 +48,7 @@ class ReferenceSet(_Base):
         nullable=False, 
         server_default=sa.text('0'))
     arrays = relationship('DBArray', backref='reference_set')
+    genomicsds_instances = relationship('GenomicsDSInstance', backref='reference_set')
     references = relationship('Reference', backref='reference_set')
     source_accessions = relationship(
         'SourceAccession',

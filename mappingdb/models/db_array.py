@@ -36,3 +36,5 @@ class DBArray(_Base):
     # When creating a new array, by default no rows exist - hence, num_rows=0
     num_rows = sa.Column(sa.BigInteger, default=0, nullable=False, server_default=sa.text('0'))
     name = sa.Column(sa.Text, nullable=False)
+    
+    genomicsds_partition = relationship('GenomicsDSPartition', backref='db_array')

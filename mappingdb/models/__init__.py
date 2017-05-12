@@ -55,7 +55,8 @@ from .sample import Sample
 from .individual import Individual
 from .variant_set import VariantSet
 from .callset_variant_set import CallSetVariantSet
-
+from .genomicsds_instance import GenomicsDSInstance
+from .genomicsds_partition import GenomicsDSPartition
 
 def bind_engine(engine):
     _Base.metadata.create_all(engine)

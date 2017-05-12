@@ -36,6 +36,8 @@ from mappingdb.models import VariantSet
 from mappingdb.models import Workspace
 from mappingdb.models import bind_engine
 from mappingdb.models import tiledb_reference_offset_padding_factor_default
+from mappingdb.models import GenomicsDSInstance
+from mappingdb.models import GenomicsDSPartition
 from collections import OrderedDict, namedtuple
 
 
@@ -71,16 +73,19 @@ class Import():
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
 
+    def get_sqlalchemy_session(self):
+        return self.session
+
     def registerReferenceSet(self, guid, assembly_id, source_accessions=None, description=None, references=OrderedDict(),
         tiledb_reference_offset_padding_factor=tiledb_reference_offset_padding_factor_default):
         """
         ReferenceSet registration for MAF occurs from an assembly config file. See hg19.json for example.
-        ReferenceSet registration for VCF occurs from reading VCF contig tags in header. 
+        ReferenceSet registration for VCF occurs from reading VCF contig tags in header.
         Requires assembly ids and guids to be unique.
         """
 
         referenceSet = self.session.query(ReferenceSet).filter(
-            or_(ReferenceSet.assembly_id == assembly_id, ReferenceSet.guid == guid))\
+            ReferenceSet.guid == guid)\
             .first()
 
         if referenceSet is None:
@@ -112,16 +117,26 @@ class Import():
         Requires a Reference name be unique for all references in a reference set
         """
 
+        reference_set_id_as_int = get_as_long(reference_set_id)
+        reference_set_db_id = self.session.query(ReferenceSet.id).filter(
+                or_(ReferenceSet.id == reference_set_id_as_int, ReferenceSet.guid == str(reference_set_id))
+                ).first()
+        if(not reference_set_db_id):
+            raise ValueError(
+                "ReferenceSet not found for id : {0} ".format(reference_set_id))
+
         reference = self.session.query(Reference).filter(
-            and_(Reference.reference_set_id == reference_set_id,Reference.name == name))\
+            or_(Reference.guid == guid,
+                and_(Reference.reference_set_id == reference_set_db_id, Reference.name == name))
+            )\
             .first()
 
         if reference is None:
             try:
                 reference = Reference(
-                    name=name, 
-                    reference_set_id=reference_set_id, 
-                    length=length, 
+                    name=name,
+                    reference_set_id=reference_set_db_id,
+                    length=length,
                     guid=guid
                 )
                 self.session.add(reference)
@@ -145,13 +160,13 @@ class Import():
         name = name.rstrip('/')
 
         workspace = self.session.query(Workspace).filter(
-            and_(Workspace.name == name))\
+            (Workspace.guid == guid))\
             .first()
 
         if workspace is None:
             try:
                 workspace = Workspace(
-                    guid=guid, 
+                    guid=guid,
                     name=name
                 )
                 self.session.add(workspace)
@@ -169,20 +184,28 @@ class Import():
         An array is unique named folder in a unique workspace path and a given reference id.
         """
 
-        # array is a unique set of workspace, array, and reference set
-        # association
+        workspace_id_as_int = get_as_long(workspace_id)
+        workspace_db_id = self.session.query(Workspace.id).filter(
+                or_(Workspace.id == workspace_id_as_int, Workspace.guid == str(workspace_id))
+                ).first()
+
+        reference_set_id_as_int = get_as_long(reference_set_id)
+        reference_set_db_id = self.session.query(ReferenceSet.id).filter(
+                or_(ReferenceSet.id == reference_set_id_as_int, ReferenceSet.guid == str(reference_set_id))
+                ).first()
+
+        # array is a unique combination of workspace and array
         dbarray = self.session.query(DBArray) .filter(
-            and_(DBArray.reference_set_id == reference_set_id,\
-                DBArray.workspace_id == workspace_id,\
-                DBArray.name == name))\
+             or_(DBArray.guid == guid,
+                 and_(DBArray.workspace_id == workspace_db_id, DBArray.name == name)))\
             .first()
 
         if dbarray is None:
             try:
                 dbarray = DBArray(
-                    guid=guid, 
-                    reference_set_id=reference_set_id, 
-                    workspace_id=workspace_id, 
+                    guid=guid,
+                    reference_set_id=reference_set_db_id,
+                    workspace_id=workspace_db_id,
                     name=name
                 )
                 self.session.add(dbarray)
@@ -257,41 +280,46 @@ class Import():
         All callsets in an array must be unique, but a callset can belong to multiple arrays.
         """
 
+        db_array_id_as_int = get_as_long(db_array_id)
+        db_array_db_id = self.session.query(DBArray.id).filter(
+                or_(DBArray.id == db_array_id_as_int, DBArray.guid == str(db_array_id))
+                ).first();
+
+        callset_id_as_int = get_as_long(callset_id)
+        callset_db_id = self.session.query(CallSet.id).filter(
+                or_(CallSet.id == callset_id_as_int, CallSet.guid == str(callset_id))
+                ).first();
+
         # check if callset is registered to array already
         callSetToDBArrayAssociation = self.session.query(CallSetToDBArrayAssociation) .filter(
-            and_(CallSetToDBArrayAssociation.db_array_id == db_array_id,
-                CallSetToDBArrayAssociation.callset_id == callset_id))\
+            and_(CallSetToDBArrayAssociation.db_array_id == db_array_db_id,
+                CallSetToDBArrayAssociation.callset_id == callset_db_id))\
             .first()
 
         if callSetToDBArrayAssociation is None:
 
             callSetToDBArrayAssociation = CallSetToDBArrayAssociation(
-                db_array_id=db_array_id, 
-                callset_id=callset_id
+                db_array_id=db_array_db_id,
+                callset_id=callset_db_id
             )
             self.session.add(callSetToDBArrayAssociation)
             self.session.commit()
 
-    def registerCallSet(self, guid, source_sample_guid, target_sample_guid, workspace,
-            array_name, variant_set_ids=None, info=None, name=None):
+    def registerCallSet(self, guid, source_sample_guid, target_sample_guid,
+            info=None, name=None):
         """
         Register a callset.
-        Associate a new or already existing callset to a variant set.
-        Register an already existing callset to an already existing array.
-        Registration requires a unique guid or a unique (name, source_sample, target_sample).
+        Registration requires a unique guid
         """
 
-        # if the name ends with a / then remove it from the name.
-        # This is done only for consistency in workspace name
-        # since users could have / or not for the workspace.
-        workspace = workspace.rstrip('/')
-
         # get samples
+        source_sample_id_as_int = get_as_long(source_sample_guid)
         sourceSample = self.session.query(Sample.id).filter(
-            Sample.guid == source_sample_guid)\
+            or_(Sample.guid == source_sample_id_as_int, Sample.id == str(source_sample_guid)))\
             .first()
+        target_sample_id_as_int = get_as_long(target_sample_guid)
         targetSample = self.session.query(Sample.id).filter(
-            Sample.guid == target_sample_guid)\
+            or_(Sample.guid == target_sample_id_as_int, Sample.id == str(target_sample_guid)))\
             .first()
 
         if sourceSample is None or targetSample is None:
@@ -299,22 +327,8 @@ class Import():
                 "Issue retrieving Sample info, check: source sample {0}, or target sample {1}".format(
                     source_sample_guid, target_sample_guid))
 
-        # get array
-        dbarray = self.session.query(DBArray)\
-            .join(Workspace)\
-            .filter(Workspace.name == workspace)\
-            .filter(DBArray.name == array_name)\
-            .first()
-
-        if dbarray is None:
-            raise ValueError(
-                "DBArray needs to exist for CallSet Registration : {0} ".format(array_name))
-
         callSet = self.session.query(CallSet).filter(
-            or_(CallSet.guid == guid,
-            and_(CallSet.name == name,
-                CallSet.source_sample_id == sourceSample[0],
-                CallSet.target_sample_id == targetSample[0])))\
+            CallSet.guid == guid)\
             .first()
 
         if callSet is None:
@@ -329,10 +343,8 @@ class Import():
                     created=int(time.time() * 1000),
                     updated=int(time.time() * 1000),
                     info=info,
-                    source_sample_id=sourceSample[0],
-                    target_sample_id=targetSample[0],
-                    variant_sets=self.updateVariantSetList(
-                        variant_set_ids)
+                    source_sample_id=sourceSample.id,
+                    target_sample_id=targetSample.id
                     )
 
                 self.session.add(callSet)
@@ -341,23 +353,6 @@ class Import():
             except exc.DataError as e:
                 self.session.rollback()
                 raise ValueError("{0} : {1} ".format(str(e), guid))
-
-        elif variant_set_ids:
-            # avoid calling and registering again if this is a repeat variant
-            # set id
-            vs = set(variant_set_ids).difference(
-                [x.id for x in callSet.variant_sets])
-            if len(vs) > 0:
-                self.updateVariantSetList(vs, callset=callSet)
-                self.session.add(callSet)
-                self.session.commit()
-
-        # adding this callset to the dbarray, performs check if already
-        # registered to array
-        self.addCallSetToDBArrayAssociation(
-            db_array_id=dbarray.id, 
-            callset_id=callSet.id
-        )
 
         return callSet
 
@@ -368,8 +363,9 @@ class Import():
         ie. an individual cannot have two samples with the same name
         """
 
+        individual_id_as_int = get_as_long(individual_guid)
         individual = self.session.query(Individual).filter(
-            Individual.guid == individual_guid)\
+            or_(Individual.guid == str(individual_guid), Individual.id == individual_id_as_int))\
             .first()
 
         if individual is None:
@@ -377,8 +373,7 @@ class Import():
                 "Invalid Individual Id : {0} ".format(individual_guid))
 
         sample = self.session.query(Sample).filter(
-            or_(Sample.guid == guid, 
-            and_(Sample.name == name, Sample.individual_id == individual.id)))\
+            Sample.guid == guid)\
             .first()
 
         if sample is None:
@@ -404,8 +399,9 @@ class Import():
         Registration of an individual requires a guid and a name.
         Name can be None to support retrival from registerSample
         """
+
         individual = self.session.query(Individual).filter(
-            or_(Individual.guid == guid, Individual.name == name))\
+            Individual.guid == str(guid))\
             .first()
 
         if individual is None:
@@ -428,6 +424,86 @@ class Import():
 
         return individual
 
+    def registerGenomicsDSInstance(self, guid, name, reference_set_id, info=None):
+        """
+        Registration of a GenomicsDSInstance requires a guid and a name
+        """
+        genomicsds_instance = self.session.query(GenomicsDSInstance).filter(
+                (GenomicsDSInstance.guid == guid)).first();
+
+        if(not genomicsds_instance):
+
+            reference_set_id_as_int = get_as_long(reference_set_id)
+            reference_set_db_id = self.session.query(ReferenceSet.id).filter(
+                    or_(ReferenceSet.id == reference_set_id_as_int,
+                        ReferenceSet.guid == str(reference_set_id))
+                    ).first()
+            if reference_set_db_id is None:
+                raise ValueError(
+                        "Invalid ReferenceSetId : {0} ".format(reference_set_id))
+
+            try:
+                genomicsds_instance = GenomicsDSInstance(
+                        guid=guid,
+                        name=name,
+                        reference_set_id=reference_set_db_id
+                        )
+                self.session.add(genomicsds_instance)
+                self.session.commit()
+
+            except (exc.DataError, exc.IntegrityError) as e:
+
+                self.session.rollback()
+                raise ValueError("{0} : {1} : {2} ".format(str(e), guid, name))
+
+        return  genomicsds_instance
+
+    def registerGenomicsDSPartition(self, guid, name, genomicsds_instance_id,
+            workspace_id, db_array_id, data_store_type='tiledb_on_disk_array', info=None):
+        """
+        Registration of a GenomicsDSPartition requires a guid, name, genomicsds_instance_id
+        workspace_id and db_array_id
+        """
+
+        genomicsds_partition = self.session.query(GenomicsDSPartition).filter(
+                (GenomicsDSPartition.guid == guid)).first();
+
+        if(not genomicsds_partition):
+
+            genomicsds_instance_id_as_int = get_as_long(genomicsds_instance_id)
+            genomicsds_instance_db_id = self.session.query(GenomicsDSInstance.id).filter(
+                    or_(GenomicsDSInstance.id == genomicsds_instance_id_as_int,
+                        GenomicsDSInstance.guid == str(genomicsds_instance_id))
+                    ).first();
+
+            workspace_id_as_int = get_as_long(workspace_id)
+            workspace_db_id = self.session.query(Workspace.id).filter(
+                    or_(Workspace.id == workspace_id_as_int, Workspace.guid == str(workspace_id))
+                    ).first()
+
+            db_array_id_as_int = get_as_long(db_array_id)
+            db_array_db_id = self.session.query(DBArray.id).filter(
+                    or_(DBArray.id == db_array_id_as_int, DBArray.guid == str(db_array_id))
+                    ).first();
+
+            try:
+                genomicsds_partition = GenomicsDSPartition(
+                        guid=guid,
+                        name=name,
+                        genomicsds_instance_id = genomicsds_instance_db_id,
+                        workspace_id=workspace_db_id,
+                        db_array_id=db_array_db_id,
+                        data_store_type=data_store_type
+                        )
+                self.session.add(genomicsds_partition)
+                self.session.commit()
+
+            except (exc.DataError, exc.IntegrityError) as e:
+
+                self.session.rollback()
+                raise ValueError("{0} : {1} : {2} ".format(str(e), guid, name))
+
+        return  genomicsds_partition
 
 def sortReferences(references):
     """
@@ -448,3 +524,6 @@ def sortReferences(references):
             )
 
     return references
+
+def get_as_long(value):
+    return long(value) if (type(value) is long or type(value) is int) else long(-1)
