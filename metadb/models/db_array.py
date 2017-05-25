@@ -31,6 +31,7 @@ class DBArray(_Base):
     id = sa.Column(BigInteger, primary_key=True)
     guid = sa.Column(sa.String(36), nullable=False, unique=True)
     reference_set_id = sa.Column(BigInteger, sa.ForeignKey('reference_set.id'), nullable=False)
+    field_set_id = sa.Column(BigInteger, sa.ForeignKey('field_set.id'), nullable=False)
     workspace_id = sa.Column(BigInteger, sa.ForeignKey('workspace.id'), nullable=False)
     # num_rows that exist in a given array - must be incremented after a new row is added
     # When creating a new array, by default no rows exist - hence, num_rows=0

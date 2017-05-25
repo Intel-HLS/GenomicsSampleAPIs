@@ -22,21 +22,14 @@
 
 from ..models import _Base, BigInteger
 import sqlalchemy as sa
+from sqlalchemy.orm import relationship, backref
 
 
-class Field(_Base):
-    __tablename__ = "field"
+class FieldSet(_Base):
+    __tablename__ = "field_set"
     id = sa.Column(BigInteger, primary_key=True)
     guid = sa.Column(sa.String(36), nullable=False, unique=True)
-    name = sa.Column(sa.Text, nullable=False)
-    field_set_id = sa.Column(BigInteger, sa.ForeignKey('field_set.id'), nullable=False)
     md5_checksum = sa.Column(sa.String(32))
-    # Unique constraint on (field_set_id, name)
-    __table_args__ = (
-        sa.UniqueConstraint('field_set_id', 'name',
-            name='unique_name_per_field_set_constraint'),
-    )
-    type = sa.Column(sa.String(6), nullable=False)
-    vcf_field_class = sa.Column(sa.Text)
-    length = sa.Column(sa.String(4), nullable=False)
-    vcf_field_combine_operation = sa.Column(sa.String(20))
+    description = sa.Column(sa.Text)
+    arrays = relationship('DBArray', backref='field_set')
+    fields = relationship('Field', backref='field_set')
