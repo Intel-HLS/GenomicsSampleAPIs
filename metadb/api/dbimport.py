@@ -31,6 +31,8 @@ from metadb.models import DBArray
 from metadb.models import Individual
 from metadb.models import Reference
 from metadb.models import ReferenceSet
+from metadb.models import Field
+from metadb.models import FieldSet
 from metadb.models import Sample
 from metadb.models import VariantSet
 from metadb.models import Workspace
@@ -62,6 +64,7 @@ class Import():
 
     def __init__(self, db):
         self.db = db
+        self.length_type_map = {-1:'A', -2:'G', -3:'R', None:'VAR'}
 
     def __enter__(self):
         self.session = self.db.Session()
@@ -134,6 +137,93 @@ class Import():
 
         return reference
 
+    def registerFieldSet(self, guid, reader, assembly_id, description=None):
+        fieldSet = self.session.query(FieldSet).filter(
+            or_(FieldSet.assembly_id == assembly_id, FieldSet.guid == guid))\
+            .first()
+        fieldMap = {}
+
+        if fieldSet is None:
+            try:
+                fieldSet = FieldSet(guid=guid, assembly_id=assembly_id, description=description)
+                self.session.add(fieldSet)
+                self.session.commit()
+
+            except exc.DataError as e:
+                self.session.rollback()
+                raise ValueError("{0} : {1} ".format(str(e), guid))
+
+            if ((reader.filters != None) and (len(reader.filters) > 0)):
+                for filter_name, filter_item in reader.filters.items():
+                    item_list = []
+                    item_list.append(filter_item)
+                    fieldMap[filter_name] = item_list
+
+            if ((reader.formats != None) and (len(reader.formats) > 0)):
+                for format_name, format_item in reader.formats.items():
+                    if (format_name in fieldMap):
+                        fieldMap[format_name].append(format_item)
+                    else:
+                        item_list = []
+                        item_list.append(format_item)
+                        fieldMap[format_name] = item_list
+
+            if ((reader.infos != None) and (len(reader.infos) > 0)):
+                for info_name, info_item in reader.infos.items():
+                    if (info_name in fieldMap):
+                        fieldMap[info_name].append(info_item)
+                    else:
+                        item_list = []
+                        item_list.append(info_item)
+                        fieldMap[info_name] = item_list
+
+        if (len(fieldMap) > 0):
+            for field_name, item_list in fieldMap.items():
+                self.registerField(str(uuid.uuid4()), fieldSet.id, field_name, item_list)
+
+        return fieldSet
+
+    def registerField(self, guid, field_set_id, field_name, field_item_list):
+        field = self.session.query(Field).filter(
+            and_(Field.field_set_id == field_set_id, Field.field == field_name)).first()
+
+        if field is None:
+            try:
+                field = Field()
+                field.is_filter = False
+                field.is_format = False
+                field.is_info = False
+                field.id = field_name
+                field.guid = guid
+                field.field = field_name
+                field.field_set_id = field_set_id
+
+                for field_item in field_item_list:
+                    if ('type' in field_item.__dict__.keys()):
+                        field.type = field_item.type
+                    if ('Filter' in str(type(field_item))):
+                        field.is_filter = True
+                    if ('Format' in str(type(field_item))):
+                        field.is_format = True
+                    if ('Info' in str(type(field_item))):
+                        field.is_info = True
+                    if ('num' in field_item.__dict__.keys()):
+                        number = field_item.num
+                        if ((None == number) or (number < 0)):
+                            field.length_type = self.length_type_map[number]
+                        else:
+                            field.length_type = 'NUM'
+                            field.length_intval = number
+                        
+                self.session.add(field)
+                self.session.commit()
+
+            except exc.DataError as e:
+                self.session.rollback()
+                raise ValueError("{0} : {1} ".format(str(e), guid))
+
+        return field
+
     def registerWorkspace(self, guid, name):
         """
         Registers a workspace.
@@ -164,7 +254,7 @@ class Import():
 
         return workspace
 
-    def registerDBArray(self, guid, reference_set_id, workspace_id, name):
+    def registerDBArray(self, guid, reference_set_id, field_set_id, workspace_id, name):
         """
         Registers a DBArray.
         An array is unique named folder in a unique workspace path and a given reference id.
@@ -175,6 +265,7 @@ class Import():
         dbarray = self.session.query(DBArray) .filter(
             and_(DBArray.reference_set_id == reference_set_id,\
                 DBArray.workspace_id == workspace_id,\
+                DBArray.field_set_id == field_set_id,\
                 DBArray.name == name))\
             .first()
 
@@ -183,6 +274,7 @@ class Import():
                 dbarray = DBArray(
                     guid=guid, 
                     reference_set_id=reference_set_id, 
+                    field_set_id=field_set_id,
                     workspace_id=workspace_id, 
                     name=name
                 )

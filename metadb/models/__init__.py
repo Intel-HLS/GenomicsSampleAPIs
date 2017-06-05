@@ -42,6 +42,7 @@ from .textpickletype import TextPickleType
 from .inc_counter import BigInteger
 from .inc_counter import autoinc_handler
 from .field import Field
+from .field_set import FieldSet
 from .reference_set import ReferenceSet
 from .reference import Reference
 from .source_accession import SourceAccession

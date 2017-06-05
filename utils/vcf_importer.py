@@ -81,9 +81,7 @@ class VCF:
         self.source_idx = conf.get('source_idx', 0)
         self.target_idx = conf.get('target_idx', 1)
 
-        self.array, self.variantset, self.referenceset = helper.registerWithMetadb(
-            conf, vcf=True, references=self.reader.contigs)
-
+        self.array, self.variantset, self.referenceset, self.fieldset = helper.registerWithMetadb(conf, self.reader, vcf=True)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -260,7 +258,6 @@ def poolImportVCF(file_info):
             return (-1, inputFile)
         return (0, inputFile, vc.callset_mapping)
 
-
 def parallelGen(config_file, inputFileList, outputDir, callset_file=None, loader_config=None):
     """
     Spawns the Pool of VCF objects to work on each input VCF
@@ -273,7 +270,7 @@ def parallelGen(config_file, inputFileList, outputDir, callset_file=None, loader
     # if no contig information in header, assume it's already registered
     with open(inputFileList[0], 'rb') as vcf_init:
         reader = vcf.Reader(vcf_init)
-        dba, vs, rs = helper.registerWithMetadb(config, vcf=True, references=reader.contigs)
+        dba, vs, rs, fs = helper.registerWithMetadb(config, reader, vcf=True)
 
     # sort and index vcfs, and
     # build arguments for parallel gen

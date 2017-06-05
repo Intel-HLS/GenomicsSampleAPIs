@@ -150,10 +150,11 @@ def writeVIDMappingFile(DB_URI, reference_set_id, output_file, fields_dict=Const
         writeJSON2File(vid_mapping, output_file)
 
 
-def registerWithMetadb(config, vcf=False, references=OrderedDict()):
+def registerWithMetadb(config, reader, vcf=False):
     """
     Registers parent object of a callset in metadb for both MAF and VCF importing.
     """
+
     if not vcf:
         # set MAF specific vars
         with open(config.TileDBAssembly) as config_file:
@@ -180,18 +181,21 @@ def registerWithMetadb(config, vcf=False, references=OrderedDict()):
         rs = metadb.registerReferenceSet(
             str(uuid.uuid4()), 
             assembly, 
-            references=references)
+            references=reader.contigs)
+        fs = metadb.registerFieldSet(
+            str(uuid.uuid4()), reader, assembly)
         dba = metadb.registerDBArray(
             guid=str(uuid.uuid4()),
             name=array,
             reference_set_id=rs.id,
+            field_set_id=fs.id,
             workspace_id=ws.id)
         vs = metadb.registerVariantSet(
             guid=str(uuid.uuid4()),
             reference_set_id=rs.id,
             dataset_id=os.path.basename(workspace))
 
-    return dba, vs, rs
+    return dba, vs, rs, fs
 
 
 def createMappingFiles(outputDir, callset_mapping, rs_id, DB_URI, array, loader_config=None):

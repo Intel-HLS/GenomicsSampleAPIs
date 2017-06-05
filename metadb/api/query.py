@@ -28,6 +28,7 @@ from sqlalchemy.orm import sessionmaker
 from itertools import chain
 
 from metadb.models import Field
+from metadb.models import FieldSet
 from metadb.models import Individual
 from metadb.models import Workspace
 from metadb.models import DBArray
