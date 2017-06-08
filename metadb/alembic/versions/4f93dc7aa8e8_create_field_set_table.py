@@ -24,17 +24,14 @@ def upgrade():
         'field_set',
         sa.Column('id', sa.BigInteger, primary_key=True),
         sa.Column('guid', sa.String(36), nullable=False, unique=True),
-        sa.Column('assembly_id', sa.String(100), nullable=False),
-        sa.Column('md5_checksum', sa.String(32)),
         sa.Column('description', sa.Text)
     )
     op.create_table(
         'field',
-        sa.Column('id', sa.String(32), primary_key=True),
+        sa.Column('id', sa.BigInteger, primary_key=True),
         sa.Column('guid', sa.String(36), nullable=False, unique=True),
         sa.Column('field', sa.String(32), nullable=False),
         sa.Column('field_set_id', sa.BigInteger, sa.ForeignKey('field_set.id'), nullable=False),
-        sa.Column('md5_checksum', sa.String(32)),
         sa.Column('type', sa.Enum('Integer', 'String', 'Float', 'Flag', name='type_enum')),
         sa.Column('is_filter', sa.Boolean, nullable=False),
         sa.Column('is_format', sa.Boolean, nullable=False),

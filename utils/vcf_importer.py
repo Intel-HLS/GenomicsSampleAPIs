@@ -293,6 +293,7 @@ def parallelGen(config_file, inputFileList, outputDir, callset_file=None, loader
 
     pool = Pool()
     failed = list()
+
     for returncode in pool.imap_unordered(poolImportVCF, function_args):
         if returncode[0] == -1:
             failed.append(returncode[1])

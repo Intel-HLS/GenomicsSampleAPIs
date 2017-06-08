@@ -175,25 +175,27 @@ def registerWithMetadb(config, reader, vcf=False):
         dbimport = DBImport(config['dburi'])
 
     with dbimport.getSession() as metadb:
-        # register workspace, referenceset, array, and variantset
-        ws = metadb.registerWorkspace(
-            str(uuid.uuid4()), workspace)
-        rs = metadb.registerReferenceSet(
-            str(uuid.uuid4()), 
-            assembly, 
-            references=reader.contigs)
-        fs = metadb.registerFieldSet(
-            str(uuid.uuid4()), reader, assembly)
-        dba = metadb.registerDBArray(
-            guid=str(uuid.uuid4()),
-            name=array,
-            reference_set_id=rs.id,
-            field_set_id=fs.id,
-            workspace_id=ws.id)
-        vs = metadb.registerVariantSet(
-            guid=str(uuid.uuid4()),
-            reference_set_id=rs.id,
-            dataset_id=os.path.basename(workspace))
+        dba, vs, rs, fs = metadb.queryDBArray(workspace, array)
+        if dba is None:
+            # register workspace, referenceset, array, and variantset
+            ws = metadb.registerWorkspace(
+                str(uuid.uuid4()), workspace)
+            rs = metadb.registerReferenceSet(
+                str(uuid.uuid4()), 
+                assembly, 
+                references=reader.contigs)
+            fs = metadb.registerFieldSet(
+                str(uuid.uuid4()), reader, assembly)
+            dba = metadb.registerDBArray(
+                guid=str(uuid.uuid4()),
+                name=array,
+                reference_set_id=rs.id,
+                field_set_id=fs.id,
+                workspace_id=ws.id)
+            vs = metadb.registerVariantSet(
+                guid=str(uuid.uuid4()),
+                reference_set_id=rs.id,
+                dataset_id=os.path.basename(workspace))
 
     return dba, vs, rs, fs
 

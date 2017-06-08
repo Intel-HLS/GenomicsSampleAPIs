@@ -30,7 +30,5 @@ class FieldSet(_Base):
     id = sa.Column(BigInteger, primary_key=True)
     guid = sa.Column(sa.String(36), nullable=False, unique=True)
     description = sa.Column(sa.Text)
-    md5_checksum = sa.Column(sa.String(32))
-    assembly_id = sa.Column(sa.String(100))
     arrays = relationship('DBArray', backref='field_set')
     fields = relationship('Field', backref='field_set')

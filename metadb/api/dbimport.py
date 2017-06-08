@@ -137,15 +137,13 @@ class Import():
 
         return reference
 
-    def registerFieldSet(self, guid, reader, assembly_id, description=None):
-        fieldSet = self.session.query(FieldSet).filter(
-            or_(FieldSet.assembly_id == assembly_id, FieldSet.guid == guid))\
-            .first()
+    def registerFieldSet(self, guid, reader, description=None):
+        fieldSet = self.session.query(FieldSet).filter(FieldSet.guid == guid).first()
         fieldMap = {}
 
         if fieldSet is None:
             try:
-                fieldSet = FieldSet(guid=guid, assembly_id=assembly_id, description=description)
+                fieldSet = FieldSet(guid=guid, description=description)
                 self.session.add(fieldSet)
                 self.session.commit()
 
@@ -193,7 +191,6 @@ class Import():
                 field.is_filter = False
                 field.is_format = False
                 field.is_info = False
-                field.id = field_name
                 field.guid = guid
                 field.field = field_name
                 field.field_set_id = field_set_id
@@ -253,6 +250,31 @@ class Import():
                 raise ValueError("{0} : {1} ".format(str(e), guid))
 
         return workspace
+
+    def queryDBArray(self, workspace_name, dbarray_name):
+        dba = None
+        vs = None
+        rs = None
+        fs = None
+        try:
+            workspace = self.session.query(Workspace).filter(Workspace.name == workspace_name).first()
+            if workspace is not None:
+                wsid = workspace.id
+                dba = self.session.query(DBArray).filter(
+                    and_(DBArray.workspace_id == wsid,\
+                        DBArray.name == dbarray_name))\
+                    .first()
+                if dba is not None:
+                    dbid = dba.id
+                    rsid = dba.reference_set_id
+                    fsid = dba.field_set_id
+                    rs = self.session.query(ReferenceSet).filter(ReferenceSet.id == rsid).first()
+                    fs = self.session.query(FieldSet).filter(FieldSet.id == fsid).first()
+                    vs = self.session.query(VariantSet).filter(VariantSet.reference_set_id == rsid).first()
+        except exc.DataError as e:
+            self.session.rollback()
+            raise ValueError("{0} : {1} : {2} ".format(str(e), guid, workspace_name, dbarray_name))
+        return dba, vs, rs, fs
 
     def registerDBArray(self, guid, reference_set_id, field_set_id, workspace_id, name):
         """

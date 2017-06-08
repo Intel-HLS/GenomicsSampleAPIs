@@ -26,17 +26,15 @@ import enum
 
 class Field(_Base):
     __tablename__ = "field"
-    id = sa.Column(sa.String(32), primary_key=True)
+    id = sa.Column(sa.BigInteger, primary_key=True)
     guid = sa.Column(sa.String(36), nullable=False, unique=True)
     field = sa.Column(sa.String(32), nullable=False)
     field_set_id = sa.Column(BigInteger, sa.ForeignKey('field_set.id'), nullable=False)
-    md5_checksum = sa.Column(sa.String(32))
     # Unique constraint on (field_set_id, name)
     __table_args__ = (
         sa.UniqueConstraint('field_set_id', 'field',
             name='unique_name_per_field_set_constraint'),
     )
-    # int/float/char/flag
     type = sa.Column(sa.Enum('Integer', 'String', 'Float', 'Flag', name='type_enum'))
     is_filter = sa.Column(sa.Boolean, nullable=False)
     is_format = sa.Column(sa.Boolean, nullable=False)
