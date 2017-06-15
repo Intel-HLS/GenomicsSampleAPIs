@@ -211,6 +211,8 @@ class Import():
                         else:
                             field.length_type = 'NUM'
                             field.length_intval = number
+                    if ('VCF_field_combine_operation' in field_item.__dict__.keys()):
+                        field.field_combine_op = field_item.VCF_field_combine_operation
                         
                 self.session.add(field)
                 self.session.commit()
