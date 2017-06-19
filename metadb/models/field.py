@@ -40,5 +40,5 @@ class Field(_Base):
     is_format = sa.Column(sa.Boolean, nullable=False)
     is_info = sa.Column(sa.Boolean, nullable=False)
     length_type = sa.Column(sa.Enum('A', 'R', 'G', 'VAR', 'NUM', name='length_enum'))
-    length_intval = sa.Column(sa.Integer)
+    length_intval = sa.Column(sa.Integer, default=1, server_default=sa.text('1'))
     field_combine_op = sa.Column(sa.Enum('sum', 'mean', 'median', 'move_to_FORMAT', 'element_wise_sum', 'concatenate', name='field_combine_optype'))

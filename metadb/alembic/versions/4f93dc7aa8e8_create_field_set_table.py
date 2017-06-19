@@ -37,7 +37,7 @@ def upgrade():
         sa.Column('is_format', sa.Boolean, nullable=False),
         sa.Column('is_info', sa.Boolean, nullable=False),
         sa.Column('length_type', sa.Enum('A', 'R', 'G', 'VAR', 'NUM', name='length_enum')),
-        sa.Column('length_intval', sa.Integer),
+        sa.Column('length_intval', sa.Integer, default=0, server_default=sa.text('1')),
         sa.Column('field_combine_op', sa.Enum('sum', 'mean', 'median', 'move_to_FORMAT', 'element_wise_sum', 'concatenate', name='field_combine_optype'))
     )
     op.create_unique_constraint('unique_name_per_field_set_constraint', 'field', ['field_set_id', 'field'])

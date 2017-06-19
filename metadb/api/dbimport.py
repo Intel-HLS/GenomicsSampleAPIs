@@ -137,27 +137,29 @@ class Import():
 
         return reference
 
-    def registerFieldSet(self, guid, reader, description=None):
+    def registerFieldSet(self, guid, reader=None, description=None):
         fieldSet = self.session.query(FieldSet).filter(FieldSet.guid == guid).first()
+        if (fieldSet is not None):
+            return fieldSet
         fieldMap = {}
 
-        if fieldSet is None:
-            try:
-                fieldSet = FieldSet(guid=guid, description=description)
-                self.session.add(fieldSet)
-                self.session.commit()
+        try:
+            fieldSet = FieldSet(guid=guid, description=description)
+            self.session.add(fieldSet)
+            self.session.commit()
 
-            except exc.DataError as e:
-                self.session.rollback()
-                raise ValueError("{0} : {1} ".format(str(e), guid))
+        except exc.DataError as e:
+            self.session.rollback()
+            raise ValueError("{0} : {1} ".format(str(e), guid))
 
-            if ((reader.filters != None) and (len(reader.filters) > 0)):
+        if (reader is not None):
+            if ((reader.filters is not None) and (len(reader.filters) > 0)):
                 for filter_name, filter_item in reader.filters.items():
                     item_list = []
                     item_list.append(filter_item)
                     fieldMap[filter_name] = item_list
 
-            if ((reader.formats != None) and (len(reader.formats) > 0)):
+            if ((reader.formats is not None) and (len(reader.formats) > 0)):
                 for format_name, format_item in reader.formats.items():
                     if (format_name in fieldMap):
                         fieldMap[format_name].append(format_item)
@@ -166,7 +168,7 @@ class Import():
                         item_list.append(format_item)
                         fieldMap[format_name] = item_list
 
-            if ((reader.infos != None) and (len(reader.infos) > 0)):
+            if ((reader.infos is not None) and (len(reader.infos) > 0)):
                 for info_name, info_item in reader.infos.items():
                     if (info_name in fieldMap):
                         fieldMap[info_name].append(info_item)
