@@ -150,7 +150,7 @@ def writeVIDMappingFile(DB_URI, reference_set_id, output_file, fields_dict=Const
         writeJSON2File(vid_mapping, output_file)
 
 
-def registerWithMetadb(config, reader, vcf=False):
+def registerWithMetadb(config, reader=None, vcf=False):
     """
     Registers parent object of a callset in metadb for both MAF and VCF importing.
     """
@@ -183,7 +183,7 @@ def registerWithMetadb(config, reader, vcf=False):
             rs = metadb.registerReferenceSet(
                 str(uuid.uuid4()), 
                 assembly, 
-                references=reader.contigs)
+                references=((reader is not None) ? reader.contigs : None)
             fs = metadb.registerFieldSet(
                 str(uuid.uuid4()), reader, assembly)
             dba = metadb.registerDBArray(

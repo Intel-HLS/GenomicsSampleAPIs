@@ -292,20 +292,20 @@ class TestDBImportLevel1(TestCase):
 
             # new array
             result = session.registerDBArray(
-                aguid, self.referenceset.id, self.workspace.id, self.array)
+                aguid, self.referenceset.id, self.fieldset.id, self.workspace.id, self.array)
             assert result.name == self.array
             assert result.guid == aguid
 
             # registered array
             reg_result = session.registerDBArray(
-                str(uuid.uuid4()), self.referenceset.id, self.workspace.id, self.array)
+                str(uuid.uuid4()), self.referenceset.id, self.fieldset.id, self.workspace.id, self.array)
             assert reg_result.name == self.array
             assert reg_result.guid == aguid
 
             # negative
             with pytest.raises(ValueError) as exec_info:
                 neg_result = session.registerDBArray(
-                    fguid, self.referenceset.id, self.workspace.id, "negative")
+                    fguid, self.referenceset.id, self.fieldset.id, self.workspace.id, "negative")
             assert "DataError" in str(exec_info.value)
 
     def test_registerSample(self):
@@ -405,9 +405,9 @@ class TestDBImportLevel2(TestCase):
             self.workspace = session.registerWorkspace(
                 str(uuid.uuid4()), "/test/dbimport/workspace")
             self.array = session.registerDBArray(
-                str(uuid.uuid4()), self.referenceset.id, self.workspace.id, "test")
+                str(uuid.uuid4()), self.referenceset.id, self.fieldset.id, self.workspace.id, "test")
             self.array2 = session.registerDBArray(
-                str(uuid.uuid4()), self.referenceset.id, self.workspace.id, "test2")
+                str(uuid.uuid4()), self.referenceset.id, self.fieldset.id, self.workspace.id, "test2")
 
             self.variantset = session.registerVariantSet(
                 str(uuid.uuid4()), self.referenceset.id, "Dataset")
